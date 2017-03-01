@@ -40,11 +40,12 @@ object HeadChef extends JsonConverter {
     val reader = new BufferedReader(new InputStreamReader(input))
     val fileString = Stream.continually(reader.readLine()).takeWhile(_ != null).mkString(",")
     val vectorString = fileString.split(",").toVector
-    val mo : Vector[Option[Map[String,Json]]] = vectorString.map( s => toJson(s) match {
+    val mo : Vector[Option[Map[String,Json]]] = vectorString.map( s => toJson(s) match { //mo = map object
       case None => None
-      case Some(j) => Some(j.asObject.get.toMap) //this is now a map TODO:continue here
-    }) //mo = map object
-    println("readFile ends")
+      case Some(j) => Some(j.asObject.get.toMap)
+    }).filter(m => m.isDefined && m.get.nonEmpty)
+    // each object per line was converted to a JSON object and then to a Map. Any empty objects or None were filtered out.
+    mo.foreach(println)
 
 
     reader.close()
