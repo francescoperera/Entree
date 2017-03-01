@@ -2,6 +2,8 @@ import java.io.{BufferedReader, InputStreamReader}
 
 import io.circe.{Json, JsonObject}
 
+import scala.collection.immutable.Stream.Empty
+
 case class objectModel(data:Option[String],label:Option[String]) //TODO:rename this. too generic
 
 object HeadChef extends JsonConverter {
@@ -9,6 +11,9 @@ object HeadChef extends JsonConverter {
   private val cfnMap:Map[String,Array[String]] = Map (
     "email_address" -> Array("email_address","email","emailaddress")
   )
+
+  private val rowsPerFile = 5000
+
 
   def getFilesWithLabel(source:S3Bucket,label:String) = {
     val files = DtlS3Cook.apply.listFiles(source.bucket).filterNot(_.endsWith("/"))
@@ -35,13 +40,14 @@ object HeadChef extends JsonConverter {
     val reader = new BufferedReader(new InputStreamReader(input))
     val fileString = Stream.continually(reader.readLine()).takeWhile(_ != null).mkString(",")
     val vectorString = fileString.split(",").toVector
-    vectorString.map { s => toJson(s) match {
-      case None => println("None")
-      case Some(j) => println(j.asObject.get.toMap) //this is now a map TODO:continue here
+    val mo : Vector[Option[Map[String,Json]]] = vectorString.map( s => toJson(s) match {
+      case None => None
+      case Some(j) => Some(j.asObject.get.toMap) //this is now a map TODO:continue here
+    }) //mo = map object
+    println("readFile ends")
 
-    }}
 
     reader.close()
   }
-  
+
 }
