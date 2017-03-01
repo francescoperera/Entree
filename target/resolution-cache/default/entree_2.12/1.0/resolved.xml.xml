@@ -4,7 +4,7 @@
 		module="entree_2.12"
 		revision="1.0"
 		status="integration"
-		publication="20170228105950"
+		publication="20170228143227"
 	>
 		<description>
 		Entree
@@ -34,5 +34,14 @@
 	<dependencies>
 		<dependency org="org.scala-lang" name="scala-compiler" rev="2.12.1" conf="scala-tool->default,optional(default)"/>
 		<dependency org="org.scala-lang" name="scala-library" rev="2.12.1" conf="scala-tool->default,optional(default);compile->default(compile)"/>
+		<dependency org="io.circe" name="circe-core_2.12" rev="0.7.0-M2" conf="compile->default(compile)"/>
+		<dependency org="io.circe" name="circe-generic_2.12" rev="0.7.0-M2" conf="compile->default(compile)"/>
+		<dependency org="io.circe" name="circe-parser_2.12" rev="0.7.0-M2" conf="compile->default(compile)"/>
+		<dependency org="io.circe" name="circe-java8_2.12" rev="0.7.0-M2" conf="compile->default(compile)"/>
+		<dependency org="org.scalaj" name="scalaj-http_2.12" rev="2.3.0" conf="compile->default(compile)"/>
+		<dependency org="org.slf4j" name="slf4j-api" rev="1.7.22" conf="compile->default(compile)"/>
+		<dependency org="com.typesafe.scala-logging" name="scala-logging_2.12" rev="3.5.0" conf="compile->default(compile)"/>
+		<dependency org="ch.qos.logback" name="logback-classic" rev="1.1.7" conf="compile->default(compile)"/>
+		<dependency org="com.github.seratch" name="awscala_2.12" rev="0.5.9" conf="compile->default(compile)"/>
 	</dependencies>
 </ivy-module>
