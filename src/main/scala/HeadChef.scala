@@ -1,10 +1,15 @@
 import java.io.{BufferedReader, InputStreamReader}
 
 import io.circe.{Json, JsonObject}
+import io.circe.{Decoder, Encoder}
 
-import scala.collection.immutable.Stream.Empty
 
-case class objectModel(data:Option[String],label:Option[String]) //TODO:rename this. too generic
+case class dataModel(data:Option[String],label:Option[String]) //TODO:rename this. too generic
+
+object  dataModel{
+  implicit val encoder: Encoder[dataModel] = io.circe.generic.semiauto.deriveEncoder
+  implicit val decoder: Decoder[dataModel] = io.circe.generic.semiauto.deriveDecoder
+}
 
 object HeadChef extends JsonConverter {
   /** HeadChef is the main resource of Entree and will direct every other resource. */
@@ -45,10 +50,11 @@ object HeadChef extends JsonConverter {
       case Some(j) => Some(j.asObject.get.toMap)
     }).filter(m => m.isDefined && m.get.nonEmpty)
     // each object per line was converted to a JSON object and then to a Map. Any empty objects or None were filtered out.
-    mo.foreach(println)
-
-
+    val modelVector = mo.flatMap(m => map2Model(m.get))
+    println(modelVector)
     reader.close()
   }
+
+  def map2Model ( m: Map[String,Json]) : Vector[dataModel] = m.map{case (k,v) => dataModel(v.asString,Some(k))}.toVector
 
 }
