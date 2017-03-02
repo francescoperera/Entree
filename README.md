@@ -53,7 +53,7 @@ Here is a preview of the data in each of these files:
 ....
 ```
 
-If you run ``` sbt "run https://s3.amazonaws.com/dummy_bucket/data https://s3.amazonaws.com/dummy_bucket/clean_data email_address ```, all of the files under the label/ontology of email_address, such as : email_adddress.json, email.json and emailaddress.json will be aggregated into one or more files with a standard data format.
+If you run ``` sbt "run https://s3.amazonaws.com/dummy_bucket/data https://s3.amazonaws.com/dummy_bucket/clean_data email_address" ```, all of the files under the label/ontology of email_address, such as : email_adddress.json, email.json and emailaddress.json will be aggregated into one or more files with a standard data format.
 
 The new file will look like the following:
 
