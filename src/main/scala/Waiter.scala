@@ -6,7 +6,7 @@ object Waiter {
     val s3Source : S3Bucket= DtlS3Cook.apply.createS3Bucket(args(0))
     val s3Dest : S3Bucket= DtlS3Cook.apply.createS3Bucket(args(1))
     val label = args(2)
-    HeadChef.getFilesWithLabel(s3Source,label)
+    HeadChef.getFilesWithLabel(s3Source,s3Dest,label)
 
   }
 
