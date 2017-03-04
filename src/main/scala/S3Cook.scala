@@ -25,9 +25,7 @@ class S3Cook(val accessKeyId: String, val secretAccessKey: String){
 
   def getFileStream(b: String, f: String): S3ObjectInputStream = s3.getObject(b, f).getObjectContent
 
-
-
-
+  def saveFile(b: String, key: String, file:File) = s3.put(Bucket(b), key, file)
 }
 
 object DtlS3Cook {

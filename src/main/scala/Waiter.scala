@@ -8,10 +8,6 @@ object Waiter {
     val label = args(2)
     HeadChef.getFilesWithLabel(s3Source,label)
 
-
-
-
-
   }
 
 }

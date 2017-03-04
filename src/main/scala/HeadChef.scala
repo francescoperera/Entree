@@ -2,6 +2,7 @@ import java.io.{BufferedReader, InputStreamReader}
 
 import io.circe.{Json, JsonObject}
 import io.circe.{Decoder, Encoder}
+import io.circe.syntax._
 
 
 case class dataModel(data:Option[String],label:Option[String]) //TODO:rename this. too generic
@@ -36,7 +37,7 @@ object HeadChef extends JsonConverter {
     }
   }
 
-  def aggregateFiles(flist:Vector[String],s3bucket:S3Bucket) = flist.foreach( f => readFile(f,s3bucket))
+  def aggregateFiles(flist:Vector[String],s3bucket:S3Bucket):Vector[Json] = flist.flatMap( f => readFile(f,s3bucket))
 
 
   def readFile(fileName:String,s3Bucket: S3Bucket) = {
@@ -51,8 +52,9 @@ object HeadChef extends JsonConverter {
     }).filter(m => m.isDefined && m.get.nonEmpty)
     // each object per line was converted to a JSON object and then to a Map. Any empty objects or None were filtered out.
     val modelVector = mo.flatMap(m => map2Model(m.get))
-    println(modelVector)
+    val jmv : Vector[Json] = modelVector.map(_.asJson) // jmv = Json Model Vector
     reader.close()
+    jmv
   }
 
   def map2Model ( m: Map[String,Json]) : Vector[dataModel] = m.map{case (k,v) => dataModel(v.asString,Some(k))}.toVector
