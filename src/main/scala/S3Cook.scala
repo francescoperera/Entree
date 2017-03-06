@@ -16,11 +16,19 @@ class S3Cook(val accessKeyId: String, val secretAccessKey: String){
   def createS3Bucket(url:String) : S3Bucket =  {
     val uv = url.split("/").toVector //uv = url vector
     val bi = uv.indexWhere(_.contains(".com")) + 1 //bi = bucket index, it comes after s3.amazonaws.com/bucket/...
+    print(uv)
+    print(bi)
     val fp = Some(uv.takeRight(uv.size - bi-1).mkString("/") + "/") //fp = file path
     S3Bucket(uv(bi),fp)
   }
 
-  def getFileStream(b: String, f: String): S3ObjectInputStream = s3.getObject(b, f).getObjectContent
+  def getFileStream(b: String, f: String): S3ObjectInputStream = {
+    println("getting file stream")
+    println(b)
+    println(f)
+    s3.getObject(b, f).getObjectContent
+  }
+
 
   def saveFile(b: String, key: String, file:Array[Byte]) = s3.put(Bucket(b), key, file, new ObjectMetadata())
 
