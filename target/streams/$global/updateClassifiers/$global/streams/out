@@ -8,7 +8,7 @@
 [debug] == resolving dependencies for default#entree$sources_2.12;1.0 [compile]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->org.scala-lang#scala-library;2.12.1 [compile->default(compile)]
 [info] Resolving org.scala-lang#scala-library;2.12.1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@494c7d0
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@40e79a09
 [debug] sbt-chain: module revision found in cache: org.scala-lang#scala-library;2.12.1
 [debug] 	found org.scala-lang#scala-library;2.12.1 in sbt-chain
 [debug] 	[2.12.1] org.scala-lang#scala-library;2.12.1
@@ -17,7 +17,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->org.scala-lang#scala-library;2.12.1 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->io.circe#circe-core_2.12;0.7.0-M2 [compile->default(compile)]
 [info] Resolving io.circe#circe-core_2.12;0.7.0-M2 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@56ac1d9a
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@53fd41c9
 [debug] sbt-chain: module revision found in cache: io.circe#circe-core_2.12;0.7.0-M2
 [debug] 	found io.circe#circe-core_2.12;0.7.0-M2 in sbt-chain
 [debug] 	[0.7.0-M2] io.circe#circe-core_2.12;0.7.0-M2
@@ -26,7 +26,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->io.circe#circe-core_2.12;0.7.0-M2 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->io.circe#circe-numbers_2.12;0.7.0-M2 [compile->default(compile)]
 [info] Resolving io.circe#circe-numbers_2.12;0.7.0-M2 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@7817d784
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@15f0e852
 [debug] sbt-chain: module revision found in cache: io.circe#circe-numbers_2.12;0.7.0-M2
 [debug] 	found io.circe#circe-numbers_2.12;0.7.0-M2 in sbt-chain
 [debug] 	[0.7.0-M2] io.circe#circe-numbers_2.12;0.7.0-M2
@@ -35,7 +35,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->io.circe#circe-numbers_2.12;0.7.0-M2 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->org.typelevel#cats-core_2.12;0.8.1 [compile->default(compile)]
 [info] Resolving org.typelevel#cats-core_2.12;0.8.1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@512b23cf
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@2032702f
 [debug] sbt-chain: module revision found in cache: org.typelevel#cats-core_2.12;0.8.1
 [debug] 	found org.typelevel#cats-core_2.12;0.8.1 in sbt-chain
 [debug] 	[0.8.1] org.typelevel#cats-core_2.12;0.8.1
@@ -44,7 +44,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->org.typelevel#cats-core_2.12;0.8.1 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->org.typelevel#cats-macros_2.12;0.8.1 [compile->default(compile)]
 [info] Resolving org.typelevel#cats-macros_2.12;0.8.1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@34f04fbb
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@39d62fa
 [debug] sbt-chain: module revision found in cache: org.typelevel#cats-macros_2.12;0.8.1
 [debug] 	found org.typelevel#cats-macros_2.12;0.8.1 in sbt-chain
 [debug] 	[0.8.1] org.typelevel#cats-macros_2.12;0.8.1
@@ -53,7 +53,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->org.typelevel#cats-macros_2.12;0.8.1 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.github.mpilquist#simulacrum_2.12;0.10.0 [compile->default(compile)]
 [info] Resolving com.github.mpilquist#simulacrum_2.12;0.10.0 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@3689c4ae
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@6d76fdb9
 [debug] sbt-chain: module revision found in cache: com.github.mpilquist#simulacrum_2.12;0.10.0
 [debug] 	found com.github.mpilquist#simulacrum_2.12;0.10.0 in sbt-chain
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.github.mpilquist#simulacrum_2.12;0.10.0 [compile->runtime]
@@ -61,7 +61,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.github.mpilquist#simulacrum_2.12;0.10.0 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->org.typelevel#macro-compat_2.12;1.1.1 [compile->default(compile)]
 [info] Resolving org.typelevel#macro-compat_2.12;1.1.1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@1a59f991
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@79022216
 [debug] sbt-chain: module revision found in cache: org.typelevel#macro-compat_2.12;1.1.1
 [debug] 	found org.typelevel#macro-compat_2.12;1.1.1 in sbt-chain
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->org.typelevel#macro-compat_2.12;1.1.1 [compile->runtime]
@@ -69,7 +69,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->org.typelevel#macro-compat_2.12;1.1.1 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->org.typelevel#machinist_2.12;0.6.1 [compile->default(compile)]
 [info] Resolving org.typelevel#machinist_2.12;0.6.1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@79cde4c2
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@4f334019
 [debug] sbt-chain: module revision found in cache: org.typelevel#machinist_2.12;0.6.1
 [debug] 	found org.typelevel#machinist_2.12;0.6.1 in sbt-chain
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->org.typelevel#machinist_2.12;0.6.1 [compile->runtime]
@@ -77,7 +77,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->org.typelevel#machinist_2.12;0.6.1 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->org.scala-lang#scala-reflect;2.12.0 [compile->default(compile)]
 [info] Resolving org.scala-lang#scala-reflect;2.12.0 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@17653a10
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@367be951
 [debug] sbt-chain: module revision found in cache: org.scala-lang#scala-reflect;2.12.0
 [debug] 	found org.scala-lang#scala-reflect;2.12.0 in sbt-chain
 [debug] 	[2.12.0] org.scala-lang#scala-reflect;2.12.0
@@ -86,7 +86,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->org.scala-lang#scala-reflect;2.12.0 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->org.typelevel#cats-kernel_2.12;0.8.1 [compile->default(compile)]
 [info] Resolving org.typelevel#cats-kernel_2.12;0.8.1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@4fa8e63f
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@618c659d
 [debug] sbt-chain: module revision found in cache: org.typelevel#cats-kernel_2.12;0.8.1
 [debug] 	found org.typelevel#cats-kernel_2.12;0.8.1 in sbt-chain
 [debug] 	[0.8.1] org.typelevel#cats-kernel_2.12;0.8.1
@@ -95,7 +95,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->org.typelevel#cats-kernel_2.12;0.8.1 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->io.circe#circe-generic_2.12;0.7.0-M2 [compile->default(compile)]
 [info] Resolving io.circe#circe-generic_2.12;0.7.0-M2 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@1d5f0248
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@5d90644a
 [debug] sbt-chain: module revision found in cache: io.circe#circe-generic_2.12;0.7.0-M2
 [debug] 	found io.circe#circe-generic_2.12;0.7.0-M2 in sbt-chain
 [debug] 	[0.7.0-M2] io.circe#circe-generic_2.12;0.7.0-M2
@@ -104,7 +104,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->io.circe#circe-generic_2.12;0.7.0-M2 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.chuusai#shapeless_2.12;2.3.2 [compile->default(compile)]
 [info] Resolving com.chuusai#shapeless_2.12;2.3.2 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@637c3576
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@3dfebbc2
 [debug] sbt-chain: module revision found in cache: com.chuusai#shapeless_2.12;2.3.2
 [debug] 	found com.chuusai#shapeless_2.12;2.3.2 in sbt-chain
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.chuusai#shapeless_2.12;2.3.2 [compile->runtime]
@@ -112,7 +112,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.chuusai#shapeless_2.12;2.3.2 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->io.circe#circe-parser_2.12;0.7.0-M2 [compile->default(compile)]
 [info] Resolving io.circe#circe-parser_2.12;0.7.0-M2 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@54ffb5e
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@16b84650
 [debug] sbt-chain: module revision found in cache: io.circe#circe-parser_2.12;0.7.0-M2
 [debug] 	found io.circe#circe-parser_2.12;0.7.0-M2 in sbt-chain
 [debug] 	[0.7.0-M2] io.circe#circe-parser_2.12;0.7.0-M2
@@ -121,7 +121,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->io.circe#circe-parser_2.12;0.7.0-M2 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->io.circe#circe-jawn_2.12;0.7.0-M2 [compile->default(compile)]
 [info] Resolving io.circe#circe-jawn_2.12;0.7.0-M2 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@188d23a
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@55e5ab8
 [debug] sbt-chain: module revision found in cache: io.circe#circe-jawn_2.12;0.7.0-M2
 [debug] 	found io.circe#circe-jawn_2.12;0.7.0-M2 in sbt-chain
 [debug] 	[0.7.0-M2] io.circe#circe-jawn_2.12;0.7.0-M2
@@ -130,7 +130,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->io.circe#circe-jawn_2.12;0.7.0-M2 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->org.spire-math#jawn-parser_2.12;0.10.4 [compile->default(compile)]
 [info] Resolving org.spire-math#jawn-parser_2.12;0.10.4 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@249ddaf0
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@3f737f2d
 [debug] sbt-chain: module revision found in cache: org.spire-math#jawn-parser_2.12;0.10.4
 [debug] 	found org.spire-math#jawn-parser_2.12;0.10.4 in sbt-chain
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->org.spire-math#jawn-parser_2.12;0.10.4 [compile->runtime]
@@ -138,7 +138,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->org.spire-math#jawn-parser_2.12;0.10.4 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->io.circe#circe-java8_2.12;0.7.0-M2 [compile->default(compile)]
 [info] Resolving io.circe#circe-java8_2.12;0.7.0-M2 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@cf4949c
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@3301e479
 [debug] sbt-chain: module revision found in cache: io.circe#circe-java8_2.12;0.7.0-M2
 [debug] 	found io.circe#circe-java8_2.12;0.7.0-M2 in sbt-chain
 [debug] 	[0.7.0-M2] io.circe#circe-java8_2.12;0.7.0-M2
@@ -147,7 +147,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->io.circe#circe-java8_2.12;0.7.0-M2 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->org.scalaj#scalaj-http_2.12;2.3.0 [compile->default(compile)]
 [info] Resolving org.scalaj#scalaj-http_2.12;2.3.0 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@ab183d2
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@15766c88
 [debug] sbt-chain: module revision found in cache: org.scalaj#scalaj-http_2.12;2.3.0
 [debug] 	found org.scalaj#scalaj-http_2.12;2.3.0 in sbt-chain
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->org.scalaj#scalaj-http_2.12;2.3.0 [compile->runtime]
@@ -155,7 +155,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->org.scalaj#scalaj-http_2.12;2.3.0 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->org.slf4j#slf4j-api;1.7.22 [compile->default(compile)]
 [info] Resolving org.slf4j#slf4j-api;1.7.22 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@3dca3615
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@2503923
 [debug] sbt-chain: module revision found in cache: org.slf4j#slf4j-api;1.7.22
 [debug] 	found org.slf4j#slf4j-api;1.7.22 in sbt-chain
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->org.slf4j#slf4j-api;1.7.22 [compile->runtime]
@@ -163,7 +163,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->org.slf4j#slf4j-api;1.7.22 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.typesafe.scala-logging#scala-logging_2.12;3.5.0 [compile->default(compile)]
 [info] Resolving com.typesafe.scala-logging#scala-logging_2.12;3.5.0 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@77c59255
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@5276c2e3
 [debug] sbt-chain: module revision found in cache: com.typesafe.scala-logging#scala-logging_2.12;3.5.0
 [debug] 	found com.typesafe.scala-logging#scala-logging_2.12;3.5.0 in sbt-chain
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.typesafe.scala-logging#scala-logging_2.12;3.5.0 [compile->runtime]
@@ -171,7 +171,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.typesafe.scala-logging#scala-logging_2.12;3.5.0 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->ch.qos.logback#logback-classic;1.1.7 [compile->default(compile)]
 [info] Resolving ch.qos.logback#logback-classic;1.1.7 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@1e661eeb
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@1e68f076
 [debug] sbt-chain: module revision found in cache: ch.qos.logback#logback-classic;1.1.7
 [debug] 	found ch.qos.logback#logback-classic;1.1.7 in sbt-chain
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->ch.qos.logback#logback-classic;1.1.7 [compile->runtime]
@@ -179,7 +179,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->ch.qos.logback#logback-classic;1.1.7 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->ch.qos.logback#logback-core;1.1.7 [compile->default(compile)]
 [info] Resolving ch.qos.logback#logback-core;1.1.7 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@5593704a
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@195a197c
 [debug] sbt-chain: module revision found in cache: ch.qos.logback#logback-core;1.1.7
 [debug] 	found ch.qos.logback#logback-core;1.1.7 in sbt-chain
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->ch.qos.logback#logback-core;1.1.7 [compile->runtime]
@@ -187,7 +187,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->ch.qos.logback#logback-core;1.1.7 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.github.seratch#awscala_2.12;0.5.9 [compile->default(compile)]
 [info] Resolving com.github.seratch#awscala_2.12;0.5.9 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@e886c79
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@4f4b946f
 [debug] sbt-chain: module revision found in cache: com.github.seratch#awscala_2.12;0.5.9
 [debug] 	found com.github.seratch#awscala_2.12;0.5.9 in sbt-chain
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.github.seratch#awscala_2.12;0.5.9 [compile->runtime]
@@ -195,7 +195,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.github.seratch#awscala_2.12;0.5.9 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.amazonaws#aws-java-sdk-iam;1.10.77 [compile->default(compile)]
 [info] Resolving com.amazonaws#aws-java-sdk-iam;1.10.77 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@36591788
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@623815f
 [debug] sbt-chain: module revision found in cache: com.amazonaws#aws-java-sdk-iam;1.10.77
 [debug] 	found com.amazonaws#aws-java-sdk-iam;1.10.77 in sbt-chain
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.amazonaws#aws-java-sdk-iam;1.10.77 [compile->runtime]
@@ -203,7 +203,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.amazonaws#aws-java-sdk-iam;1.10.77 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.amazonaws#aws-java-sdk-core;1.10.77 [compile->default(compile)]
 [info] Resolving com.amazonaws#aws-java-sdk-core;1.10.77 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@662b2d12
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@4a12862e
 [debug] sbt-chain: module revision found in cache: com.amazonaws#aws-java-sdk-core;1.10.77
 [debug] 	found com.amazonaws#aws-java-sdk-core;1.10.77 in sbt-chain
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.amazonaws#aws-java-sdk-core;1.10.77 [compile->runtime]
@@ -211,7 +211,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.amazonaws#aws-java-sdk-core;1.10.77 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->commons-logging#commons-logging;1.1.3 [compile->default(compile)]
 [info] Resolving commons-logging#commons-logging;1.1.3 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@51b06626
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@40cb7678
 [debug] sbt-chain: module revision found in cache: commons-logging#commons-logging;1.1.3
 [debug] 	found commons-logging#commons-logging;1.1.3 in sbt-chain
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->commons-logging#commons-logging;1.1.3 [compile->runtime]
@@ -219,7 +219,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->commons-logging#commons-logging;1.1.3 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->org.apache.httpcomponents#httpclient;4.3.6 [compile->default(compile)]
 [info] Resolving org.apache.httpcomponents#httpclient;4.3.6 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@2ebc372e
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@b068d1f
 [debug] sbt-chain: module revision found in cache: org.apache.httpcomponents#httpclient;4.3.6
 [debug] 	found org.apache.httpcomponents#httpclient;4.3.6 in sbt-chain
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->org.apache.httpcomponents#httpclient;4.3.6 [compile->runtime]
@@ -227,7 +227,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->org.apache.httpcomponents#httpclient;4.3.6 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->org.apache.httpcomponents#httpcore;4.3.3 [compile->default(compile)]
 [info] Resolving org.apache.httpcomponents#httpcore;4.3.3 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@dbdfc59
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@b6ee594
 [debug] sbt-chain: module revision found in cache: org.apache.httpcomponents#httpcore;4.3.3
 [debug] 	found org.apache.httpcomponents#httpcore;4.3.3 in sbt-chain
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->org.apache.httpcomponents#httpcore;4.3.3 [compile->runtime]
@@ -235,7 +235,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->org.apache.httpcomponents#httpcore;4.3.3 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->commons-codec#commons-codec;1.6 [compile->default(compile)]
 [info] Resolving commons-codec#commons-codec;1.6 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@55fd227b
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@3bd895f8
 [debug] sbt-chain: module revision found in cache: commons-codec#commons-codec;1.6
 [debug] 	found commons-codec#commons-codec;1.6 in sbt-chain
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->commons-codec#commons-codec;1.6 [compile->runtime]
@@ -243,7 +243,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->commons-codec#commons-codec;1.6 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.fasterxml.jackson.core#jackson-databind;2.5.3 [compile->default(compile)]
 [info] Resolving com.fasterxml.jackson.core#jackson-databind;2.5.3 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@1986a40a
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@3e58abb4
 [debug] sbt-chain: module revision found in cache: com.fasterxml.jackson.core#jackson-databind;2.5.3
 [debug] 	found com.fasterxml.jackson.core#jackson-databind;2.5.3 in sbt-chain
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.fasterxml.jackson.core#jackson-databind;2.5.3 [compile->runtime]
@@ -251,7 +251,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.fasterxml.jackson.core#jackson-databind;2.5.3 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.fasterxml.jackson.core#jackson-annotations;2.5.0 [compile->default(compile)]
 [info] Resolving com.fasterxml.jackson.core#jackson-annotations;2.5.0 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@458ca3d
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@9e16f8a
 [debug] sbt-chain: module revision found in cache: com.fasterxml.jackson.core#jackson-annotations;2.5.0
 [debug] 	found com.fasterxml.jackson.core#jackson-annotations;2.5.0 in sbt-chain
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.fasterxml.jackson.core#jackson-annotations;2.5.0 [compile->runtime]
@@ -259,7 +259,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.fasterxml.jackson.core#jackson-annotations;2.5.0 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.fasterxml.jackson.core#jackson-core;2.5.3 [compile->default(compile)]
 [info] Resolving com.fasterxml.jackson.core#jackson-core;2.5.3 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@d4cf720
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@52fc496
 [debug] sbt-chain: module revision found in cache: com.fasterxml.jackson.core#jackson-core;2.5.3
 [debug] 	found com.fasterxml.jackson.core#jackson-core;2.5.3 in sbt-chain
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.fasterxml.jackson.core#jackson-core;2.5.3 [compile->runtime]
@@ -267,7 +267,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.fasterxml.jackson.core#jackson-core;2.5.3 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.fasterxml.jackson.dataformat#jackson-dataformat-cbor;2.5.3 [compile->default(compile)]
 [info] Resolving com.fasterxml.jackson.dataformat#jackson-dataformat-cbor;2.5.3 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@212ea776
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@3b7a04d3
 [debug] sbt-chain: module revision found in cache: com.fasterxml.jackson.dataformat#jackson-dataformat-cbor;2.5.3
 [debug] 	found com.fasterxml.jackson.dataformat#jackson-dataformat-cbor;2.5.3 in sbt-chain
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.fasterxml.jackson.dataformat#jackson-dataformat-cbor;2.5.3 [compile->runtime]
@@ -275,7 +275,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.fasterxml.jackson.dataformat#jackson-dataformat-cbor;2.5.3 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.amazonaws#aws-java-sdk-sts;1.10.77 [compile->default(compile)]
 [info] Resolving com.amazonaws#aws-java-sdk-sts;1.10.77 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@5f6cffcd
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@3084c61e
 [debug] sbt-chain: module revision found in cache: com.amazonaws#aws-java-sdk-sts;1.10.77
 [debug] 	found com.amazonaws#aws-java-sdk-sts;1.10.77 in sbt-chain
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.amazonaws#aws-java-sdk-sts;1.10.77 [compile->runtime]
@@ -283,7 +283,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.amazonaws#aws-java-sdk-sts;1.10.77 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.amazonaws#aws-java-sdk-ec2;1.10.77 [compile->default(compile)]
 [info] Resolving com.amazonaws#aws-java-sdk-ec2;1.10.77 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@44073964
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@4fc89ae5
 [debug] sbt-chain: module revision found in cache: com.amazonaws#aws-java-sdk-ec2;1.10.77
 [debug] 	found com.amazonaws#aws-java-sdk-ec2;1.10.77 in sbt-chain
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.amazonaws#aws-java-sdk-ec2;1.10.77 [compile->runtime]
@@ -291,7 +291,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.amazonaws#aws-java-sdk-ec2;1.10.77 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.amazonaws#aws-java-sdk-s3;1.10.77 [compile->default(compile)]
 [info] Resolving com.amazonaws#aws-java-sdk-s3;1.10.77 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@56a95c81
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@3774552c
 [debug] sbt-chain: module revision found in cache: com.amazonaws#aws-java-sdk-s3;1.10.77
 [debug] 	found com.amazonaws#aws-java-sdk-s3;1.10.77 in sbt-chain
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.amazonaws#aws-java-sdk-s3;1.10.77 [compile->runtime]
@@ -299,7 +299,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.amazonaws#aws-java-sdk-s3;1.10.77 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.amazonaws#aws-java-sdk-kms;1.10.77 [compile->default(compile)]
 [info] Resolving com.amazonaws#aws-java-sdk-kms;1.10.77 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@ab75215
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@62309bf2
 [debug] sbt-chain: module revision found in cache: com.amazonaws#aws-java-sdk-kms;1.10.77
 [debug] 	found com.amazonaws#aws-java-sdk-kms;1.10.77 in sbt-chain
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.amazonaws#aws-java-sdk-kms;1.10.77 [compile->runtime]
@@ -307,7 +307,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.amazonaws#aws-java-sdk-kms;1.10.77 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.amazonaws#aws-java-sdk-sqs;1.10.77 [compile->default(compile)]
 [info] Resolving com.amazonaws#aws-java-sdk-sqs;1.10.77 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@62b1eadd
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@60a00d8d
 [debug] sbt-chain: module revision found in cache: com.amazonaws#aws-java-sdk-sqs;1.10.77
 [debug] 	found com.amazonaws#aws-java-sdk-sqs;1.10.77 in sbt-chain
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.amazonaws#aws-java-sdk-sqs;1.10.77 [compile->runtime]
@@ -315,7 +315,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.amazonaws#aws-java-sdk-sqs;1.10.77 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.amazonaws#aws-java-sdk-emr;1.10.77 [compile->default(compile)]
 [info] Resolving com.amazonaws#aws-java-sdk-emr;1.10.77 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@11af3c82
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@4e99abc0
 [debug] sbt-chain: module revision found in cache: com.amazonaws#aws-java-sdk-emr;1.10.77
 [debug] 	found com.amazonaws#aws-java-sdk-emr;1.10.77 in sbt-chain
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.amazonaws#aws-java-sdk-emr;1.10.77 [compile->runtime]
@@ -323,7 +323,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.amazonaws#aws-java-sdk-emr;1.10.77 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.amazonaws#aws-java-sdk-redshift;1.10.77 [compile->default(compile)]
 [info] Resolving com.amazonaws#aws-java-sdk-redshift;1.10.77 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@55a0c6a
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@1c361672
 [debug] sbt-chain: module revision found in cache: com.amazonaws#aws-java-sdk-redshift;1.10.77
 [debug] 	found com.amazonaws#aws-java-sdk-redshift;1.10.77 in sbt-chain
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.amazonaws#aws-java-sdk-redshift;1.10.77 [compile->runtime]
@@ -331,7 +331,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.amazonaws#aws-java-sdk-redshift;1.10.77 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.amazonaws#aws-java-sdk-dynamodb;1.10.77 [compile->default(compile)]
 [info] Resolving com.amazonaws#aws-java-sdk-dynamodb;1.10.77 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@b8d50f5
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@35193cfd
 [debug] sbt-chain: module revision found in cache: com.amazonaws#aws-java-sdk-dynamodb;1.10.77
 [debug] 	found com.amazonaws#aws-java-sdk-dynamodb;1.10.77 in sbt-chain
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.amazonaws#aws-java-sdk-dynamodb;1.10.77 [compile->runtime]
@@ -339,7 +339,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.amazonaws#aws-java-sdk-dynamodb;1.10.77 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.amazonaws#aws-java-sdk-simpledb;1.10.77 [compile->default(compile)]
 [info] Resolving com.amazonaws#aws-java-sdk-simpledb;1.10.77 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@31fbc183
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@300348de
 [debug] sbt-chain: module revision found in cache: com.amazonaws#aws-java-sdk-simpledb;1.10.77
 [debug] 	found com.amazonaws#aws-java-sdk-simpledb;1.10.77 in sbt-chain
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.amazonaws#aws-java-sdk-simpledb;1.10.77 [compile->runtime]
@@ -347,7 +347,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->com.amazonaws#aws-java-sdk-simpledb;1.10.77 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->joda-time#joda-time;2.9.6 [compile->default(compile)]
 [info] Resolving joda-time#joda-time;2.9.6 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@42f50da7
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@1032a802
 [debug] sbt-chain: module revision found in cache: joda-time#joda-time;2.9.6
 [debug] 	found joda-time#joda-time;2.9.6 in sbt-chain
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->joda-time#joda-time;2.9.6 [compile->runtime]
@@ -355,7 +355,7 @@
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->joda-time#joda-time;2.9.6 [compile->master]
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->org.joda#joda-convert;1.8.1 [compile->default(compile)]
 [info] Resolving org.joda#joda-convert;1.8.1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@74e27eeb
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@747c83af
 [debug] sbt-chain: module revision found in cache: org.joda#joda-convert;1.8.1
 [debug] 	found org.joda#joda-convert;1.8.1 in sbt-chain
 [debug] == resolving dependencies default#entree$sources_2.12;1.0->org.joda#joda-convert;1.8.1 [compile->runtime]
@@ -2936,7 +2936,7 @@
 [debug] 	[NOT REQUIRED] org.scala-lang#scala-reflect;2.12.1!scala-reflect.jar(src)
 [debug] 	[NOT REQUIRED] org.scala-lang.modules#scala-xml_2.12;1.0.6!scala-xml_2.12.jar(src)
 [debug] 	[NOT REQUIRED] jline#jline;2.14.1!jline.jar(src)
-[debug] :: resolution report :: resolve 2962ms :: artifacts dl 87ms
+[debug] :: resolution report :: resolve 3042ms :: artifacts dl 188ms
 [debug] 	report for default#entree$sources_2.12;1.0 compile produced in /Users/francescoperera/Developer/datalogue/Entree/target/resolution-cache/reports/default-entree$sources_2.12-compile.xml
 [debug] 	report for default#entree$sources_2.12;1.0 runtime produced in /Users/francescoperera/Developer/datalogue/Entree/target/resolution-cache/reports/default-entree$sources_2.12-runtime.xml
 [debug] 	report for default#entree$sources_2.12;1.0 test produced in /Users/francescoperera/Developer/datalogue/Entree/target/resolution-cache/reports/default-entree$sources_2.12-test.xml
@@ -2950,4 +2950,4 @@
 [debug] 	report for default#entree$sources_2.12;1.0 docs produced in /Users/francescoperera/Developer/datalogue/Entree/target/resolution-cache/reports/default-entree$sources_2.12-docs.xml
 [debug] 	report for default#entree$sources_2.12;1.0 pom produced in /Users/francescoperera/Developer/datalogue/Entree/target/resolution-cache/reports/default-entree$sources_2.12-pom.xml
 [debug] 	report for default#entree$sources_2.12;1.0 scala-tool produced in /Users/francescoperera/Developer/datalogue/Entree/target/resolution-cache/reports/default-entree$sources_2.12-scala-tool.xml
-[debug] 	resolve done (2962ms resolve - 87ms download)
+[debug] 	resolve done (3042ms resolve - 188ms download)

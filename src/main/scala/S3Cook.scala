@@ -1,6 +1,6 @@
 import awscala.File
 import awscala.s3.{Bucket, S3}
-import com.amazonaws.services.s3.model.S3ObjectInputStream
+import com.amazonaws.services.s3.model.{ObjectMetadata, S3ObjectInputStream}
 
 case class S3Bucket(bucket:String,folderPath:Option[String])
 
@@ -9,10 +9,7 @@ class S3Cook(val accessKeyId: String, val secretAccessKey: String){
   implicit val region = awscala.Region.US_EAST_1
   implicit val s3 = S3(accessKeyId, secretAccessKey)
 
-  def saveFile(file: File, folderPath:String,bucketName:String) = {
-    val path = folderPath + file.getName
-    s3.put(Bucket(bucketName), path, file)
-  }
+
 
   def listFiles(bucketName:String) : Vector[String] = s3.objectSummaries(Bucket(bucketName)).map(_.getKey).toVector
 
@@ -25,7 +22,12 @@ class S3Cook(val accessKeyId: String, val secretAccessKey: String){
 
   def getFileStream(b: String, f: String): S3ObjectInputStream = s3.getObject(b, f).getObjectContent
 
-  def saveFile(b: String, key: String, file:File) = s3.put(Bucket(b), key, file)
+  def saveFile(b: String, key: String, file:Array[Byte]) = s3.put(Bucket(b), key, file, new ObjectMetadata())
+
+  def saveFile(bucketName:String,folderPath:String,file: File) = {
+    val path = folderPath + file.getName
+    s3.put(Bucket(bucketName), path, file)
+  }
 }
 
 object DtlS3Cook {
