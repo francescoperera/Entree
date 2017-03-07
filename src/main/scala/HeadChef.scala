@@ -39,19 +39,21 @@ object HeadChef extends JsonConverter {
 
 
   def getFilesWithLabel(source:S3Bucket,destination:S3Bucket,label:String) = {
-    val files = DtlS3Cook.apply.listFiles(source.bucket).filterNot(_.endsWith("/"))
+    println(source.bucket)
+    println(source.folderPath.getOrElse(""))
+    val files = DtlS3Cook.apply.listFiles(source.bucket).filterNot( fp => fp.endsWith("/")).filter(_.contains(source.folderPath.getOrElse("")))
+    println(files) //only keep the ones that have the same folderPath as source -- FIX
     val fileNames = files.map(_.split("/").last)
     label match {
       case "." =>
         println(fileNames)
         val dataModels = aggregateFiles(fileNames,source)
-        println("about to push to S3")
-        batchSave(dataModels,destination)
+        batchSave(dataModels,destination,label)
       case _ =>
         val lf = fileNames.filterNot(cfnMap(label).contains(_)) //lf = labeled files or files whose name are under the designated lf
         println(lf)
         val dataModels = aggregateFiles(lf,source)
-        batchSave(dataModels,destination)
+        batchSave(dataModels,destination,label)
     }
   }
 
@@ -60,10 +62,8 @@ object HeadChef extends JsonConverter {
   def readFile(fileName:String,s3Bucket: S3Bucket) : Vector[String] = {
     println(s3Bucket.folderPath.getOrElse("") + fileName)
     val input = DtlS3Cook.apply.getFileStream(s3Bucket.bucket,s3Bucket.folderPath.getOrElse("") + fileName)
-    println("H1")
     val reader = new BufferedReader(new InputStreamReader(input))
     val fileString = Stream.continually(reader.readLine()).takeWhile(_ != null).mkString(",")
-    println("about to close fileString")
     reader.close()
     val vectorString = fileString.split(",").toVector
     val mo : Vector[Option[Map[String,Json]]] = vectorString.map( s => toJson(s) match { //mo = map object
@@ -78,7 +78,6 @@ object HeadChef extends JsonConverter {
   def map2Model ( m: Map[String,Json]) : Vector[dataFormat] = m.map{case (k,v) => dataFormat(v.asString,Some(k))}.toVector
 
   def saveToS3(v:Vector[String],dest:S3Bucket,fname:String) = {
-    println("saveToS3")
     val f = new File(s"$fname.json") //TODO: Figure out file naming convention
     val bw = new BufferedWriter(new FileWriter(f))
     v.foreach(s => bw.write( s + "\n"))
@@ -87,15 +86,10 @@ object HeadChef extends JsonConverter {
     DtlS3Cook.apply.saveFile(dest.bucket,dest.folderPath.getOrElse(""),f)
   }
 
-  def batchSave(v:Vector[String],dest:S3Bucket,label:String) = {
+  def batchSave(v:Vector[String],dest:S3Bucket,label:String) : Unit = {
     val splitIdx = Seq.range(1,v.length/rowsPerFile).toVector.map( _ * rowsPerFile)
-    println(v.length)
-    println(splitIdx)
     val splitV = v.grouped(rowsPerFile).toVector.zipWithIndex
     splitV.map{ case (vec,idx) => saveToS3(vec,dest,label + "-" + idx.toString)}
-
-
-
 
   }
 
