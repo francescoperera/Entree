@@ -34,7 +34,7 @@ object HeadChef extends JsonConverter {
     "employer" -> Array("employer")
   )
 
-  private val rowsPerFile = 5000
+  private val rowsPerFile = 10000
 
 
   def getFilesWithLabel(source:S3Bucket,destination:S3Bucket,label:String) = {
@@ -46,6 +46,8 @@ object HeadChef extends JsonConverter {
       case "all" =>
         println(fileNames)
         val dataModels = aggregateFiles(fileNames,source)
+        println("saving")
+        println(dataModels.length)
         batchSave(dataModels,destination,label)
       case _ =>
         val lf = fileNames.filterNot(CFNMappingCook.isValPresent(label,_)) //lf = labeled files or files whose name are under the designated lf
@@ -58,18 +60,26 @@ object HeadChef extends JsonConverter {
   def aggregateFiles(flist:Vector[String],s3bucket:S3Bucket):Vector[String] = flist.flatMap( f => readFile(f,s3bucket))
 
   def readFile(fileName:String,s3Bucket: S3Bucket) : Vector[String] = {
+    println(s3Bucket)
     println(s3Bucket.folderPath.getOrElse("") + fileName)
     val input = DtlS3Cook.apply.getFileStream(s3Bucket.bucket,s3Bucket.folderPath.getOrElse("") + fileName)
     val reader = new BufferedReader(new InputStreamReader(input))
     val fileString = Stream.continually(reader.readLine()).takeWhile(_ != null).mkString(",")
     reader.close()
     val vectorString = fileString.split(",").toVector
+    println("got vectorString")
+    println(vectorString.length)
     val mo : Vector[Option[Map[String,Json]]] = vectorString.map( s => toJson(s) match { //mo = map object
-      case None => None
-      case Some(j) => Some(j.asObject.get.toMap)
-    }).filter(m => m.isDefined && m.get.nonEmpty)
+      case None => Some(Map[String,Json]())
+      case Some(j) =>
+        println(s"$fileName :casting to Map")
+        println(j.asObject.getOrElse(JsonObject.empty))
+        Some(j.asObject.getOrElse(JsonObject.empty).toMap)
+    }).filterNot(_.isEmpty) //filterNot(m => m.isDefined)
+    println(mo.length)
     // each object per line was converted to a JSON object and then to a Map. Any empty objects or None were filtered out.
-    val modelVector = mo.flatMap(m => map2Model(m.get))
+    val modelVector = mo.flatMap{m => map2Model(m.get)}
+    println(modelVector.length)
     modelVector.map(_.asJson.noSpaces)
   }
 
@@ -84,13 +94,16 @@ object HeadChef extends JsonConverter {
     v.foreach(s => bw.write( s + "\n"))
     bw.close()
 //    val f = v.map(_.toByte).toArray  //TODO:Figure out to stream the content (v) back to S3.
+    println(s"Saving to S3:$fname ")
     DtlS3Cook.apply.saveFile(dest.bucket,dest.folderPath.getOrElse(""),f)
+    println("saved")
   }
 
-  def batchSave(v:Vector[String],dest:S3Bucket,label:String) : Unit = {
+  def batchSave(v:Vector[String],dest:S3Bucket,label:String) = {
+    println("batching")
     val splitIdx = Seq.range(1,v.length/rowsPerFile).toVector.map( _ * rowsPerFile)
     val splitV = v.grouped(rowsPerFile).toVector.zipWithIndex
-    splitV.map{ case (vec,idx) => saveToS3(vec,dest,label + "-" + idx.toString)}
+    splitV.foreach{ case (vec,idx) => saveToS3(vec,dest,label + "_" + idx.toString)}
   }
 
 }

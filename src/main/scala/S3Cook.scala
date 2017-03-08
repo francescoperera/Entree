@@ -32,10 +32,10 @@ class S3Cook(val accessKeyId: String, val secretAccessKey: String){
 
 object DtlS3Cook {
   /** S3Cook represents an S3Client that will interface with S3 and fetch the data in an S3 bucket */
-//  private val accessKeyId = sys.env.getOrElse("S3_KEY_ID", "AKIAJZUC55ZOLZSRM7RQ")
-//  private val secretAccessKey = sys.env.getOrElse("S3_KEY_SECRET", "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")
-  private val accessKeyId = sys.env.getOrElse("S3_KEY_ID", "AKIAJMVPH47YHSLXVXTA") //dev
-  private val secretAccessKey = sys.env.getOrElse("S3_KEY_SECRET", "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") //dev
+  private val accessKeyId = sys.env.getOrElse("S3_KEY_ID", "AKIAJZUC55ZOLZSRM7RQ")
+  private val secretAccessKey = sys.env.getOrElse("S3_KEY_SECRET", "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")
+//  private val accessKeyId = sys.env.getOrElse("S3_KEY_ID", "AKIAJMVPH47YHSLXVXTA") //dev
+//  private val secretAccessKey = sys.env.getOrElse("S3_KEY_SECRET", "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") //dev
 
   implicit val region = awscala.Region.US_EAST_1
   implicit val s3 = S3(accessKeyId, secretAccessKey)
