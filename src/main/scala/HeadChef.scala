@@ -5,7 +5,7 @@ import io.circe.{Decoder, Encoder}
 import io.circe.syntax._
 
 
-case class dataFormat(data:Option[String],label:Option[String]) //TODO:rename this. too generic
+case class dataFormat(data:Option[String],label:Option[String],originalLabel:Option[String]) //TODO:rename this. too generic
 //TODO:Add original label
 
 object  dataFormat{
@@ -15,8 +15,7 @@ object  dataFormat{
 
 object HeadChef extends JsonConverter {
   /** HeadChef is the main resource of Entree and will direct every other resource. */
-
-  private val cfnMap:Map[String,Array[String]] = Map ( //TODO: Fucking manual work. Automate this ASAP
+  val cfnMap:Map[String,Array[String]] = Map ( //TODO: Fucking manual work. Automate this ASAP
     "email_address" -> Array("email_address","email","emailaddress"),
     "full_name" -> Array("full_name"),
     "first_name" -> Array("first_name","firstname"),
@@ -42,15 +41,14 @@ object HeadChef extends JsonConverter {
     println(source.bucket)
     println(source.folderPath.getOrElse(""))
     val files = DtlS3Cook.apply.listFiles(source.bucket).filterNot( fp => fp.endsWith("/")).filter(_.contains(source.folderPath.getOrElse("")))
-    println(files) //only keep the ones that have the same folderPath as source -- FIX
     val fileNames = files.map(_.split("/").last)
     label match {
-      case "." =>
+      case "all" =>
         println(fileNames)
         val dataModels = aggregateFiles(fileNames,source)
         batchSave(dataModels,destination,label)
       case _ =>
-        val lf = fileNames.filterNot(cfnMap(label).contains(_)) //lf = labeled files or files whose name are under the designated lf
+        val lf = fileNames.filterNot(CFNMappingCook.isValPresent(label,_)) //lf = labeled files or files whose name are under the designated lf
         println(lf)
         val dataModels = aggregateFiles(lf,source)
         batchSave(dataModels,destination,label)
@@ -75,14 +73,17 @@ object HeadChef extends JsonConverter {
     modelVector.map(_.asJson.noSpaces)
   }
 
-  def map2Model ( m: Map[String,Json]) : Vector[dataFormat] = m.map{case (k,v) => dataFormat(v.asString,Some(k))}.toVector
+  def map2Model ( m: Map[String,Json]) : Vector[dataFormat] = m.map{case (k,v) => dataFormat(v.asString,Some(CFNMappingCook.getKeyFromVal(k)),Some(k))}.toVector
+
+
+
 
   def saveToS3(v:Vector[String],dest:S3Bucket,fname:String) = {
     val f = new File(s"$fname.json") //TODO: Figure out file naming convention
     val bw = new BufferedWriter(new FileWriter(f))
     v.foreach(s => bw.write( s + "\n"))
     bw.close()
-    //val f = v.map(_.toByte).toArray //TODO:Figure out to stream the content (v) back to S3.
+//    val f = v.map(_.toByte).toArray  //TODO:Figure out to stream the content (v) back to S3.
     DtlS3Cook.apply.saveFile(dest.bucket,dest.folderPath.getOrElse(""),f)
   }
 
@@ -90,7 +91,6 @@ object HeadChef extends JsonConverter {
     val splitIdx = Seq.range(1,v.length/rowsPerFile).toVector.map( _ * rowsPerFile)
     val splitV = v.grouped(rowsPerFile).toVector.zipWithIndex
     splitV.map{ case (vec,idx) => saveToS3(vec,dest,label + "-" + idx.toString)}
-
   }
 
 }

@@ -9,20 +9,7 @@ class S3Cook(val accessKeyId: String, val secretAccessKey: String){
   implicit val region = awscala.Region.US_EAST_1
   implicit val s3 = S3(accessKeyId, secretAccessKey)
 
-
-
-  def listFiles(bucketName:String) : Vector[String] = {
-    println("Listing")
-    println(s3.objectSummaries(Bucket(bucketName)).map(_.getKey).toVector)
-    s3.objectSummaries(Bucket(bucketName)).map(_.getKey).toVector
-  }
-
-//  def listFilesInSource(s3Bucket: S3Bucket) = s3.ls(Bucket(s3Bucket.bucket), s3Bucket.folderPath.getOrElse("")).map {
-//        case Left(directoryPrefix) =>
-//        case Right(s3ObjectSummary) =>
-//      }
-
-  // use prefix to get only files from source folder
+  def listFiles(bucketName:String) : Vector[String] = s3.objectSummaries(Bucket(bucketName)).map(_.getKey).toVector
 
   def createS3Bucket(url:String) : S3Bucket =  {
     val uv = url.split("/").toVector //uv = url vector
@@ -33,13 +20,7 @@ class S3Cook(val accessKeyId: String, val secretAccessKey: String){
     S3Bucket(uv(bi),fp)
   }
 
-  def getFileStream(b: String, f: String): S3ObjectInputStream = {
-//    println("getting file stream")
-//    println(b)
-//    println(f)
-    s3.getObject(b, f).getObjectContent
-  }
-
+  def getFileStream(b: String, f: String): S3ObjectInputStream = s3.getObject(b, f).getObjectContent
 
   def saveFile(b: String, key: String, file:Array[Byte]) = s3.put(Bucket(b), key, file, new ObjectMetadata())
 
