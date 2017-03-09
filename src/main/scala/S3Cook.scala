@@ -12,10 +12,8 @@ class S3Cook(val accessKeyId: String, val secretAccessKey: String){
   def listFiles(bucketName:String) : Vector[String] = s3.objectSummaries(Bucket(bucketName)).map(_.getKey).toVector
 
   def createS3Bucket(url:String) : S3Bucket =  {
-    val uv = url.split("/").toVector //uv = url vector
-    val bi = uv.indexWhere(_.contains(".com")) + 1 //bi = bucket index, it comes after s3.amazonaws.com/bucket/...
-    print(uv)
-    print(bi)
+    val uv:Vector[String] = url.split("/").toVector //uv = url vector
+    val bi : Int = uv.indexWhere(_.contains(".com")) + 1 //bi = bucket index, it comes after s3.amazonaws.com/bucket/...
     val fp = Some(uv.takeRight(uv.size - bi-1).mkString("/") + "/") //fp = file path
     S3Bucket(uv(bi),fp)
   }

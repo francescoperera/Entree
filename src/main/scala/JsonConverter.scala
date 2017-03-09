@@ -13,7 +13,6 @@ trait JsonConverter {
       case Left(failure) => None
       case Right(json) => Some(json)
     }
-
   }
 
 

@@ -4,6 +4,8 @@ import io.circe.{Json, JsonObject}
 import io.circe.{Decoder, Encoder}
 import io.circe.syntax._
 
+import com.typesafe.scalalogging.LazyLogging
+
 
 case class dataFormat(data:Option[String],label:Option[String],originalLabel:Option[String]) //TODO:rename this. too generic
 //TODO:Add original label
@@ -13,7 +15,7 @@ object  dataFormat{
   implicit val decoder: Decoder[dataFormat] = io.circe.generic.semiauto.deriveDecoder
 }
 
-object HeadChef extends JsonConverter {
+object HeadChef extends JsonConverter with LazyLogging {
   /** HeadChef is the main resource of Entree and will direct every other resource. */
   val cfnMap:Map[String,Array[String]] = Map ( //TODO: Fucking manual work. Automate this ASAP
     "email_address" -> Array("email_address","email","emailaddress"),
@@ -38,21 +40,21 @@ object HeadChef extends JsonConverter {
 
 
   def getFilesWithLabel(source:S3Bucket,destination:S3Bucket,label:String) = {
-    println(source.bucket)
-    println(source.folderPath.getOrElse(""))
+    logger.info(s"Getting files from S3 Bucket: ${source.bucket}")
+    logger.info(s"Following Folder Path : ${source.folderPath.getOrElse("")}")
     val files = DtlS3Cook.apply.listFiles(source.bucket).filterNot( fp => fp.endsWith("/")).filter(_.contains(source.folderPath.getOrElse("")))
     val fileNames = files.map(_.split("/").last)
     label match {
       case "all" =>
-        println(fileNames)
+        logger.info(s"Aggregating data from ${fileNames.length} files")
         val dataModels = aggregateFiles(fileNames,source)
-        println("saving")
-        println(dataModels.length)
+        logger.info(s"Saving to Bucket: ${destination.bucket}, Path:${destination.folderPath}")
         batchSave(dataModels,destination,label)
       case _ =>
-        val lf = fileNames.filterNot(CFNMappingCook.isValPresent(label,_)) //lf = labeled files or files whose name are under the designated lf
-        println(lf)
+        val lf = fileNames.filterNot(CFNMappingCook.isValPresent(label,_)) // lf = labeled files or files whose name are under the designated lf //TODO: filter based on content not file name
+        logger.info(s"Aggregating data from ${lf.length} files")
         val dataModels = aggregateFiles(lf,source)
+        logger.info(s"Saving to Bucket: ${destination.bucket}, Path:${destination.folderPath}")
         batchSave(dataModels,destination,label)
     }
   }
@@ -60,33 +62,23 @@ object HeadChef extends JsonConverter {
   def aggregateFiles(flist:Vector[String],s3bucket:S3Bucket):Vector[String] = flist.flatMap( f => readFile(f,s3bucket))
 
   def readFile(fileName:String,s3Bucket: S3Bucket) : Vector[String] = {
-    println(s3Bucket)
-    println(s3Bucket.folderPath.getOrElse("") + fileName)
+    logger.info(s" Reading file: $fileName")
     val input = DtlS3Cook.apply.getFileStream(s3Bucket.bucket,s3Bucket.folderPath.getOrElse("") + fileName)
     val reader = new BufferedReader(new InputStreamReader(input))
     val fileString = Stream.continually(reader.readLine()).takeWhile(_ != null).mkString(",")
     reader.close()
     val vectorString = fileString.split(",").toVector
-    println("got vectorString")
-    println(vectorString.length)
     val mo : Vector[Option[Map[String,Json]]] = vectorString.map( s => toJson(s) match { //mo = map object
       case None => Some(Map[String,Json]())
       case Some(j) =>
-        println(s"$fileName :casting to Map")
-        println(j.asObject.getOrElse(JsonObject.empty))
         Some(j.asObject.getOrElse(JsonObject.empty).toMap)
     }).filterNot(_.isEmpty) //filterNot(m => m.isDefined)
-    println(mo.length)
     // each object per line was converted to a JSON object and then to a Map. Any empty objects or None were filtered out.
     val modelVector = mo.flatMap{m => map2Model(m.get)}
-    println(modelVector.length)
     modelVector.map(_.asJson.noSpaces)
   }
 
   def map2Model ( m: Map[String,Json]) : Vector[dataFormat] = m.map{case (k,v) => dataFormat(v.asString,Some(CFNMappingCook.getKeyFromVal(k)),Some(k))}.toVector
-
-
-
 
   def saveToS3(v:Vector[String],dest:S3Bucket,fname:String) = {
     val f = new File(s"$fname.json") //TODO: Figure out file naming convention
@@ -94,13 +86,11 @@ object HeadChef extends JsonConverter {
     v.foreach(s => bw.write( s + "\n"))
     bw.close()
 //    val f = v.map(_.toByte).toArray  //TODO:Figure out to stream the content (v) back to S3.
-    println(s"Saving to S3:$fname ")
+    logger.info(s"Saving to S3:$fname")
     DtlS3Cook.apply.saveFile(dest.bucket,dest.folderPath.getOrElse(""),f)
-    println("saved")
   }
 
   def batchSave(v:Vector[String],dest:S3Bucket,label:String) = {
-    println("batching")
     val splitIdx = Seq.range(1,v.length/rowsPerFile).toVector.map( _ * rowsPerFile)
     val splitV = v.grouped(rowsPerFile).toVector.zipWithIndex
     splitV.foreach{ case (vec,idx) => saveToS3(vec,dest,label + "_" + idx.toString)}
