@@ -2,11 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="419b1bab-7146-4b80-b654-a5e7c1d609d8" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/HeadChef.scala" afterPath="$PROJECT_DIR$/src/main/scala/HeadChef.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/JsonConverter.scala" afterPath="$PROJECT_DIR$/src/main/scala/JsonConverter.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/S3Cook.scala" afterPath="$PROJECT_DIR$/src/main/scala/S3Cook.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/Waiter.scala" afterPath="$PROJECT_DIR$/src/main/scala/Waiter.scala" />
     </list>
     <ignored path="Entree.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -59,8 +55,8 @@
       <file leaf-file-name="HeadChef.scala" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/scala/HeadChef.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1080">
-              <caret line="86" column="14" selection-start-line="86" selection-start-column="14" selection-end-line="86" selection-end-column="14" />
+            <state relative-caret-position="361">
+              <caret line="48" column="50" selection-start-line="48" selection-start-column="50" selection-end-line="48" selection-end-column="50" />
               <folding>
                 <element signature="e#0#16#0" expanded="true" />
               </folding>
@@ -116,10 +112,10 @@
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/src/main/scala/ColumnFieldNameCook.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/CFNMappingCook.scala" />
-        <option value="$PROJECT_DIR$/src/main/scala/HeadChef.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/S3Cook.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/JsonConverter.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/Waiter.scala" />
+        <option value="$PROJECT_DIR$/src/main/scala/HeadChef.scala" />
       </list>
     </option>
   </component>
@@ -786,12 +782,12 @@
       <workItem from="1488382544039" duration="5665000" />
       <workItem from="1488584243211" duration="2156000" />
       <workItem from="1488653319929" duration="4484000" />
-      <workItem from="1488810355550" duration="31974000" />
+      <workItem from="1488810355550" duration="32782000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="60239000" />
+    <option name="totallyTimeSpent" value="61047000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-349" y="-1200" width="1920" height="1200" extended-state="0" />
@@ -1244,8 +1240,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/HeadChef.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1080">
-          <caret line="86" column="14" selection-start-line="86" selection-start-column="14" selection-end-line="86" selection-end-column="14" />
+        <state relative-caret-position="361">
+          <caret line="48" column="50" selection-start-line="48" selection-start-column="50" selection-end-line="48" selection-end-column="50" />
           <folding>
             <element signature="e#0#16#0" expanded="true" />
           </folding>

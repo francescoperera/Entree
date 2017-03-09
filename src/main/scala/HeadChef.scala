@@ -46,20 +46,21 @@ object HeadChef extends JsonConverter with LazyLogging {
     val fileNames = files.map(_.split("/").last)
     label match {
       case "all" =>
-        logger.info(s"Aggregating data from ${fileNames.length} files")
-        val dataModels = aggregateFiles(fileNames,source)
-        logger.info(s"Saving to Bucket: ${destination.bucket}, Path:${destination.folderPath}")
-        batchSave(dataModels,destination,label)
+        aggregateFiles(fileNames,source,destination,"all")
       case _ =>
         val lf = fileNames.filterNot(CFNMappingCook.isValPresent(label,_)) // lf = labeled files or files whose name are under the designated lf //TODO: filter based on content not file name
-        logger.info(s"Aggregating data from ${lf.length} files")
-        val dataModels = aggregateFiles(lf,source)
-        logger.info(s"Saving to Bucket: ${destination.bucket}, Path:${destination.folderPath}")
-        batchSave(dataModels,destination,label)
+        aggregateFiles(lf,source,destination,_)
     }
   }
 
-  def aggregateFiles(flist:Vector[String],s3bucket:S3Bucket):Vector[String] = flist.flatMap( f => readFile(f,s3bucket))
+
+  def aggregateFiles(flist:Vector[String],source:S3Bucket,destination:S3Bucket,label:String) = {
+    logger.info(s"Aggregating data from ${flist.length} files")
+    val dataModels = flist.flatMap( f => readFile(f,source))
+    logger.info(s"Saving to Bucket: ${destination.bucket}, Path:${destination.folderPath}")
+    batchSave(dataModels,destination,label)
+
+  }
 
   def readFile(fileName:String,s3Bucket: S3Bucket) : Vector[String] = {
     logger.info(s" Reading file: $fileName")
