@@ -8,7 +8,6 @@ import com.typesafe.scalalogging.LazyLogging
 
 
 case class dataFormat(data:Option[String],label:Option[String],originalLabel:Option[String]) //TODO:rename this. too generic
-//TODO:Add original label
 
 object  dataFormat{
   implicit val encoder: Encoder[dataFormat] = io.circe.generic.semiauto.deriveEncoder
@@ -45,7 +44,7 @@ object HeadChef extends JsonConverter with LazyLogging {
     val files = DtlS3Cook.apply.listFiles(source.bucket).filterNot( fp => fp.endsWith("/")).filter(_.contains(source.folderPath.getOrElse("")))
     val fileNames = files.map(_.split("/").last)
     label match {
-      case "all" =>
+      case "all" => //TODO: change String All to a struct
         aggregateFiles(fileNames,source,destination,"all")
       case _ =>
         val lf = fileNames.filterNot(CFNMappingCook.isValPresent(label,_)) // lf = labeled files or files whose name are under the designated lf //TODO: filter based on content not file name
@@ -53,6 +52,15 @@ object HeadChef extends JsonConverter with LazyLogging {
     }
   }
 
+  //DEV
+  def getFileWithLabel(f:String,l:String,source:S3Bucket) = {
+    val input = DtlS3Cook.apply.getFileStream(source.bucket,source.folderPath.getOrElse("") + f)
+    val reader = new BufferedReader(new InputStreamReader(input))
+    val fileString = Stream.continually(reader.readLine()).takeWhile(_ != null).mkString(",")
+    //take only first 5 and look at the key  used to store data and see if it cfnMap(l).contains(key). YES -> keep file, NO -> filter out file
+    reader.close()
+  }
+  //DEV
 
   def aggregateFiles(flist:Vector[String],source:S3Bucket,destination:S3Bucket,label:String) = {
     logger.info(s"Aggregating data from ${flist.length} files")
@@ -82,7 +90,7 @@ object HeadChef extends JsonConverter with LazyLogging {
   def map2Model ( m: Map[String,Json]) : Vector[dataFormat] = m.map{case (k,v) => dataFormat(v.asString,Some(CFNMappingCook.getKeyFromVal(k)),Some(k))}.toVector
 
   def saveToS3(v:Vector[String],dest:S3Bucket,fname:String) = {
-    val f = new File(s"$fname.json") //TODO: Figure out file naming convention
+    val f = new File(s"$fname.json")
     val bw = new BufferedWriter(new FileWriter(f))
     v.foreach(s => bw.write( s + "\n"))
     bw.close()

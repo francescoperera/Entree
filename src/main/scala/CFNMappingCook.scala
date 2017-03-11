@@ -3,7 +3,7 @@
   */
 object CFNMappingCook {
 
-  private val cfnMap:Map[String,Array[String]] = Map ( //TODO: Fucking manual work. Automate this ASAP
+  val cfnMap:Map[String,Array[String]] = Map ( //TODO: Fucking manual work. Automate this ASAP
     "email_address" -> Array("email_address","email","emailaddress"),
     "full_name" -> Array("full_name","fullname"),
     "first_name" -> Array("first_name","firstname"),
@@ -19,12 +19,11 @@ object CFNMappingCook {
     "uuid" -> Array("uuid"),
     "job_title" -> Array("job_title","jobtitle","occupation","occupation_title"), //TODO: double check  difference between occupation and job title
     "salary" -> Array("salary"),
-    "employer" -> Array("employer")
+    "employer" -> Array("employer"),
+    "all" -> Array()
   )
 
-  def getKeyFromVal(v:String):String = {
-    cfnMap.find(_._2.contains(v)).get._1
-  }
+  def getKeyFromVal(v:String):String = cfnMap.find(_._2.contains(v)).get._1
 
   def isValPresent(k:String,v:String):Boolean = cfnMap(k).contains(v)
 
