@@ -8,6 +8,7 @@ import com.typesafe.scalalogging.LazyLogging
 
 
 case class dataFormat(data:Option[String],label:Option[String],originalLabel:Option[String]) //TODO:rename this. too generic
+case class validNDJSONFile(filename:String,source:S3Bucket,valid:Boolean)
 
 object  dataFormat{
   implicit val encoder: Encoder[dataFormat] = io.circe.generic.semiauto.deriveEncoder
@@ -47,22 +48,45 @@ object HeadChef extends JsonConverter with LazyLogging {
       case "all" => //TODO: change String All to a struct
         aggregateFiles(fileNames,source,destination,"all")
       case _ =>
+        println(label)
+        fileNames.foreach(toNDSJON(_,label,source))
         val lf = fileNames.filterNot(CFNMappingCook.isValPresent(label,_)) // lf = labeled files or files whose name are under the designated lf //TODO: filter based on content not file name
-        aggregateFiles(lf,source,destination,_)
+        aggregateFiles(lf,source,destination,label)
     }
   }
 
-  //DEV
-  def getFileWithLabel(f:String,l:String,source:S3Bucket) = {
+  //DEV turn JSON shit to NDJSON
+  def toNDSJON(f:String,l:String,source:S3Bucket):Vector[String] = {
     val input = DtlS3Cook.apply.getFileStream(source.bucket,source.folderPath.getOrElse("") + f)
     val reader = new BufferedReader(new InputStreamReader(input))
-    val fileString = Stream.continually(reader.readLine()).takeWhile(_ != null).mkString(",")
-    //take only first 5 and look at the key  used to store data and see if it cfnMap(l).contains(key). YES -> keep file, NO -> filter out file
+    val fileString = Stream.continually(reader.readLine()).takeWhile(_ != null).mkString("")//.mkString(",") //only taking 5 at this stage
     reader.close()
+    val fileJS = toJson(fileString) match {
+        case None => None
+        case Some(j) => j.asArray
+      }
+    println("GET FILE WITH LABEL")
+    val ndjson = fileJS.get.map(_.noSpaces)
+    ndjson.foreach(println)
+    ndjson
+    //println(vectorString)
+    //take only first 5 and look at the key  used to store data and see if it cfnMap(l).contains(key). YES -> keep file, NO -> filter out file
   }
   //DEV
 
+
+  def isNDJSON(f:String,source:S3Bucket): validNDJSON = {
+    val input = DtlS3Cook.apply.getFileStream(source.bucket,source.folderPath.getOrElse("") + f)
+    val reader = new BufferedReader(new InputStreamReader(input))
+    val fileString = Stream.continually(reader.readLine()).take(1).mkString("")//.mkString(",") //only taking 5 at this stage
+    reader.close()
+    val isValid = fileString.startsWith("{") && fileString.endsWith("}")
+    validNDJSON(f,source,isValid)
+  }
+
   def aggregateFiles(flist:Vector[String],source:S3Bucket,destination:S3Bucket,label:String) = {
+    //for each f in flist, create a validNDJSON object
+    //depending on the valid type in validNDSJON object read normally or just call toNDJSON and then do what you do now
     logger.info(s"Aggregating data from ${flist.length} files")
     val dataModels = flist.flatMap( f => readFile(f,source))
     logger.info(s"Saving to Bucket: ${destination.bucket}, Path:${destination.folderPath}")

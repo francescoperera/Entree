@@ -1,4 +1,4 @@
-[0m[[0minfo[0m] [0mRunning Waiter https://s3.amazonaws.com/dtl-data/PII/dump https://s3.amazonaws.com/dtl-data/PII/training_data all[0m
+[0m[[0minfo[0m] [0mRunning Waiter https://s3.amazonaws.com/fp-data/PII/glassdoor https://s3.amazonaws.com/fp-data/PII/training_data job_title[0m
 [0m[[0mdebug[0m] [0mWaiting for threads to exit or System.exit to be called.[0m
 [0m[[0mdebug[0m] [0m  Classpath:[0m
 [0m[[0mdebug[0m] [0m	/Users/francescoperera/Developer/datalogue/Entree/target/scala-2.12/classes[0m
