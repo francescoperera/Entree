@@ -66,7 +66,7 @@ object HeadChef extends JsonConverter with LazyLogging {
         case None => None
         case Some(j) => j.asArray
       }
-    println("GET FILE WITH LABEL")
+    //println("TRANSFORMING JSON TO NDJSON")
     val ndjson = fileJS.get.map(_.noSpaces)
     ndjson.foreach(println)
     ndjson
@@ -110,7 +110,7 @@ object HeadChef extends JsonConverter with LazyLogging {
         Some(j.asObject.getOrElse(JsonObject.empty).toMap)
     }).filterNot(_.isEmpty) //filterNot(m => m.isDefined)
     // each object per line was converted to a JSON object and then to a Map. Any empty objects or None were filtered out.
-    println("MAPPING TO MODEL")
+    //jprintln("MAPPING TO MODEL")
     val modelVector = mo.flatMap{m => map2Model(m.get)}.filterNot(_.isEmpty)
     modelVector.map(_.get.asJson.noSpaces)
   }
@@ -137,7 +137,7 @@ object HeadChef extends JsonConverter with LazyLogging {
 
   def map2Model ( m: Map[String,Json]) : Vector[Option[dataFormat]] = m.map{
     case (k,v) =>
-      println(k,v)
+      //println(k,v)
       CFNMappingCook.isValPresent(k) match {
         case true => Some(dataFormat(v.asString,Some(CFNMappingCook.getKeyFromVal(k)),Some(k)))
         case false =>
