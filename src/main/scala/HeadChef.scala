@@ -49,14 +49,15 @@ object HeadChef extends JsonConverter with LazyLogging {
         aggregateFiles(fileNames,source,destination,"all")
       case _ =>
         println(label)
-        fileNames.foreach(toNDSJON(_,label,source))
-        val lf = fileNames.filterNot(CFNMappingCook.isValPresent(label,_)) // lf = labeled files or files whose name are under the designated lf //TODO: filter based on content not file name
+        fileNames.foreach(toNDSJON(_,source))
+        val lf = fileNames.filterNot(CFNMappingCook.isValPresentWithKey(label,_)) // lf = labeled files or files whose name are under the designated lf //TODO: filter based on content not file name
         aggregateFiles(lf,source,destination,label)
     }
   }
 
   //DEV turn JSON shit to NDJSON
-  def toNDSJON(f:String,l:String,source:S3Bucket):Vector[String] = {
+  def toNDSJON(f:String,source:S3Bucket):Vector[String] = {
+    logger.info(s" Reading NON-NDJSON file: $f")
     val input = DtlS3Cook.apply.getFileStream(source.bucket,source.folderPath.getOrElse("") + f)
     val reader = new BufferedReader(new InputStreamReader(input))
     val fileString = Stream.continually(reader.readLine()).takeWhile(_ != null).mkString("")//.mkString(",") //only taking 5 at this stage
@@ -75,43 +76,75 @@ object HeadChef extends JsonConverter with LazyLogging {
   //DEV
 
 
-  def isNDJSON(f:String,source:S3Bucket): validNDJSON = {
+  def isNDJSON(f:String,source:S3Bucket): validNDJSONFile = {
     val input = DtlS3Cook.apply.getFileStream(source.bucket,source.folderPath.getOrElse("") + f)
     val reader = new BufferedReader(new InputStreamReader(input))
     val fileString = Stream.continually(reader.readLine()).take(1).mkString("")//.mkString(",") //only taking 5 at this stage
     reader.close()
     val isValid = fileString.startsWith("{") && fileString.endsWith("}")
-    validNDJSON(f,source,isValid)
+    validNDJSONFile(f,source,isValid)
   }
 
-  def aggregateFiles(flist:Vector[String],source:S3Bucket,destination:S3Bucket,label:String) = {
+  def aggregateFiles(fv:Vector[String],source:S3Bucket,destination:S3Bucket,label:String) = {
     //for each f in flist, create a validNDJSON object
     //depending on the valid type in validNDSJON object read normally or just call toNDJSON and then do what you do now
-    logger.info(s"Aggregating data from ${flist.length} files")
-    val dataModels = flist.flatMap( f => readFile(f,source))
+    val ndjson = fv.map(f => isNDJSON(f,source))
+    println(ndjson)
+    logger.info(s"Aggregating data from ${fv.length} files")
+    val dataModels = ndjson.flatMap( jf => readFile(jf))
+    println(dataModels)
     logger.info(s"Saving to Bucket: ${destination.bucket}, Path:${destination.folderPath}")
     batchSave(dataModels,destination,label)
 
   }
 
-  def readFile(fileName:String,s3Bucket: S3Bucket) : Vector[String] = {
-    logger.info(s" Reading file: $fileName")
-    val input = DtlS3Cook.apply.getFileStream(s3Bucket.bucket,s3Bucket.folderPath.getOrElse("") + fileName)
-    val reader = new BufferedReader(new InputStreamReader(input))
-    val fileString = Stream.continually(reader.readLine()).takeWhile(_ != null).mkString(",")
-    reader.close()
-    val vectorString = fileString.split(",").toVector
+  def readFile(ndjson:validNDJSONFile) : Vector[String] = {
+//    logger.info(s" Reading file: $fileName")
+    val vectorString = ndjson.valid match {
+      case true =>readNDSJONFile(ndjson.filename,ndjson.source)
+      case false => toNDSJON(ndjson.filename,ndjson.source)
+    }
     val mo : Vector[Option[Map[String,Json]]] = vectorString.map( s => toJson(s) match { //mo = map object
       case None => Some(Map[String,Json]())
       case Some(j) =>
         Some(j.asObject.getOrElse(JsonObject.empty).toMap)
     }).filterNot(_.isEmpty) //filterNot(m => m.isDefined)
     // each object per line was converted to a JSON object and then to a Map. Any empty objects or None were filtered out.
-    val modelVector = mo.flatMap{m => map2Model(m.get)}
-    modelVector.map(_.asJson.noSpaces)
+    println("MAPPING TO MODEL")
+    val modelVector = mo.flatMap{m => map2Model(m.get)}.filterNot(_.isEmpty)
+    modelVector.map(_.get.asJson.noSpaces)
   }
 
-  def map2Model ( m: Map[String,Json]) : Vector[dataFormat] = m.map{case (k,v) => dataFormat(v.asString,Some(CFNMappingCook.getKeyFromVal(k)),Some(k))}.toVector
+//    val vectorString = fileString.split(",").toVector
+//    val mo : Vector[Option[Map[String,Json]]] = vectorString.map( s => toJson(s) match { //mo = map object
+//      case None => Some(Map[String,Json]())
+//      case Some(j) =>
+//        Some(j.asObject.getOrElse(JsonObject.empty).toMap)
+//    }).filterNot(_.isEmpty) //filterNot(m => m.isDefined)
+//    // each object per line was converted to a JSON object and then to a Map. Any empty objects or None were filtered out.
+//    val modelVector = mo.flatMap{m => map2Model(m.get)}
+//    modelVector.map(_.asJson.noSpaces)
+//  }
+
+  def readNDSJONFile(fileName:String,s3Bucket: S3Bucket):Vector[String] = {
+    logger.info(s" Reading  NDJSON file: $fileName")
+    val input = DtlS3Cook.apply.getFileStream(s3Bucket.bucket,s3Bucket.folderPath.getOrElse("") + fileName)
+    val reader = new BufferedReader(new InputStreamReader(input))
+    val fileString = Stream.continually(reader.readLine()).takeWhile(_ != null).mkString(",")
+    reader.close()
+    fileString.split(",").toVector
+  }
+
+  def map2Model ( m: Map[String,Json]) : Vector[Option[dataFormat]] = m.map{
+    case (k,v) =>
+      println(k,v)
+      CFNMappingCook.isValPresent(k) match {
+        case true => Some(dataFormat(v.asString,Some(CFNMappingCook.getKeyFromVal(k)),Some(k)))
+        case false =>
+          logger.info(s" The key $k is not present in cfnMap. Look at CFNMappingCook.")
+          None
+      }
+  }.toVector
 
   def saveToS3(v:Vector[String],dest:S3Bucket,fname:String) = {
     val f = new File(s"$fname.json")
