@@ -68,7 +68,7 @@ object HeadChef extends JsonConverter with LazyLogging {
       }
     //println("TRANSFORMING JSON TO NDJSON")
     val ndjson = fileJS.get.map(_.noSpaces)
-    ndjson.foreach(println)
+    //ndjson.foreach(println)
     ndjson
     //println(vectorString)
     //take only first 5 and look at the key  used to store data and see if it cfnMap(l).contains(key). YES -> keep file, NO -> filter out file
@@ -92,7 +92,7 @@ object HeadChef extends JsonConverter with LazyLogging {
     println(ndjson)
     logger.info(s"Aggregating data from ${fv.length} files")
     val dataModels = ndjson.flatMap( jf => readFile(jf))
-    println(dataModels)
+    //println(dataModels)
     logger.info(s"Saving to Bucket: ${destination.bucket}, Path:${destination.folderPath}")
     batchSave(dataModels,destination,label)
 
