@@ -131,11 +131,16 @@ object HeadChef extends JsonConverter with LazyLogging {
   def toNDSJON(f:String,source:S3Bucket):Vector[String] = {
     logger.info(s"Formatting $f to NDJSON format")
     val fileString = streamEntireFile(f,source)
+    f match {
+      case "glassdoor_jobs_Administrative_1488550381.418022.json" => println(fileString)
+      case _ => println(f)
+    }
     val fileJS = toJson(fileString) match {
       case None => None
       case Some(j) => j.asArray
     }
     fileJS.get.map(_.noSpaces)
+
   }
 
   /**
