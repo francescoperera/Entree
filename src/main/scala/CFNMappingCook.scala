@@ -1,6 +1,5 @@
 
 object CFNMappingCook {
-
   /** CFNMappingCook has the only responsibility of storing the column field map and is the only resource in Entree
     * that can interact with it.
     * */
@@ -46,8 +45,4 @@ object CFNMappingCook {
     * @return - boolean
     */
   def isValPresent(str:String):Boolean = cfnMap.values.exists(_.contains(str))
-
-
-
-
 }

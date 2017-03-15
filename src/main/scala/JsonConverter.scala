@@ -15,6 +15,4 @@ trait JsonConverter extends LazyLogging {
       case Right(json) => Some(json)
     }
   }
-
-
 }

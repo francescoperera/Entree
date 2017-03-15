@@ -139,9 +139,9 @@ object HeadChef extends JsonConverter with LazyLogging {
   }
 
   /**
-    *  Converts a Map to an Optional dataFormat object. It maps through each key-value pair and if the key is present in the column field name
-    *  Map (specified in CFNMappingCook), then the conversion happens.
-    *  For each k,v in the m:
+    * Converts a Map to an Optional dataFormat object. It maps through each key-value pair and if the key is present in the column field name
+    * Map (specified in CFNMappingCook), then the conversion happens.
+    * For each k,v in the m:
     *   data = v
     *   label = key from cfnMap with value = k . Look at CFNMappingCook
     *   originalLabel = k
@@ -151,7 +151,7 @@ object HeadChef extends JsonConverter with LazyLogging {
   def map2Model ( m: Map[String,Json]) : Vector[Option[dataFormat]] = m.map{ case (k,v) =>
       CFNMappingCook.isValPresent(k) match {
         case true => Some(dataFormat(v.asString,Some(CFNMappingCook.getKeyFromVal(k)),Some(k)))
-        case false =>None
+        case false => None
       }
   }.toVector
 
@@ -182,5 +182,4 @@ object HeadChef extends JsonConverter with LazyLogging {
     val splitV = v.grouped(rowsPerFile).toVector.zipWithIndex
     splitV.foreach{ case (vec,idx) => saveToS3(vec,dest,label + "_" + idx.toString)}
   }
-
 }
