@@ -7,7 +7,7 @@ import io.circe.syntax._
 import com.typesafe.scalalogging.LazyLogging
 
 
-case class dataFormat(data:Option[String],label:Option[String],originalLabel:Option[String]) //TODO:rename this. too generic
+case class dataFormat(data:Option[String],label:Option[String],originalLabel:Option[String])
 case class validNDJSONFile(filename:String,source:S3Bucket,valid:Boolean)
 
 object  dataFormat{
@@ -36,7 +36,6 @@ object HeadChef extends JsonConverter with LazyLogging {
         aggregateFiles(fileNames,source,destination,"all")
       case _ =>
         println(label) //TODO: this case needs to be looked at more carefully, filtering files based on content not filename
-        fileNames.foreach(toNDSJON(_,source))
         val lf = fileNames.filterNot(CFNMappingCook.isValPresentWithKey(label,_)) // lf = labeled files or files whose name are under the designated lf //TODO: filter based on content not file name
         aggregateFiles(lf,source,destination,label)
     }
@@ -60,7 +59,6 @@ object HeadChef extends JsonConverter with LazyLogging {
     val dataModels = ndjson.flatMap( jf => readFile(jf))
     logger.info(s"Saving to Bucket: ${destination.bucket}, Path:${destination.folderPath}")
     batchSave(dataModels,destination,label)
-
   }
 
   /**
