@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="419b1bab-7146-4b80-b654-a5e7c1d609d8" name="Default" comment="">
+<<<<<<< HEAD
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/scala-2.12/classes/CFNMappingCook$.class" afterPath="$PROJECT_DIR$/target/scala-2.12/classes/CFNMappingCook$.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/scala-2.12/classes/HeadChef$.class" afterPath="$PROJECT_DIR$/target/scala-2.12/classes/HeadChef$.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/scala-2.12/classes/HeadChef.class" afterPath="$PROJECT_DIR$/target/scala-2.12/classes/HeadChef.class" />
@@ -12,6 +13,9 @@
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/streams/compile/compileIncremental/$global/streams/out" afterPath="$PROJECT_DIR$/target/streams/compile/compileIncremental/$global/streams/out" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/streams/compile/incCompileSetup/$global/streams/inc_compile_2.12" afterPath="$PROJECT_DIR$/target/streams/compile/incCompileSetup/$global/streams/inc_compile_2.12" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/streams/compile/run/$global/streams/out" afterPath="$PROJECT_DIR$/target/streams/compile/run/$global/streams/out" />
+=======
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
+>>>>>>> parent of 80988ef...  updated column field map in README
     </list>
     <ignored path="Entree.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -54,11 +58,18 @@
       <file leaf-file-name="HeadChef.scala" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/scala/HeadChef.scala">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
             <state relative-caret-position="645">
               <caret line="135" column="25" selection-start-line="135" selection-start-column="25" selection-end-line="135" selection-end-column="25" />
               <folding>
                 <element signature="e#0#16#0" expanded="true" />
                 <marker date="1489616107000" expanded="true" signature="9050:9188" ph="..." />
+=======
+            <state relative-caret-position="534">
+              <caret line="172" column="35" selection-start-line="172" selection-start-column="35" selection-end-line="172" selection-end-column="35" />
+              <folding>
+                <element signature="e#0#16#0" expanded="true" />
+>>>>>>> parent of 80988ef...  updated column field map in README
               </folding>
             </state>
           </provider>
@@ -67,8 +78,13 @@
       <file leaf-file-name="S3Cook.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/scala/S3Cook.scala">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
             <state relative-caret-position="750">
               <caret line="52" column="6" selection-start-line="52" selection-start-column="6" selection-end-line="52" selection-end-column="6" />
+=======
+            <state relative-caret-position="360">
+              <caret line="24" column="3" selection-start-line="6" selection-start-column="2" selection-end-line="24" selection-end-column="3" />
+>>>>>>> parent of 80988ef...  updated column field map in README
               <folding />
             </state>
           </provider>
@@ -77,8 +93,13 @@
       <file leaf-file-name="CFNMappingCook.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/scala/CFNMappingCook.scala">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
             <state relative-caret-position="450">
               <caret line="30" column="96" selection-start-line="30" selection-start-column="96" selection-end-line="30" selection-end-column="96" />
+=======
+            <state relative-caret-position="75">
+              <caret line="5" column="41" selection-start-line="5" selection-start-column="41" selection-end-line="5" selection-end-column="41" />
+>>>>>>> parent of 80988ef...  updated column field map in README
               <folding />
             </state>
           </provider>
@@ -87,8 +108,13 @@
       <file leaf-file-name="JsonConverter.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/scala/JsonConverter.scala">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
             <state relative-caret-position="195">
               <caret line="15" column="3" selection-start-line="15" selection-start-column="3" selection-end-line="15" selection-end-column="3" />
+=======
+            <state relative-caret-position="915">
+              <caret line="63" column="18" selection-start-line="63" selection-start-column="18" selection-end-line="63" selection-end-column="18" />
+>>>>>>> parent of 80988ef...  updated column field map in README
               <folding />
             </state>
           </provider>
@@ -97,8 +123,13 @@
       <file leaf-file-name="README.md" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/README.md">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
             <state relative-caret-position="225">
               <caret line="16" column="152" selection-start-line="16" selection-start-column="152" selection-end-line="16" selection-end-column="152" />
+=======
+            <state relative-caret-position="684">
+              <caret line="97" column="3" selection-start-line="97" selection-start-column="3" selection-end-line="97" selection-end-column="3" />
+>>>>>>> parent of 80988ef...  updated column field map in README
               <folding />
             </state>
           </provider>
@@ -122,6 +153,10 @@
         <option value="$PROJECT_DIR$/src/main/scala/ColumnFieldNameCook.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/JsonConverter.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/Waiter.scala" />
+<<<<<<< HEAD
+=======
+        <option value="$PROJECT_DIR$/src/main/scala/HeadChef.scala" />
+>>>>>>> parent of 80988ef...  updated column field map in README
         <option value="$PROJECT_DIR$/src/main/scala/CFNMappingCook.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/S3Cook.scala" />
         <option value="$PROJECT_DIR$/README.md" />
@@ -779,14 +814,22 @@
       <workItem from="1488810355550" duration="35799000" />
       <workItem from="1489352258086" duration="14566000" />
       <workItem from="1489506722584" duration="354000" />
+<<<<<<< HEAD
       <workItem from="1489507107936" duration="10921000" />
       <workItem from="1489607530962" duration="2313000" />
       <workItem from="1489615750744" duration="440000" />
+=======
+      <workItem from="1489507107936" duration="5040000" />
+>>>>>>> parent of 80988ef...  updated column field map in README
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
+<<<<<<< HEAD
     <option name="totallyTimeSpent" value="92658000" />
+=======
+    <option name="totallyTimeSpent" value="84024000" />
+>>>>>>> parent of 80988ef...  updated column field map in README
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1440" height="900" extended-state="0" />
@@ -851,6 +894,7 @@
     <entry file="file://$PROJECT_DIR$/all_142.json" />
     <entry file="file://$PROJECT_DIR$/all_141.json" />
     <entry file="file://$PROJECT_DIR$/all_144.json" />
+    <entry file="file://$PROJECT_DIR$/all_145.json" />
     <entry file="file://$PROJECT_DIR$/all_147.json" />
     <entry file="file://$PROJECT_DIR$/all_148.json" />
     <entry file="file://$PROJECT_DIR$/all_149.json" />
@@ -879,6 +923,7 @@
     <entry file="file://$PROJECT_DIR$/all_3.json" />
     <entry file="file://$PROJECT_DIR$/all_4.json" />
     <entry file="file://$PROJECT_DIR$/all_7.json" />
+<<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/src/main/scala/Waiter.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="255">
@@ -899,42 +944,74 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="450">
           <caret line="30" column="96" selection-start-line="30" selection-start-column="96" selection-end-line="30" selection-end-column="96" />
+=======
+    <entry file="file://$PROJECT_DIR$/src/main/scala/S3Cook.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="915">
+          <caret line="63" column="18" selection-start-line="63" selection-start-column="18" selection-end-line="63" selection-end-column="18" />
+>>>>>>> parent of 80988ef...  updated column field map in README
           <folding />
         </state>
       </provider>
     </entry>
+<<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/src/main/scala/S3Cook.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="750">
           <caret line="52" column="6" selection-start-line="52" selection-start-column="6" selection-end-line="52" selection-end-column="6" />
+=======
+    <entry file="file://$PROJECT_DIR$/src/main/scala/Waiter.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="5" column="41" selection-start-line="5" selection-start-column="41" selection-end-line="5" selection-end-column="41" />
+>>>>>>> parent of 80988ef...  updated column field map in README
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/JsonConverter.scala">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
         <state relative-caret-position="195">
           <caret line="15" column="3" selection-start-line="15" selection-start-column="3" selection-end-line="15" selection-end-column="3" />
           <folding />
+=======
+        <state relative-caret-position="534">
+          <caret line="172" column="35" selection-start-line="172" selection-start-column="35" selection-end-line="172" selection-end-column="35" />
+          <folding>
+            <element signature="e#0#16#0" expanded="true" />
+          </folding>
+>>>>>>> parent of 80988ef...  updated column field map in README
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
         <state relative-caret-position="225">
           <caret line="16" column="152" selection-start-line="16" selection-start-column="152" selection-end-line="16" selection-end-column="152" />
+=======
+        <state relative-caret-position="360">
+          <caret line="24" column="3" selection-start-line="6" selection-start-column="2" selection-end-line="24" selection-end-column="3" />
+>>>>>>> parent of 80988ef...  updated column field map in README
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/HeadChef.scala">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
         <state relative-caret-position="645">
           <caret line="135" column="25" selection-start-line="135" selection-start-column="25" selection-end-line="135" selection-end-column="25" />
           <folding>
             <element signature="e#0#16#0" expanded="true" />
             <marker date="1489616107000" expanded="true" signature="9050:9188" ph="..." />
           </folding>
+=======
+        <state relative-caret-position="684">
+          <caret line="97" column="3" selection-start-line="97" selection-start-column="3" selection-end-line="97" selection-end-column="3" />
+          <folding />
+>>>>>>> parent of 80988ef...  updated column field map in README
         </state>
       </provider>
     </entry>

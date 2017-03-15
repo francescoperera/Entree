@@ -101,10 +101,10 @@ object HeadChef extends JsonConverter with LazyLogging {
     modelVector.map(_.get.asJson.noSpaces)
   }
 
-  def streamEntireFile(fileName:String,s3Bucket: S3Bucket):String = {
+  def streamEntireFile(fileName:String,s3Bucket: S3Bucket,strSeperator:String):String = {
     val input = DtlS3Cook.apply.getFileStream(s3Bucket.bucket,s3Bucket.folderPath.getOrElse("") + fileName)
     val reader = new BufferedReader(new InputStreamReader(input))
-    val fileString = Stream.continually(reader.readLine()).takeWhile(_ != null).mkString(",")
+    val fileString = Stream.continually(reader.readLine()).takeWhile(_ != null).mkString(strSeperator)
     reader.close()
     fileString
   }
@@ -118,7 +118,7 @@ object HeadChef extends JsonConverter with LazyLogging {
     */
   def readNDSJONFile(fileName:String,s3Bucket: S3Bucket):Vector[String] = {
     logger.info(s" Reading  NDJSON file: $fileName")
-    streamEntireFile(fileName,s3Bucket).split(",").toVector
+    streamEntireFile(fileName,s3Bucket,",").split(",").toVector
   }
 
   /**
@@ -130,17 +130,12 @@ object HeadChef extends JsonConverter with LazyLogging {
     */
   def toNDSJON(f:String,source:S3Bucket):Vector[String] = {
     logger.info(s"Formatting $f to NDJSON format")
-    val fileString = streamEntireFile(f,source)
-    f match {
-      case "glassdoor_jobs_Administrative_1488550381.418022.json" => println(fileString)
-      case _ => println(f)
-    }
+    val fileString = streamEntireFile(f,source,"")
     val fileJS = toJson(fileString) match {
       case None => None
       case Some(j) => j.asArray
     }
     fileJS.get.map(_.noSpaces)
-
   }
 
   /**
@@ -171,17 +166,14 @@ object HeadChef extends JsonConverter with LazyLogging {
     val bw = new BufferedWriter(new FileWriter(f))
     v.foreach(s => bw.write( s + "\n"))
     bw.close()
-//    val f = v.flatMap(_.getBytes).toArray
-//    val d1 = f.map(_.toChar)
-//    d1.foreach(println)
-    //TODO:Figure out to stream the content. Using Array of Bytes does not seem to work properly.
+//    val f = v.map(_.toByte).toArray  //TODO:Figure out to stream the content (v) back to S3.
     logger.info(s"Saving to S3:$fname")
     DtlS3Cook.apply.saveFile(dest.bucket,dest.folderPath.getOrElse(""),f)
   }
 
   /**
     * Takes all aggregated data in the form of a vector of strings and saves a batch of the strings at a time. The batch size
-    * is determined by rowsPerFile
+    * is determined by rowsPerFile.
     * @param v
     * @param dest
     * @param label

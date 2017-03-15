@@ -53,6 +53,7 @@ class S3Cook(val accessKeyId: String, val secretAccessKey: String){
     //println(metadata.getContentLength)
     s3.put(Bucket(b), key, file, metadata)}
 
+
   /**
     * Takesa bucket name, folder path , and a file .It saves the file content in the specified bucket, following the path
     * determined by the folderPath
