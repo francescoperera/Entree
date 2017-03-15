@@ -47,10 +47,10 @@ class S3Cook(val accessKeyId: String, val secretAccessKey: String){
     * @param file - array of bytes carrying the file contents to be saved
     */
   def saveFile(b: String, key: String, file:Array[Byte]) ={
-    println(file.length)
+    //println(file.length)
     val metadata = new ObjectMetadata()
     metadata.setContentLength(file.length.toLong)
-    println(metadata.getContentLength)
+    //println(metadata.getContentLength)
     s3.put(Bucket(b), key, file, metadata)}
 
   /**

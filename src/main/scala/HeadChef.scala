@@ -18,7 +18,7 @@ object  dataFormat{
 object HeadChef extends JsonConverter with LazyLogging {
   /** HeadChef is the main resource of Entree and will direct every other resource. */
 
-  private val rowsPerFile = 10000
+  private val rowsPerFile = 100000 // Important: this value determines the size of the output files.
 
   /**
     * takes the source S3 bucket and gets all the filenames according to the label. It then aggregates all the files.
@@ -43,22 +43,6 @@ object HeadChef extends JsonConverter with LazyLogging {
   }
 
   /**
-    * Takes a filename and its source S3 bucket, reads the first line of the file and determines whether the file has a NDSJON or just
-    * regular JSON. It then creates a validNDSJONFile object for the file
-    * @param f - filename
-    * @param source - input S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
-    * @return - validNDSJONFile object. Look at HeadChef for validNDSJONFile implementation
-    */
-  def isNDJSON(f:String,source:S3Bucket): validNDJSONFile = {
-    val input = DtlS3Cook.apply.getFileStream(source.bucket,source.folderPath.getOrElse("") + f)
-    val reader = new BufferedReader(new InputStreamReader(input))
-    val fileString = Stream.continually(reader.readLine()).take(1).mkString("")
-    reader.close()
-    val isValid = fileString.startsWith("{") && fileString.endsWith("}") //NDJSON object start with { and end with } on the same line
-    validNDJSONFile(f,source,isValid)
-  }
-
-  /**
     * Takes a vector of filesnames, the source S3bucket, destination S3Bucket and the label for which data needs to be aggregated for.
     * It checks whether each file is a valid NDJSON file or not and creates a validNDSJON object. The vector of NDSJON objects is then
     * used to read the files and aggregate all the data based on the input label. The vector of dataFormat objects it is then passed on
@@ -80,6 +64,22 @@ object HeadChef extends JsonConverter with LazyLogging {
   }
 
   /**
+    * Takes a filename and its source S3 bucket, reads the first line of the file and determines whether the file has a NDSJON or just
+    * regular JSON. It then creates a validNDSJONFile object for the file
+    * @param f - filename
+    * @param source - input S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
+    * @return - validNDSJONFile object. Look at HeadChef for validNDSJONFile implementation
+    */
+  def isNDJSON(f:String,source:S3Bucket): validNDJSONFile = {
+    val input = DtlS3Cook.apply.getFileStream(source.bucket,source.folderPath.getOrElse("") + f)
+    val reader = new BufferedReader(new InputStreamReader(input))
+    val fileString = Stream.continually(reader.readLine()).take(1).mkString("")
+    reader.close()
+    val isValid = fileString.startsWith("{") && fileString.endsWith("}") //NDJSON object start with { and end with } on the same line
+    validNDJSONFile(f,source,isValid)
+  }
+
+  /**
     * Takes a validNDJSONFile object,checks whether the file it refers to is a valid NDJSON file. If yes, it just reads the file as vector of strings.
     * If not, it converts to NDJSON format and then casts the it as a vector of strings. Then, each string is transformed to a Map and then to
     * a dataFormat object. Lastly each dataFormat object is encoded into JSON , specifically NDJSON format.
@@ -88,17 +88,25 @@ object HeadChef extends JsonConverter with LazyLogging {
     * @return - vector of string, where each stringified dataFormat object
     */
   def readFile(ndjson:validNDJSONFile) : Vector[String] = {
-//    logger.info(s" Reading file: $fileName")
     val vectorString : Vector[String] = ndjson.valid match {
       case true =>readNDSJONFile(ndjson.filename,ndjson.source)
       case false => toNDSJON(ndjson.filename,ndjson.source)
     }
     val mo : Vector[Option[Map[String,Json]]] = vectorString.map( s => toJson(s) match {
-      case None => Some(Map[String,Json]())
+      case None => None //Some(Map[String,Json]())
       case Some(j) =>Some(j.asObject.getOrElse(JsonObject.empty).toMap)
     }).filterNot(_.isEmpty) //each object per line was converted to a JSON object and then to a Map. Any empty objects or None were filtered out.
     val modelVector:Vector[Option[dataFormat]] = mo.flatMap{m => map2Model(m.get)}.filterNot(_.isEmpty) //.isEmpty filters None's.
+    logger.info(s"Mapped ${ndjson.filename} content to ${modelVector.length} standard data format objects")
     modelVector.map(_.get.asJson.noSpaces)
+  }
+
+  def streamEntireFile(fileName:String,s3Bucket: S3Bucket):String = {
+    val input = DtlS3Cook.apply.getFileStream(s3Bucket.bucket,s3Bucket.folderPath.getOrElse("") + fileName)
+    val reader = new BufferedReader(new InputStreamReader(input))
+    val fileString = Stream.continually(reader.readLine()).takeWhile(_ != null).mkString(",")
+    reader.close()
+    fileString
   }
 
   /**
@@ -110,11 +118,7 @@ object HeadChef extends JsonConverter with LazyLogging {
     */
   def readNDSJONFile(fileName:String,s3Bucket: S3Bucket):Vector[String] = {
     logger.info(s" Reading  NDJSON file: $fileName")
-    val input = DtlS3Cook.apply.getFileStream(s3Bucket.bucket,s3Bucket.folderPath.getOrElse("") + fileName)
-    val reader = new BufferedReader(new InputStreamReader(input))
-    val fileString = Stream.continually(reader.readLine()).takeWhile(_ != null).mkString(",")
-    reader.close()
-    fileString.split(",").toVector
+    streamEntireFile(fileName,s3Bucket).split(",").toVector
   }
 
   /**
@@ -125,11 +129,8 @@ object HeadChef extends JsonConverter with LazyLogging {
     * @return - vector of strings ( where each string is a NDJSON object)
     */
   def toNDSJON(f:String,source:S3Bucket):Vector[String] = {
-    logger.info(s" Reading NON-NDJSON file: $f")
-    val input = DtlS3Cook.apply.getFileStream(source.bucket,source.folderPath.getOrElse("") + f)
-    val reader = new BufferedReader(new InputStreamReader(input))
-    val fileString = Stream.continually(reader.readLine()).takeWhile(_ != null).mkString("")//.mkString(",") //only taking 5 at this stage
-    reader.close()
+    logger.info(s"Formatting $f to NDJSON format")
+    val fileString = streamEntireFile(f,source)
     val fileJS = toJson(fileString) match {
       case None => None
       case Some(j) => j.asArray
@@ -139,16 +140,18 @@ object HeadChef extends JsonConverter with LazyLogging {
 
   /**
     *  Converts a Map to an Optional dataFormat object. It maps through each key-value pair and if the key is present in the column field name
-    *  Map (specified in CFNMappingCook), then the conversion happens/
+    *  Map (specified in CFNMappingCook), then the conversion happens.
+    *  For each k,v in the m:
+    *   data = v
+    *   label = key from cfnMap with value = k . Look at CFNMappingCook
+    *   originalLabel = k
     * @param m - Map
     * @return - vector of Option[dataFormat]
     */
   def map2Model ( m: Map[String,Json]) : Vector[Option[dataFormat]] = m.map{ case (k,v) =>
       CFNMappingCook.isValPresent(k) match {
         case true => Some(dataFormat(v.asString,Some(CFNMappingCook.getKeyFromVal(k)),Some(k)))
-        case false =>
-          logger.info(s" The key $k is not present in cfnMap. Look at CFNMappingCook.")
-          None
+        case false =>None
       }
   }.toVector
 
@@ -179,7 +182,6 @@ object HeadChef extends JsonConverter with LazyLogging {
     * @param label
     */
   def batchSave(v:Vector[String],dest:S3Bucket,label:String) = {
-    val splitIdx = Seq.range(1,v.length/rowsPerFile).toVector.map( _ * rowsPerFile)
     val splitV = v.grouped(rowsPerFile).toVector.zipWithIndex
     splitV.foreach{ case (vec,idx) => saveToS3(vec,dest,label + "_" + idx.toString)}
   }

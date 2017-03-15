@@ -15,6 +15,13 @@ This clt requires three inputs:
   2. s3 url pointing to the bucket & folder path that you want to save the formatted data to.(i.e https://s3.amazonaws.com/my_bucket/folder1/folder2)
   3. label or column field name that you want to format data for. If you want to label all column field names in your bucket use "all", else type the column field name ( i.e "email_address")
 
+## Output
+JSON data is aggregated in or more files in NDJSON format, where each object has the following structure:
+
+```
+        {"data":"foo","label":"bar","originalLabel":"baz"}
+```
+
 ## Getting started
 
 ### Compile
@@ -60,12 +67,12 @@ If you run ``` sbt "run https://s3.amazonaws.com/dummy_bucket/data https://s3.am
 The new file will look like the following:
 
 ```
-{"data":"hzk@yahoo.com","label":"email"}
-{"data":"trevorp@hotmail.com","label":"email"}
-{"data":"xyz@gmail.com","label":"email_address"}
-{"data":"bot@gmail.com","label":"email_address"}
-{"data":"ark@byu.edu","label":"emailaddress"}
-{"data":"lol@aol.com","label":"emailaddress"}
+{"data":"hzk@yahoo.com","label":"email_address","originalLabel":"email"}
+{"data":"trevorp@hotmail.com","label":"email_address","originalLabel":"email"}
+{"data":"xyz@gmail.com","label":"email_address","originalLabel":"email_address"}
+{"data":"bot@gmail.com","label":"email_address","originalLabel":"email_address"}
+{"data":"ark@byu.edu","label":"email_address","originalLabel":"emailaddress"}
+{"data":"lol@aol.com","label":"email_address","originalLabel":"emailaddress"}
 ```
 This file will be stored in https://s3.amazonaws.com/dummy_bucket/clean_data
 

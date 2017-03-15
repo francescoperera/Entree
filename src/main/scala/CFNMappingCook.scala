@@ -1,8 +1,9 @@
 
 object CFNMappingCook {
 
-  /** CFNMappingCook has the only responsability of storing the column field map and is the only resource in Entree
-    * that can interact with it. */
+  /** CFNMappingCook has the only responsibility of storing the column field map and is the only resource in Entree
+    * that can interact with it.
+    * */
 
   val cfnMap:Map[String,Array[String]] = Map ( //TODO: Fucking manual work. Automate this ASAP
     "email_address" -> Array("email_address","email","emailaddress"),
@@ -28,7 +29,6 @@ object CFNMappingCook {
 
   /**
     * Given a certain string or value, it finds the key in cfnMap that maps to that string/value
-    *
     * @param v - string of value
     * @return - key that maps to the input value
     */
@@ -36,7 +36,6 @@ object CFNMappingCook {
 
   /**
     * Checks whether a value,v, is present in cfnMap with a specific key,k
-    *
     * @param k - key/ string
     * @param v - value/string
     * @return - boolean
@@ -45,7 +44,6 @@ object CFNMappingCook {
 
   /**
     * Checks whether the input string, str, exists as a value in cfnMap.
-    *
     * @param str - value/string
     * @return - boolean
     */
