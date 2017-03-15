@@ -46,7 +46,12 @@ class S3Cook(val accessKeyId: String, val secretAccessKey: String){
     * @param key - path/ file name where to save the contents to
     * @param file - array of bytes carrying the file contents to be saved
     */
-  def saveFile(b: String, key: String, file:Array[Byte]) = s3.put(Bucket(b), key, file, new ObjectMetadata())
+  def saveFile(b: String, key: String, file:Array[Byte]) ={
+    println(file.length)
+    val metadata = new ObjectMetadata()
+    metadata.setContentLength(file.length.toLong)
+    println(metadata.getContentLength)
+    s3.put(Bucket(b), key, file, metadata)}
 
   /**
     * Takesa bucket name, folder path , and a file .It saves the file content in the specified bucket, following the path

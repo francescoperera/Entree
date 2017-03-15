@@ -163,14 +163,17 @@ object HeadChef extends JsonConverter with LazyLogging {
     val bw = new BufferedWriter(new FileWriter(f))
     v.foreach(s => bw.write( s + "\n"))
     bw.close()
-//    val f = v.map(_.toByte).toArray  //TODO:Figure out to stream the content (v) back to S3.
+//    val f = v.flatMap(_.getBytes).toArray
+//    val d1 = f.map(_.toChar)
+//    d1.foreach(println)
+    //TODO:Figure out to stream the content. Using Array of Bytes does not seem to work properly.
     logger.info(s"Saving to S3:$fname")
     DtlS3Cook.apply.saveFile(dest.bucket,dest.folderPath.getOrElse(""),f)
   }
 
   /**
     * Takes all aggregated data in the form of a vector of strings and saves a batch of the strings at a time. The batch size
-    * is determined by rowsPerFile.
+    * is determined by rowsPerFile
     * @param v
     * @param dest
     * @param label
