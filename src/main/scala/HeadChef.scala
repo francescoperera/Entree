@@ -7,7 +7,7 @@ import io.circe.syntax._
 import com.typesafe.scalalogging.LazyLogging
 
 
-case class dataFormat(data:Option[String],label:Option[String],originalLabel:Option[String])
+case class dataFormat(data:Option[String],label:Option[String],column_header:Option[String],column_description:String) //TODO: check if anything here needs to be an Option
 case class validNDJSONFile(filename:String,source:S3Bucket,valid:Boolean)
 
 object  dataFormat{
@@ -22,6 +22,7 @@ object HeadChef extends JsonConverter with LazyLogging {
 
   /**
     * takes the source S3 bucket and gets all the filenames according to the label. It then aggregates all the files.
+    *
     * @param source -  input S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
     * @param destination - output S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
     * @param label - greater ontology/column field name for which data needs to be aggregated. Could be "all" vs "specific_label"
@@ -46,6 +47,7 @@ object HeadChef extends JsonConverter with LazyLogging {
     * It checks whether each file is a valid NDJSON file or not and creates a validNDSJON object. The vector of NDSJON objects is then
     * used to read the files and aggregate all the data based on the input label. The vector of dataFormat objects it is then passed on
     * and saved to S3.
+    *
     * @param fv - vector of filenames
     * @param source - input S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
     * @param destination - output S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
@@ -64,6 +66,7 @@ object HeadChef extends JsonConverter with LazyLogging {
   /**
     * Takes a filename and its source S3 bucket, reads the first line of the file and determines whether the file has a NDSJON or just
     * regular JSON. It then creates a validNDSJONFile object for the file
+    *
     * @param f - filename
     * @param source - input S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
     * @return - validNDSJONFile object. Look at HeadChef for validNDSJONFile implementation
@@ -82,6 +85,7 @@ object HeadChef extends JsonConverter with LazyLogging {
     * If not, it converts to NDJSON format and then casts the it as a vector of strings. Then, each string is transformed to a Map and then to
     * a dataFormat object. Lastly each dataFormat object is encoded into JSON , specifically NDJSON format.
     * it reads the file and converts
+    *
     * @param ndjson - validNDSJONFile object ( contains filename, source and valid fields). Look at HeadChef for implementation.
     * @return - vector of string, where each stringified dataFormat object
     */
@@ -110,6 +114,7 @@ object HeadChef extends JsonConverter with LazyLogging {
   /**
     * Takes a filename and an S3bucket object pointing to the location of filename. It Streams the content of the S3 file and outputs
     * a vector of Strings
+    *
     * @param fileName - filename
     * @param s3Bucket - input S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
     * @return - file content as a vector of strings
@@ -122,6 +127,7 @@ object HeadChef extends JsonConverter with LazyLogging {
   /**
     * Takes a filename and its source S3 bucket and converts it into NDJSON( newline delimited JSON) and casts it as a Vector of strings, where
     * each string is the NDJSON object.
+    *
     * @param f - filename
     * @param source - input S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
     * @return - vector of strings ( where each string is a NDJSON object)
@@ -143,18 +149,45 @@ object HeadChef extends JsonConverter with LazyLogging {
     *   data = v
     *   label = key from cfnMap with value = k . Look at CFNMappingCook
     *   originalLabel = k
+    *
     * @param m - Map
     * @return - vector of Option[dataFormat]
     */
-  def map2Model ( m: Map[String,Json]) : Vector[Option[dataFormat]] = m.map{ case (k,v) =>
+  def map2Model ( m: Map[String,Json]) : Vector[Option[dataFormat]] = {
+    val colDesc = m.getOrElse("column_description","".asJson)
+    m.map{ case (k,v) =>
       CFNMappingCook.isValPresent(k) match {
-        case true => Some(dataFormat(v.asString,Some(CFNMappingCook.getKeyFromVal(k)),Some(k)))
+        case true => Some(dataFormat(v.asString,Some(CFNMappingCook.getKeyFromVal(k)),Some(k),colDesc.asString.get)) //TODO: add column_description if available
         case false => None
       }
-  }.toVector
+    }.toVector
+  }
 
+  def filterDataFormat(mv:Vector[Option[dataFormat]]) = {
+    def isDataInvalid(d:Option[String]): Boolean = d.get match {
+      case "NA" => true
+      case "N/A" => true
+      case "None" => true
+      case "" => true
+      case "[REDACTED]" => true //address_socrata.json
+      case "UNFILLED" => true //employee_socrata.json
+      case _ => false
+    }
+
+    def isDataEmpty (d:Option[String]) : Boolean = d.get.trim().isEmpty //true if d.get is only whitespace i.e "   "
+
+    def filterData[A](a:A,f1: A=>Boolean,f2: A => Boolean) : Boolean = f1(a) || f2(a) //TODO: Expand this to handle a list of functions
+
+    mv.filterNot(od => filterData(od.get.data,isDataInvalid _, isDataEmpty _))
+  }
+
+
+
+  //TODO: 1. iterate through keys of m . If key == column description capture it and its value. If not use that as column header and its value as data
+  //TODO Assume all maps have a column_description. If yes,grab value otherwise "". Then for the other fields get data and colunmn_header
   /**
     * Takes a vector of strings and saves it to a File and then pushes the file to S3.
+    *
     * @param v - vector of strings/ file content
     * @param dest - output/destination S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
     * @param fname - filename used to save the file contents
@@ -177,7 +210,8 @@ object HeadChef extends JsonConverter with LazyLogging {
     * @param label
     */
   def batchSave(v:Vector[String],dest:S3Bucket,label:String) = {
-    val splitV = v.grouped(rowsPerFile).toVector.zipWithIndex
+    val randomV: Vector[String] = util.Random.shuffle(v)
+    val splitV = randomV.grouped(rowsPerFile).toVector.zipWithIndex
     splitV.foreach{ case (vec,idx) => saveToS3(vec,dest,label + "_" + idx.toString)}
   }
 }

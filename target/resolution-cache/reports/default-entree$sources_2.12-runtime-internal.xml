@@ -7,7 +7,7 @@
 		revision="1.0"
 		conf="runtime-internal"
 		confs="compile, runtime, test, provided, optional, compile-internal, runtime-internal, test-internal, plugin, sources, docs, pom, scala-tool"
-		date="20170306102739"/>
+		date="20170315203049"/>
 	<dependencies>
 		<module organisation="com.github.seratch" name="awscala_2.12">
 			<revision name="0.5.9" status="release" pubdate="20161123183130" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/seratch/awscala" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="21">
@@ -383,11 +383,11 @@
 				<metadata-artifact status="no" details="" size="2890" time="0" location="/Users/francescoperera/.ivy2/cache/org.scalaj/scalaj-http_2.12/ivy-2.3.0.xml" searched="false" origin-is-local="false" origin-location="https://jcenter.bintray.com/org/scalaj/scalaj-http_2.12/2.3.0/scalaj-http_2.12-2.3.0.pom"/>
 				<caller organisation="default" name="entree$sources_2.12" conf="compile, runtime-internal, runtime, optional" rev="2.3.0" rev-constraint-default="2.3.0" rev-constraint-dynamic="2.3.0" callerrev="1.0"/>
 				<artifacts>
-					<artifact name="scalaj-http_2.12" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="13316" time="0" location="/Users/francescoperera/.ivy2/cache/org.scalaj/scalaj-http_2.12/srcs/scalaj-http_2.12-2.3.0-sources.jar">
-						<origin-location is-local="false" location="https://jcenter.bintray.com/org/scalaj/scalaj-http_2.12/2.3.0/scalaj-http_2.12-2.3.0-sources.jar"/>
-					</artifact>
 					<artifact name="scalaj-http_2.12" type="jar" ext="jar" status="no" details="" size="108412" time="0" location="/Users/francescoperera/.ivy2/cache/org.scalaj/scalaj-http_2.12/jars/scalaj-http_2.12-2.3.0.jar">
 						<origin-location is-local="false" location="https://jcenter.bintray.com/org/scalaj/scalaj-http_2.12/2.3.0/scalaj-http_2.12-2.3.0.jar"/>
+					</artifact>
+					<artifact name="scalaj-http_2.12" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="13316" time="0" location="/Users/francescoperera/.ivy2/cache/org.scalaj/scalaj-http_2.12/srcs/scalaj-http_2.12-2.3.0-sources.jar">
+						<origin-location is-local="false" location="https://jcenter.bintray.com/org/scalaj/scalaj-http_2.12/2.3.0/scalaj-http_2.12-2.3.0-sources.jar"/>
 					</artifact>
 				</artifacts>
 			</revision>

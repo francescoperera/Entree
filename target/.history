@@ -1,0 +1,7 @@
+inspect sources
+inspect tree sources
+sbt console
+run s3
+quit
+q
+exit

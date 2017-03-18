@@ -27,7 +27,8 @@ class S3Cook(val accessKeyId: String, val secretAccessKey: String){
   def createS3Bucket(url:String) : S3Bucket =  {
     val uv:Vector[String] = url.split("/").toVector //uv = url vector
     val bi : Int = uv.indexWhere(_.contains(".com")) + 1 //bi = bucket index, it comes after s3.amazonaws.com/bucket/...
-    val fp : Option[String] = Some(uv.takeRight(uv.size - bi-1).mkString("/") + "/") //fp = file path
+    val fp : Option[String] = Some(uv.takeRight(uv.size - bi-1).mkString("/") + "/") //fp = folder path
+    // TODO: this assumes  s3 urls only points to folders, HANDLE also files
     S3Bucket(uv(bi),fp)
   }
 
