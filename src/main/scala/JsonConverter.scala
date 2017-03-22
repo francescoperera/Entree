@@ -9,11 +9,11 @@ trait JsonConverter extends LazyLogging {
     * JsonConverter is an interface that resources in Entree will use to go from and to Json. It will use Circe
     */
 
-  def toJson(str: String): Option[Json] = {
-    println(s"Converting $str")
-    parser.parse(str) match {
-      case Left(failure) => None
-      case Right(json) => Some(json)
-    }
-  }
+//  def toJson(str: String): Option[Json] = {
+//    parser.parse(str) match {
+//      case Left(failure) => None
+//      case Right(json) => Some(json)
+//    }
+//  }
+  def toJson(str:String) = parser.parse(str).getOrElse(Json.Null)
 }
