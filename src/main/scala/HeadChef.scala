@@ -154,23 +154,41 @@ object HeadChef extends JsonConverter with LazyLogging {
     * @return - vector of Option[dataFormat]
     */
   def map2Model ( m: Map[String,Json]) : Vector[Option[dataFormat]] = {
+
+    def ltrim(s: String) = s.replaceAll("^\\s+", "")
+    def rtrim(s: String) = s.replaceAll("\\s+$", "")
+
     val colDesc = m.getOrElse("column_description","".asJson)
     m.map{ case (k,v) =>
       CFNMappingCook.isValPresent(k) match {
-        case true => Some(dataFormat(v.asString,Some(CFNMappingCook.getKeyFromVal(k)),Some(k),colDesc.asString.get)) //TODO: add column_description if available
+        case true =>
+          val dataVal = Some(rtrim(ltrim(v.asString.get)))
+          Some(dataFormat(dataVal,Some(CFNMappingCook.getKeyFromVal(k)),Some(k),colDesc.asString.get))
         case false => None
       }
     }.toVector
   }
 
   def filterDataFormat(mv:Vector[Option[dataFormat]]) = {
-    def isDataInvalid(d:Option[String]): Boolean = d.get match {
-      case "NA" => true
-      case "N/A" => true
-      case "None" => true
+    def isDataInvalid(d:Option[String]): Boolean = d.get.toLowerCase() match {
+      case "na" => true
+      case "n/a" => true
+      case "n/d" => true
+      case "none" => true
       case "" => true
-      case "[REDACTED]" => true //address_socrata.json
-      case "UNFILLED" => true //employee_socrata.json
+      case "[redacted]" => true //address_socrata.json
+      case "unfilled" => true //employee_socrata.json
+      case "address redacted" => true //address_socrata.json
+      case "redacted address" => true
+      case "redacted" => true
+      case "unknown" => true
+      case "null" => true
+      case "no registra" => true
+      case "no informa" => true
+      case "no reporta" => true
+      case "no aporta" => true
+      case "no tiene" => true
+      case "no" => true
       case _ => false
     }
 
@@ -181,10 +199,6 @@ object HeadChef extends JsonConverter with LazyLogging {
     mv.filterNot(od => filterData(od.get.data,isDataInvalid _, isDataEmpty _))
   }
 
-
-
-  //TODO: 1. iterate through keys of m . If key == column description capture it and its value. If not use that as column header and its value as data
-  //TODO Assume all maps have a column_description. If yes,grab value otherwise "". Then for the other fields get data and colunmn_header
   /**
     * Takes a vector of strings and saves it to a File and then pushes the file to S3.
     *
