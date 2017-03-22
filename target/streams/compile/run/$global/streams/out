@@ -1,5 +1,4 @@
-[0m[[0minfo[0m] [0mRunning Waiter https://s3.amazonaws.com/fp-data/PII/dump https://s3.amazonaws.com/fp-data/PII/streaming all[0m
-[0m[[0mdebug[0m] [0mWaiting for threads to exit or System.exit to be called.[0m
+[0m[[0minfo[0m] [0mRunning Waiter https://s3.amazonaws.com/fp-data/PII/test https://s3.amazonaws.com/fp-data/PII/shitz all[0m
 [0m[[0mdebug[0m] [0m  Classpath:[0m
 [0m[[0mdebug[0m] [0m	/Users/francescoperera/Developer/datalogue/Entree/target/scala-2.12/classes[0m
 [0m[[0mdebug[0m] [0m	/Users/francescoperera/.ivy2/cache/org.scala-lang/scala-library/jars/scala-library-2.12.1.jar[0m
@@ -45,6 +44,7 @@
 [0m[[0mdebug[0m] [0m	/Users/francescoperera/.ivy2/cache/com.amazonaws/aws-java-sdk-dynamodb/jars/aws-java-sdk-dynamodb-1.10.77.jar[0m
 [0m[[0mdebug[0m] [0m	/Users/francescoperera/.ivy2/cache/com.amazonaws/aws-java-sdk-simpledb/jars/aws-java-sdk-simpledb-1.10.77.jar[0m
 [0m[[0mdebug[0m] [0m	/Users/francescoperera/.ivy2/cache/org.joda/joda-convert/jars/joda-convert-1.8.1.jar[0m
+[0m[[0mdebug[0m] [0mWaiting for threads to exit or System.exit to be called.[0m
 [0m[[0mdebug[0m] [0mWaiting for thread run-main-0 to terminate.[0m
 [0m[[0mdebug[0m] [0m	Thread run-main-0 exited.[0m
 [0m[[0mdebug[0m] [0mInterrupting remaining threads (should be all daemons).[0m

@@ -31,7 +31,6 @@ object CFNMappingCook {
 
   /**
     * Given a certain string or value, it finds the key in cfnMap that maps to that string/value
-    *
     * @param v - string of value
     * @return - key that maps to the input value
     */
@@ -39,7 +38,6 @@ object CFNMappingCook {
 
   /**
     * Checks whether a value,v, is present in cfnMap with a specific key,k
-    *
     * @param k - key/ string
     * @param v - value/string
     * @return - boolean
@@ -48,7 +46,6 @@ object CFNMappingCook {
 
   /**
     * Checks whether the input string, str, exists as a value in cfnMap.
-    *
     * @param str - value/string
     * @return - boolean
     */

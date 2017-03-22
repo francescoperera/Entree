@@ -94,11 +94,19 @@ object HeadChef extends JsonConverter with LazyLogging {
       case true =>readNDSJONFile(ndjson.filename,ndjson.source)
       case false => toNDSJON(ndjson.filename,ndjson.source)
     }
+    println(vectorString.size)
     val mo : Vector[Option[Map[String,Json]]] = vectorString.map( s => toJson(s) match {
       case None => None //Some(Map[String,Json]())
-      case Some(j) =>Some(j.asObject.getOrElse(JsonObject.empty).toMap)
+      case Some(j) =>
+        println(j)
+        Some(j.asObject.getOrElse(JsonObject.empty).toMap)
     }).filterNot(_.isEmpty) //each object per line was converted to a JSON object and then to a Map. Any empty objects or None were filtered out.
+    println(mo.size)
     val modelVector:Vector[Option[dataFormat]] = mo.flatMap{m => map2Model(m.get)}.filterNot(_.isEmpty) //.isEmpty filters None's.
+    println(s"modelVector contains ${modelVector.size}")
+    println(modelVector)
+    val fmv : Vector[Option[dataFormat]] = filterDataFormat(modelVector)
+    println(s"filtered model vector contains ${fmv.size}")
     logger.info(s"Mapped ${ndjson.filename} content to ${modelVector.length} standard data format objects")
     modelVector.map(_.get.asJson.noSpaces)
   }
@@ -108,6 +116,7 @@ object HeadChef extends JsonConverter with LazyLogging {
     val reader = new BufferedReader(new InputStreamReader(input))
     val fileString = Stream.continually(reader.readLine()).takeWhile(_ != null).mkString(strSeperator)
     reader.close()
+    println(fileString)
     fileString
   }
 
@@ -121,7 +130,11 @@ object HeadChef extends JsonConverter with LazyLogging {
     */
   def readNDSJONFile(fileName:String,s3Bucket: S3Bucket):Vector[String] = {
     logger.info(s" Reading  NDJSON file: $fileName")
-    streamEntireFile(fileName,s3Bucket,",").split(",").toVector
+    val fileContent = streamEntireFile(fileName,s3Bucket,",").split(",").toVector
+    fileContent.foreach(println)
+    println(s"$fileName contains ${fileContent.size} objects")
+    fileContent
+
   }
 
   /**
@@ -134,7 +147,7 @@ object HeadChef extends JsonConverter with LazyLogging {
     */
   def toNDSJON(f:String,source:S3Bucket):Vector[String] = {
     logger.info(s"Formatting $f to NDJSON format")
-    val fileString = streamEntireFile(f,source,"")
+    val fileString = streamEntireFile(f,source,",")
     val fileJS = toJson(fileString) match {
       case None => None
       case Some(j) => j.asArray
@@ -157,20 +170,27 @@ object HeadChef extends JsonConverter with LazyLogging {
 
     def ltrim(s: String) = s.replaceAll("^\\s+", "")
     def rtrim(s: String) = s.replaceAll("\\s+$", "")
-
+    println(m)
     val colDesc = m.getOrElse("column_description","".asJson)
-    m.map{ case (k,v) =>
+    val vd : Vector[Option[dataFormat]] = m.map{ case (k,v) =>
       CFNMappingCook.isValPresent(k) match {
         case true =>
-          val dataVal = Some(rtrim(ltrim(v.asString.get)))
+          println("PRESENT")
+          println(k)
+          val dataVal = Some(rtrim(ltrim(v.asString.getOrElse(""))))
           Some(dataFormat(dataVal,Some(CFNMappingCook.getKeyFromVal(k)),Some(k),colDesc.asString.get))
-        case false => None
+        case false =>
+          println(k)
+          println("Not present in Map")
+          None
       }
     }.toVector
+    println(vd)
+    vd
   }
 
   def filterDataFormat(mv:Vector[Option[dataFormat]]) = {
-    def isDataInvalid(d:Option[String]): Boolean = d.get.toLowerCase() match {
+    def isDataInvalid(d:Option[String]): Boolean = d.getOrElse("").toLowerCase() match {
       case "na" => true
       case "n/a" => true
       case "n/d" => true
@@ -192,7 +212,7 @@ object HeadChef extends JsonConverter with LazyLogging {
       case _ => false
     }
 
-    def isDataEmpty (d:Option[String]) : Boolean = d.get.trim().isEmpty //true if d.get is only whitespace i.e "   "
+    def isDataEmpty (d:Option[String]) : Boolean = d.getOrElse("").trim().isEmpty //true if d.get is only whitespace i.e "   "
 
     def filterData[A](a:A,f1: A=>Boolean,f2: A => Boolean) : Boolean = f1(a) || f2(a) //TODO: Expand this to handle a list of functions
 
@@ -226,6 +246,7 @@ object HeadChef extends JsonConverter with LazyLogging {
   def batchSave(v:Vector[String],dest:S3Bucket,label:String) = {
     val randomV: Vector[String] = util.Random.shuffle(v)
     val splitV = randomV.grouped(rowsPerFile).toVector.zipWithIndex
+    println(s" The size of the objects${v.size}, ${randomV.size}")
     splitV.foreach{ case (vec,idx) => saveToS3(vec,dest,label + "_" + idx.toString)}
   }
 }

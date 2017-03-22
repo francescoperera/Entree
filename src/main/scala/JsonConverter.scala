@@ -10,6 +10,7 @@ trait JsonConverter extends LazyLogging {
     */
 
   def toJson(str: String): Option[Json] = {
+    println(s"Converting $str")
     parser.parse(str) match {
       case Left(failure) => None
       case Right(json) => Some(json)
