@@ -58,8 +58,11 @@ object HeadChef extends JsonConverter with LazyLogging {
     val ndjson = fv.map(f => isNDJSON(f,source))
     logger.info(s"Aggregating data from ${fv.length} files")
     val jsonVec : Vector[Json] = ndjson.flatMap( j => readFile(j)).flatten // flatMap flattens the Options and flatten turns Vec[Vec] into just Vec. Does it makes sense?
+    logger.info(s"Entree detected ${jsonVec.size} possible objects")
     val dataFormatVec : Vector[dataFormat] = jsonVec.flatMap(createDataFormat(_)).flatten
+    logger.info(s"${dataFormatVec.size} dataFormat objects were created out of ${jsonVec.size} Json objects")
     val filteredDataFormatVec : Vector[dataFormat]  = filterDataFormat(dataFormatVec)
+    logger.info(s" The vector dataFormat objects was sized down to ${filteredDataFormatVec.size}")
     val dataModels = filteredDataFormatVec.map(_.asJson.noSpaces)
     logger.info(s"Saving to Bucket: ${destination.bucket}, Path:${destination.folderPath}")
     batchSave(dataModels,destination,label)
@@ -88,6 +91,7 @@ object HeadChef extends JsonConverter with LazyLogging {
     * @return - Optional vector of Json where Json represents an object in the file.
     */
   def readFile(vnf:validNDJSONFile):Option[Vector[Json]] = {
+    logger.info(s"Reading file - ${vnf.filename}")
     val input = DtlS3Cook.apply.getFileStream(vnf.source.bucket,vnf.source.folderPath.getOrElse("") + vnf.filename)
     val reader = new BufferedReader(new InputStreamReader(input))
     vnf.valid match {
