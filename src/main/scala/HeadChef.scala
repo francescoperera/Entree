@@ -7,7 +7,7 @@ import io.circe.syntax._
 import com.typesafe.scalalogging.LazyLogging
 
 
-case class dataFormat(data:Option[String],label:Option[String],column_header:Option[String],column_description:String) //TODO: check if anything here needs to be an Option
+case class dataFormat(data:Option[String],label:Option[String],column_header:Option[String],column_description:Option[String]) //TODO: check if anything here needs to be an Option
 case class validNDJSONFile(filename:String,source:S3Bucket,valid:Boolean)
 
 object  dataFormat{
@@ -58,6 +58,8 @@ object HeadChef extends JsonConverter with LazyLogging {
     val ndjson = fv.map(f => isNDJSON(f,source))
     logger.info(s"Aggregating data from ${fv.length} files")
     val jsonVec : Vector[Json] = ndjson.flatMap( j => readFile(j)).flatten // flatMap flattens the Options and flatten turns Vec[Vec] into just Vec. Does it makes sense?
+    val dfv : Vector[dataFormat] = jsonVec.flatMap(createDataFormat(_)).flatten
+    println(dfv)
     logger.info(s"Saving to Bucket: ${destination.bucket}, Path:${destination.folderPath}")
     //batchSave(dataModels,destination,label)
   }
@@ -162,38 +164,38 @@ object HeadChef extends JsonConverter with LazyLogging {
 //  }
 
 
-  /**
-    * Converts a Map to an Optional dataFormat object. It maps through each key-value pair and if the key is present in the column field name
-    * Map (specified in CFNMappingCook), then the conversion happens.
-    * For each k,v in the m:
-    *   data = v
-    *   label = key from cfnMap with value = k . Look at CFNMappingCook
-    *   originalLabel = k
-    *
-    * @param m - Map
-    * @return - vector of Option[dataFormat]
-    */
-  def map2Model ( m: Map[String,Json]) : Vector[Option[dataFormat]] = {
-
-    def ltrim(s: String) = s.replaceAll("^\\s+", "")
-    def rtrim(s: String) = s.replaceAll("\\s+$", "")
-    println(m)
-    val colDesc = m.getOrElse("column_description","".asJson)
-    val vd : Vector[Option[dataFormat]] = m.map{ case (k,v) =>
-      CFNMappingCook.isValPresent(k) match {
-        case true =>
-          println("PRESENT")
-          println(k)
-          val dataVal = Some(rtrim(ltrim(v.asString.getOrElse(""))))
-          Some(dataFormat(dataVal,Some(CFNMappingCook.getKeyFromVal(k)),Some(k),colDesc.asString.get))
-        case false =>
-          println(k)
-          println("Not present in Map")
-          None
-      }
-    }.toVector
-    vd
-  }
+//  /**
+//    * Converts a Map to an Optional dataFormat object. It maps through each key-value pair and if the key is present in the column field name
+//    * Map (specified in CFNMappingCook), then the conversion happens.
+//    * For each k,v in the m:
+//    *   data = v
+//    *   label = key from cfnMap with value = k . Look at CFNMappingCook
+//    *   originalLabel = k
+//    *
+//    * @param m - Map
+//    * @return - vector of Option[dataFormat]
+//    */
+//  def map2Model ( m: Map[String,Json]) : Vector[Option[dataFormat]] = {
+//
+//    def ltrim(s: String) = s.replaceAll("^\\s+", "")
+//    def rtrim(s: String) = s.replaceAll("\\s+$", "")
+//    println(m)
+//    val colDesc = m.getOrElse("column_description","".asJson)
+//    val vd : Vector[Option[dataFormat]] = m.map{ case (k,v) =>
+//      CFNMappingCook.isValPresent(k) match {
+//        case true =>
+//          println("PRESENT")
+//          println(k)
+//          val dataVal = Some(rtrim(ltrim(v.asString.getOrElse(""))))
+//          Some(dataFormat(dataVal,Some(CFNMappingCook.getKeyFromVal(k)),Some(k),colDesc.asString.get))
+//        case false =>
+//          println(k)
+//          println("Not present in Map")
+//          None
+//      }
+//    }.toVector
+//    vd
+//  }
 
   def createDataFormat (j:Json) = {
 
@@ -204,20 +206,21 @@ object HeadChef extends JsonConverter with LazyLogging {
       case None => None
       case Some(obj) =>
         val keys = obj.fields
-        val dfv = keys.map{k =>
+        val dfv = keys.map{k => //dfv = data format vector
           val colDesc = obj.apply("column_description").getOrElse(Json.Null).asString
           CFNMappingCook.isValPresent(k) match {
             case true =>
-              println("PRESENT")
-              println(k)
+//              println("PRESENT")
+//              println(k)
               val dataVal = obj.apply(k).getOrElse(Json.Null).asString
               Some(dataFormat(dataVal,Some(CFNMappingCook.getKeyFromVal(k)),Some(k),colDesc))
             case false =>
-              println(k)
-              println("Not present in Map")
+//              println(k)
+//              println("Not present in Map")
               None
           }
         }
+        Some(dfv.flatten)
     }
   }
 
