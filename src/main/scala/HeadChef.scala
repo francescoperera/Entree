@@ -34,7 +34,6 @@ object HeadChef extends JsonConverter with LazyLogging {
     val fileNames = files.map(_.split("/").last)
     label match {
       case "all" =>
-        UnknownCook.wordSampler()
         aggregateFiles(fileNames,source,destination,"all")
       case _ =>
         println(label) //TODO: this case needs to be looked at more carefully, filtering files based on content not filename
@@ -64,8 +63,11 @@ object HeadChef extends JsonConverter with LazyLogging {
     logger.info(s"${dataFormatVec.size} dataFormat objects were created out of ${jsonVec.size} Json objects")
     val filteredDataFormatVec : Vector[dataFormat]  = filterDataFormat(dataFormatVec)
     logger.info(s" The vector dataFormat objects was sized down to ${filteredDataFormatVec.size}")
-    val dataModels = filteredDataFormatVec.map(_.asJson.noSpaces)
-    //Add unknowns here
+    val unknownsDataFormat = createUnknows(filteredDataFormatVec)
+    logger.info(s" Create vector of ${unknownsDataFormat.size} unknown data format objects")
+    val dataModels = (filteredDataFormatVec ++ unknownsDataFormat).map(_.asJson.noSpaces)
+    logger.info(s" Saving ${dataModels.size}  data format objects")
+    //val dataModels = filteredDataFormatVec.map(_.asJson.noSpaces)
     logger.info(s"Saving to Bucket: ${destination.bucket}, Path:${destination.folderPath}")
     batchSave(dataModels,destination,label)
   }
@@ -166,10 +168,13 @@ object HeadChef extends JsonConverter with LazyLogging {
     mv.filterNot(od => filterData(od.data,isDataInvalid _, isDataEmpty _))
   }
 
-//  def createUnknows(n:Int): Vector[dataFormat] = {
-//    val l = List.range(0,n)
-//    l.map()
-//  }
+  def createUnknows(dfv: Vector[dataFormat]): Vector[dataFormat] = {
+    dfv.map{ df =>
+      val fn = util.Random.shuffle(UnknownCook.generators).head //fn = random function from Unknown.generators
+      val unknownData = fn(df.data.getOrElse(""))
+      dataFormat(Some(unknownData),Some("unknown"),Some("unknown"),"")
+    }
+  }
 
   /**
     * Takes a vector of strings and saves it to a File and then pushes the file to S3.
