@@ -81,6 +81,12 @@ object HeadChef extends JsonConverter with LazyLogging {
     validNDJSONFile(f,source,isValid)
   }
 
+  /**
+    * readFile takes a validNDJSONFile object streams the content of the file in the object,
+    * and maps to a Vector of Json. Conversion to JSON differs between and NDJSON and JSON.
+    * @param vnf - validNDSJONFile object. See HeadChef for implementation
+    * @return - Optional vector of Json where Json represents an object in the file.
+    */
   def readFile(vnf:validNDJSONFile):Option[Vector[Json]] = {
     val input = DtlS3Cook.apply.getFileStream(vnf.source.bucket,vnf.source.folderPath.getOrElse("") + vnf.filename)
     val reader = new BufferedReader(new InputStreamReader(input))
@@ -98,7 +104,13 @@ object HeadChef extends JsonConverter with LazyLogging {
     }
   }
 
-  def createDataFormat (j:Json) = {
+  /**
+    * createDataFormat takes Json casts it as a JsonObject and traverses its keys,creating
+    * a dataFormat object for each key.
+    * @param j - Json
+    * @return Optional vector of dataFormat objects.
+    */
+  def createDataFormat (j:Json): Option[Vector[dataFormat]] = {
     j.asObject match {
       case None => None
       case Some(obj) =>
@@ -115,8 +127,13 @@ object HeadChef extends JsonConverter with LazyLogging {
         Some(dfv.flatten)
     }
   }
-
-  def filterDataFormat(mv:Vector[dataFormat]) = {
+  /**
+    * filterDataFormat takes a vector of dataFormat objects and filters out any object
+    * that returns true to either the "isDataInvalid" or the "isDataEmpty" methods.
+    * @param mv - vector of dataFormat objects
+    * @return - vector of dataFormat objects.
+    */
+  def filterDataFormat(mv:Vector[dataFormat]): Vector[dataFormat] = {
     def isDataInvalid(d:Option[String]): Boolean = d.getOrElse("").toLowerCase() match {
       case "na" => true
       case "n/a" => true
@@ -148,7 +165,6 @@ object HeadChef extends JsonConverter with LazyLogging {
 
   /**
     * Takes a vector of strings and saves it to a File and then pushes the file to S3.
-    *
     * @param v - vector of strings/ file content
     * @param dest - output/destination S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
     * @param fname - filename used to save the file contents
