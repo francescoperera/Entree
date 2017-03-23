@@ -7,8 +7,8 @@ import io.circe.syntax._
 import com.typesafe.scalalogging.LazyLogging
 
 
-case class dataFormat(data:Option[String],label:Option[String],column_header:Option[String],column_description:String) //TODO: check if anything here needs to be an Option
-case class validNDJSONFile(filename:String,source:S3Bucket,valid:Boolean)
+case class dataFormat(data:Option[String],label:Option[String],column_header:Option[String],column_description:String)
+case class validNDJSONFile(filename:String,source:S3Bucket,valid:Boolean) //TODO: susbtitute valid with type field ( i.e type: JSON, CSV)
 
 object  dataFormat{
   implicit val encoder: Encoder[dataFormat] = io.circe.generic.semiauto.deriveEncoder
@@ -34,6 +34,7 @@ object HeadChef extends JsonConverter with LazyLogging {
     val fileNames = files.map(_.split("/").last)
     label match {
       case "all" =>
+        UnknownCook.wordSampler()
         aggregateFiles(fileNames,source,destination,"all")
       case _ =>
         println(label) //TODO: this case needs to be looked at more carefully, filtering files based on content not filename
@@ -64,6 +65,7 @@ object HeadChef extends JsonConverter with LazyLogging {
     val filteredDataFormatVec : Vector[dataFormat]  = filterDataFormat(dataFormatVec)
     logger.info(s" The vector dataFormat objects was sized down to ${filteredDataFormatVec.size}")
     val dataModels = filteredDataFormatVec.map(_.asJson.noSpaces)
+    //Add unknowns here
     logger.info(s"Saving to Bucket: ${destination.bucket}, Path:${destination.folderPath}")
     batchSave(dataModels,destination,label)
   }
@@ -96,12 +98,12 @@ object HeadChef extends JsonConverter with LazyLogging {
     val reader = new BufferedReader(new InputStreamReader(input))
     vnf.valid match {
         case true =>
-          // stream differently for JSON and NDJSON.
+          // reading NDJSON
           val fileVec = Stream.continually(reader.readLine()).takeWhile(_ != null).toVector //.mkString("")
           reader.close()
           Some(fileVec.map(toJson(_)))
         case false =>
-          // stream differently for JSON and NDJSON.
+          // reading JSON
           val fileString = Stream.continually(reader.readLine()).takeWhile(_ != null).mkString("")
           reader.close()
           toJson(fileString).asArray
@@ -159,13 +161,15 @@ object HeadChef extends JsonConverter with LazyLogging {
       case "no" => true
       case _ => false
     }
-
     def isDataEmpty (d:Option[String]) : Boolean = d.getOrElse("").trim().isEmpty //true if d.get is only whitespace i.e "   "
-
     def filterData[A](a:A,f1: A=>Boolean,f2: A => Boolean) : Boolean = f1(a) || f2(a) //TODO: Expand this to handle a list of functions
-
     mv.filterNot(od => filterData(od.data,isDataInvalid _, isDataEmpty _))
   }
+
+//  def createUnknows(n:Int): Vector[dataFormat] = {
+//    val l = List.range(0,n)
+//    l.map()
+//  }
 
   /**
     * Takes a vector of strings and saves it to a File and then pushes the file to S3.
