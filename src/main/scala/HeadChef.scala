@@ -7,7 +7,7 @@ import io.circe.syntax._
 import com.typesafe.scalalogging.LazyLogging
 
 
-case class dataFormat(data:Option[String],label:Option[String],column_header:Option[String],column_description:Option[String]) //TODO: check if anything here needs to be an Option
+case class dataFormat(data:Option[String],label:Option[String],column_header:Option[String],column_description:String) //TODO: check if anything here needs to be an Option
 case class validNDJSONFile(filename:String,source:S3Bucket,valid:Boolean)
 
 object  dataFormat{
@@ -58,10 +58,11 @@ object HeadChef extends JsonConverter with LazyLogging {
     val ndjson = fv.map(f => isNDJSON(f,source))
     logger.info(s"Aggregating data from ${fv.length} files")
     val jsonVec : Vector[Json] = ndjson.flatMap( j => readFile(j)).flatten // flatMap flattens the Options and flatten turns Vec[Vec] into just Vec. Does it makes sense?
-    val dfv : Vector[dataFormat] = jsonVec.flatMap(createDataFormat(_)).flatten
-    println(dfv)
+    val dataFormatVec : Vector[dataFormat] = jsonVec.flatMap(createDataFormat(_)).flatten
+    val filteredDataFormatVec : Vector[dataFormat]  = filterDataFormat(dataFormatVec)
+    val dataModels = filteredDataFormatVec.map(_.asJson.noSpaces)
     logger.info(s"Saving to Bucket: ${destination.bucket}, Path:${destination.folderPath}")
-    //batchSave(dataModels,destination,label)
+    batchSave(dataModels,destination,label)
   }
 
   /**
@@ -207,7 +208,7 @@ object HeadChef extends JsonConverter with LazyLogging {
       case Some(obj) =>
         val keys = obj.fields
         val dfv = keys.map{k => //dfv = data format vector
-          val colDesc = obj.apply("column_description").getOrElse(Json.Null).asString
+          val colDesc = obj.apply("column_description").getOrElse(Json.Null).asString.getOrElse("")
           CFNMappingCook.isValPresent(k) match {
             case true =>
 //              println("PRESENT")
@@ -224,7 +225,7 @@ object HeadChef extends JsonConverter with LazyLogging {
     }
   }
 
-  def filterDataFormat(mv:Vector[Option[dataFormat]]) = {
+  def filterDataFormat(mv:Vector[dataFormat]) = {
     def isDataInvalid(d:Option[String]): Boolean = d.getOrElse("").toLowerCase() match {
       case "na" => true
       case "n/a" => true
@@ -251,7 +252,7 @@ object HeadChef extends JsonConverter with LazyLogging {
 
     def filterData[A](a:A,f1: A=>Boolean,f2: A => Boolean) : Boolean = f1(a) || f2(a) //TODO: Expand this to handle a list of functions
 
-    mv.filterNot(od => filterData(od.get.data,isDataInvalid _, isDataEmpty _))
+    mv.filterNot(od => filterData(od.data,isDataInvalid _, isDataEmpty _))
   }
 
   /**
@@ -281,7 +282,6 @@ object HeadChef extends JsonConverter with LazyLogging {
   def batchSave(v:Vector[String],dest:S3Bucket,label:String) = {
     val randomV: Vector[String] = util.Random.shuffle(v)
     val splitV = randomV.grouped(rowsPerFile).toVector.zipWithIndex
-    println(s" The size of the objects${v.size}, ${randomV.size}")
     splitV.foreach{ case (vec,idx) => saveToS3(vec,dest,label + "_" + idx.toString)}
   }
 }
