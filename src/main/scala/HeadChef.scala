@@ -166,6 +166,14 @@ object HeadChef extends JsonConverter with LazyLogging {
     }
     def isDataEmpty (d:Option[String]) : Boolean = d.getOrElse("").trim().isEmpty //true if d.get is only whitespace i.e "   "
     def filterData[A](a:A,f1: A=>Boolean,f2: A => Boolean) : Boolean = f1(a) || f2(a) //TODO: Expand this to handle a list of functions
+    //def filterData[A](a:A):Boolean = {
+    // val lfn: List[A => Boolean] = List(isDataInvalid _, isDataEmpty _) //lfn = List of Functions
+    // val fr : Boolean = lfn.map ( f => f(a)) fr = filter results 
+    // fr.find(_ == true) match {
+    // case Some(bool) => bool
+    // case None => false
+    // }
+    // }
     mv.filterNot(od => filterData(od.data,isDataInvalid _, isDataEmpty _))
   }
 
