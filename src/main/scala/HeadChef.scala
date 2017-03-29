@@ -31,7 +31,6 @@ object HeadChef extends JsonConverter with LazyLogging {
     logger.info(s"Getting files from S3 Bucket: ${source.bucket}")
     logger.info(s"Following Folder Path : ${source.folderPath.getOrElse("")}")
     val files = DtlS3Cook.apply.listFiles(source.bucket).filterNot( fp => fp.endsWith("/")).filter(_.contains(source.folderPath.getOrElse("")))
-    println(DtlS3Cook.apply.listFiles(source.bucket))
     val fileNames = files.map(_.split("/").last)
     label match {
       case "all" =>
@@ -63,12 +62,11 @@ object HeadChef extends JsonConverter with LazyLogging {
     val dataFormatVec : Vector[dataFormat] = jsonVec.flatMap(createDataFormat(_)).flatten
     logger.info(s"${dataFormatVec.size} dataFormat objects were created out of ${jsonVec.size} Json objects")
     val filteredDataFormatVec : Vector[dataFormat]  = filterDataFormat(dataFormatVec)
-    logger.info(s" The vector dataFormat objects was sized down to ${filteredDataFormatVec.size}")
+    logger.info(s"The vector dataFormat objects was sized down to ${filteredDataFormatVec.size}")
     val unknownsDataFormat = createUnknows(filteredDataFormatVec)
-    logger.info(s" Create vector of ${unknownsDataFormat.size} unknown data format objects")
+    logger.info(s"Create vector of ${unknownsDataFormat.size} unknown data format objects")
     val dataModels = (filteredDataFormatVec ++ unknownsDataFormat).map(_.asJson.noSpaces)
-    logger.info(s" Saving ${dataModels.size}  data format objects")
-    //val dataModels = filteredDataFormatVec.map(_.asJson.noSpaces)
+    logger.info(s"Saving ${dataModels.size}  data format objects")
     logger.info(s"Saving to Bucket: ${destination.bucket}, Path:${destination.folderPath}")
     batchSave(dataModels,destination,label)
   }
@@ -84,7 +82,6 @@ object HeadChef extends JsonConverter with LazyLogging {
     val input = DtlS3Cook.apply.getFileStream(source.bucket,source.folderPath.getOrElse("") + f)
     val reader = new BufferedReader(new InputStreamReader(input))
     val fileString = Stream.continually(reader.readLine()).take(1).mkString("")
-    println(fileString)
     reader.close()
     val isValid = fileString.startsWith("{") && fileString.endsWith("}") //NDJSON object start with { and end with } on the same line
     validNDJSONFile(f,source,isValid)
