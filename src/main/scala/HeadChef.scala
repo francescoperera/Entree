@@ -31,6 +31,7 @@ object HeadChef extends JsonConverter with LazyLogging {
     logger.info(s"Getting files from S3 Bucket: ${source.bucket}")
     logger.info(s"Following Folder Path : ${source.folderPath.getOrElse("")}")
     val files = DtlS3Cook.apply.listFiles(source.bucket).filterNot( fp => fp.endsWith("/")).filter(_.contains(source.folderPath.getOrElse("")))
+    println(DtlS3Cook.apply.listFiles(source.bucket))
     val fileNames = files.map(_.split("/").last)
     label match {
       case "all" =>
@@ -83,6 +84,7 @@ object HeadChef extends JsonConverter with LazyLogging {
     val input = DtlS3Cook.apply.getFileStream(source.bucket,source.folderPath.getOrElse("") + f)
     val reader = new BufferedReader(new InputStreamReader(input))
     val fileString = Stream.continually(reader.readLine()).take(1).mkString("")
+    println(fileString)
     reader.close()
     val isValid = fileString.startsWith("{") && fileString.endsWith("}") //NDJSON object start with { and end with } on the same line
     validNDJSONFile(f,source,isValid)
@@ -143,24 +145,26 @@ object HeadChef extends JsonConverter with LazyLogging {
     */
   def filterDataFormat(mv:Vector[dataFormat]): Vector[dataFormat] = {
     def isDataInvalid(d:Option[String]): Boolean = d.getOrElse("").toLowerCase() match {
-      case "na" => true
-      case "n/a" => true
-      case "n/d" => true
-      case "none" => true
-      case "" => true
-      case "[redacted]" => true //address_socrata.json
-      case "unfilled" => true //employee_socrata.json
-      case "address redacted" => true //address_socrata.json
-      case "redacted address" => true
-      case "redacted" => true
-      case "unknown" => true
-      case "null" => true
-      case "no registra" => true
-      case "no informa" => true
-      case "no reporta" => true
-      case "no aporta" => true
-      case "no tiene" => true
-      case "no" => true
+      case "na"| "n/a"|"n/d"|"none"|""|"[redacted]"|"unfilled"|"address redacted"|"redacted address"|"redacted"|
+           "unknown"|"null"|"no registra"|"no informa"|"no reporta"|"no aporta"|"no tiene"| "no"=> true
+//      case "na" => true
+//      case "n/a" => true
+//      case "n/d" => true
+//      case "none" => true
+//      case "" => true
+//      case "[redacted]" => true //address_socrata.json
+//      case "unfilled" => true //employee_socrata.json
+//      case "address redacted" => true //address_socrata.json
+//      case "redacted address" => true
+//      case "redacted" => true
+//      case "unknown" => true
+//      case "null" => true
+//      case "no registra" => true
+//      case "no informa" => true
+//      case "no reporta" => true
+//      case "no aporta" => true
+//      case "no tiene" => true
+//      case "no" => true
       case _ => false
     }
     def isDataEmpty (d:Option[String]) : Boolean = d.getOrElse("").trim().isEmpty //true if d.get is only whitespace i.e "   "
