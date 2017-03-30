@@ -1,8 +1,19 @@
 # Entree
-Entree is a tool that enables you to aggregate all  JSON files present in an S3 bucket
-into a one or more files with a standard data format. The data format is set to be a JSON object with three keys: data and label and originalLabel.
-The key data maps to the actual value stored in an  newline delimited JSON (ndjson) object. label maps to the the greater ontology/column field name of the
-the key used in the original JSON object. Lastly, originalLabel points to key used in the original JSON object.
+Entree is a tool that enables you to aggregate and label files present in an S3 bucket
+into a one or more files with a standard data format.
+The data format is set to be a JSON object with the following keys:
+    - data
+    - label
+    - column header
+    - breakdown
+    - column description
+
+The key "data" maps to the actual value stored in either a CSV column or JSON object. "label" maps to the the greater ontology/column field name of the
+the key used in the original JSON object or column header in a CSV file. "column header" points to key used in the original JSON object or the column header
+in the CSV file. "breakdown" maps to an object that breaks down a composite data point into its core components. A full address like "123 9th Street, NY,NY,10010" can be
+broken down in street address, city,state and zipcode. Address is only one of the few labels that map to composite data. Another example is name (first name, middle name,
+last nam and name modifier). Not all labels contain composite data and thus will map to an empty "breakdown" object.
+The last key is "column description", if files contain a column description, it will be included here.
 Currently Entree works as a command line tool (clt).
 
 ## Required
@@ -52,77 +63,10 @@ JSON data is aggregated into one or more files in NDJSON format, where each obje
 ```sbt "run {s3_url_source} {s3_url_destination} label" ```
 
 ## Example
+For an example, check the docs(./docs/Entree-Example.md)
 
-In your s3 bucket, named "dummy_bucket", you have a folder,named "data",where you have stored all of your JSON files.
+To understand how the label / column field name mapping happens, check this doc(./docs/Column Field Name - Mapping.md)
 
-https://s3.amazonaws.com/dummy_bucket/data:
-  -  email.json
-  -  email_address.json
-  -  emailaddress.json
 
-Here is a preview of the data in each of these files:
-
-#### email.json
-```
-{"email":"hzk@yahoo.com"}
-{"email":"trevorp@hotmail.com"}
-....
-```
-
-#### email_address.json
-```
-{"email_address":"xyz@gmail.com"}
-{"email_address":"bot@gmail.com"}
-....
-```
-
-#### emailaddress.json
-```
-{"emailaddress":"ark@byu.edu"}
-{"emailaddress":"lol@aol.com"}
-....
-```
-
-If you run ``` sbt "run https://s3.amazonaws.com/dummy_bucket/data https://s3.amazonaws.com/dummy_bucket/clean_data email_address" ```, all of the files under the label/ontology of email_address, such as : email_adddress.json, email.json and emailaddress.json will be aggregated into one or more files with a standard data format.
-
-The new file will look like the following:
-
-```
-{"data":"hzk@yahoo.com","label":"email_address","originalLabel":"email"}
-{"data":"trevorp@hotmail.com","label":"email_address","originalLabel":"email"}
-{"data":"xyz@gmail.com","label":"email_address","originalLabel":"email_address"}
-{"data":"bot@gmail.com","label":"email_address","originalLabel":"email_address"}
-{"data":"ark@byu.edu","label":"email_address","originalLabel":"emailaddress"}
-{"data":"lol@aol.com","label":"email_address","originalLabel":"emailaddress"}
-```
-This file will be stored in https://s3.amazonaws.com/dummy_bucket/clean_data
-
-## Important:
- Data aggregation relies on the column field name Map being up to date. Thus, if Entree complains that it cannot find a label, it might be because
- that label is not present in the the column field name Map ( look at CFNMappingCook).
-
- This is the current Map:
-
- ```
- val cfnMap:Map[String,Array[String]] = Map (
-     "email_address" -> Array("email_address","email","emailaddress"),
-     "full_name" -> Array("full_name","fullname"),
-     "first_name" -> Array("first_name","firstname"),
-     "last_name" -> Array("last_name","lastname","surname","family_name"),
-     "name" -> Array ("name"),
-     "middle_name" -> Array("middle_name","middlename"),
-     "address" -> Array("address","physical_address","physicaladdress","employer_address","work_address"),
-     "phone_number" -> Array("phone_number","phonenumber","phone"),
-     "username" -> Array("username","user_name"),
-     "education"-> Array("college","university","school"),
-     "employee" -> Array("employee"),
-     "employee_id" -> Array("employee_id"),
-     "uuid" -> Array("uuid"),
-     "job_title" -> Array("job_title","jobtitle","occupation","occupation_title","jobTitle"),
-     "salary" -> Array("salary"),
-     "employer" -> Array("employer","companyName"),
-     "all" -> Array()
-   )
-```
 
 
