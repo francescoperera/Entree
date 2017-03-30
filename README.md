@@ -16,6 +16,26 @@ This clt requires three inputs:
   3. label or column field name that you want to format data for. If you want to label all column field names in your bucket use "all",
   else type the column field name ( i.e "email_address"). Entree will only accept labels that are stored as values in cfnMap. Look at Important section.
 
+### Label
+The following is a list of accepted labels:
+ - email_address
+ - full_name
+ - first_name
+ - last_name
+ - name
+ - middle_name
+ - address
+ - phone_number
+ - username
+ - education
+ - employee
+ - employee_id
+ - uuid
+ - job_title
+ - salary
+ - employer
+ - all
+
 ## Output
 JSON data is aggregated into one or more files in NDJSON format, where each object has the following structure:
 
@@ -29,7 +49,7 @@ JSON data is aggregated into one or more files in NDJSON format, where each obje
 ```sbt compile```
 
 ### Run
-```sbt "run s3_url_source s3_url_destination label" ```
+```sbt "run {s3_url_source} {s3_url_destination} label" ```
 
 ## Example
 
