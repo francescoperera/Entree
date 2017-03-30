@@ -63,9 +63,9 @@ JSON data is aggregated into one or more files in NDJSON format, where each obje
 ```sbt "run {s3_url_source} {s3_url_destination} label" ```
 
 ## Example
-For an example, check the docs(./docs/Entree-Example.md)
+For an example, check the [docs](./docs/Entree-Example.md)
 
-To understand how the label / column field name mapping happens, check this doc(./docs/Column Field Name - Mapping.md)
+To understand how the label / column field name mapping happens, check this [doc](./docs/Column Field Name - Mapping.md)
 
 
 
