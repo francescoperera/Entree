@@ -17,6 +17,7 @@ object UnknownCook {
     val end = 5
     val reader = new BufferedReader(new FileReader(stopWordsFile))
     val words = Stream.continually(reader.readLine()).takeWhile( _ != null).toVector
+    reader.close()
     val n = start + scala.util.Random.nextInt( (end - start) + 1)
     scala.util.Random.shuffle(words).take(n).mkString("")
 
