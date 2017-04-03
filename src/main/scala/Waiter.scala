@@ -1,3 +1,4 @@
+import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
 
 object Waiter extends LazyLogging {
@@ -10,6 +11,11 @@ object Waiter extends LazyLogging {
     CFNMappingCook.cfnMap.keySet.contains(label) match {
       case false => logger.error(s"$label is an unrecognized label. Entree does not know it.")
       case true =>
+        val conf = ConfigFactory.load()
+        val p1 = conf.getInt("local.ROWS_PER_FILE")
+        val p2 = conf.getString("local.DATA_FORMAT")
+        println(p1)
+        println(p2)
         logger.info(s"Waiter is going to send your order -> Aggregate all files with label :$label")
         HeadChef.getFilesWithLabel(s3Source,s3Dest,label)
     }

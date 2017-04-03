@@ -144,24 +144,6 @@ object HeadChef extends JsonConverter with LazyLogging {
     def isDataInvalid(d:Option[String]): Boolean = d.getOrElse("").toLowerCase() match {
       case "na"| "n/a"|"n/d"|"none"|""|"[redacted]"|"unfilled"|"address redacted"|"redacted address"|"redacted"|
            "unknown"|"null"|"no registra"|"no informa"|"no reporta"|"no aporta"|"no tiene"| "no"=> true
-//      case "na" => true
-//      case "n/a" => true
-//      case "n/d" => true
-//      case "none" => true
-//      case "" => true
-//      case "[redacted]" => true //address_socrata.json
-//      case "unfilled" => true //employee_socrata.json
-//      case "address redacted" => true //address_socrata.json
-//      case "redacted address" => true
-//      case "redacted" => true
-//      case "unknown" => true
-//      case "null" => true
-//      case "no registra" => true
-//      case "no informa" => true
-//      case "no reporta" => true
-//      case "no aporta" => true
-//      case "no tiene" => true
-//      case "no" => true
       case _ => false
     }
     def isDataEmpty (d:Option[String]) : Boolean = d.getOrElse("").trim().isEmpty //true if d.get is only whitespace i.e "   "
