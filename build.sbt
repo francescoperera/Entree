@@ -24,3 +24,6 @@ libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.7"
 
 // AWS
 libraryDependencies += "com.github.seratch" %% "awscala" % "0.5.9"
+
+//Config
+libraryDependencies += "com.typesafe" % "config" % "1.3.1"
