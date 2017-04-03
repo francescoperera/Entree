@@ -13,9 +13,11 @@ object Waiter extends LazyLogging {
       case true =>
         val conf = ConfigFactory.load()
         val p1 = conf.getInt("local.ROWS_PER_FILE")
-        val p2 = conf.getString("local.DATA_FORMAT")
+        val p2 = conf.getObject("local.DATA_FORMAT").unwrapped()
         println(p1)
         println(p2)
+        val ch = p2.get("column_header").asInstanceOf[String]
+        println(ch)
         logger.info(s"Waiter is going to send your order -> Aggregate all files with label :$label")
         HeadChef.getFilesWithLabel(s3Source,s3Dest,label)
     }
