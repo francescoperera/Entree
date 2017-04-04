@@ -1,9 +1,12 @@
 import java.io._
 
+import com.typesafe.config.ConfigObject
 import io.circe.{Json, JsonObject}
 import io.circe.{Decoder, Encoder}
 import io.circe.syntax._
 
+import scala.collection.JavaConversions.mapAsScalaMap
+import collection.JavaConverters._
 import com.typesafe.scalalogging.LazyLogging
 
 
@@ -15,10 +18,10 @@ object  dataFormat{
   implicit val decoder: Decoder[dataFormat] = io.circe.generic.semiauto.deriveDecoder
 }
 
-object HeadChef extends JsonConverter with LazyLogging {
+object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
   /** HeadChef is the main resource of Entree and will direct every other resource. */
 
-  private val rowsPerFile = 100000 // Important: this value determines the size of the output files.
+  private val rowsPerFile = conf.getInt("local.ROWS_PER_FILE")//Important: this value determines the size of the output files.
 
   /**
     * takes the source S3 bucket and gets all the filenames according to the label. It then aggregates all the files.
@@ -118,6 +121,12 @@ object HeadChef extends JsonConverter with LazyLogging {
     * @return Optional vector of dataFormat objects.
     */
   def createDataFormat (j:Json): Option[Vector[dataFormat]] = {
+    //
+    val dfSchema = mapAsScalaMap(conf.getObject("local.DATA_FORMAT").unwrapped())
+    val dfSchemaMap = dfSchema.toMap.map{case (k,v) => k -> mapAsScalaMap(v.asInstanceOf[java.util.HashMap[String,AnyRef]]).toMap}
+    println(dfSchemaMap)
+
+
     j.asObject match {
       case None => None
       case Some(obj) =>
@@ -127,6 +136,33 @@ object HeadChef extends JsonConverter with LazyLogging {
           CFNMappingCook.isValPresent(k) match {
             case true =>
               val dataVal = Some(obj.apply(k).getOrElse(Json.Null).asString.getOrElse("").trim)
+
+              //NEW , make this its own function
+              //TODO: traverse config object for DATA_FORMAT
+              //TODO: for each object based on action, do one action and get value
+              //TODO: create new Map/Object/data format.
+              //TODO: cast Map/object/thing as Json
+              val dataMap = dfSchemaMap.map{case (key,value) =>
+                  val keyMap = dfSchemaMap.getOrElse(key,Map[String,AnyRef]())
+                  val action = keyMap.get("action").asInstanceOf[Option[String]]
+                  action.getOrElse("") match {
+                    case "value" => key -> dataVal
+                    case "label" => key -> Some(CFNMappingCook.getKeyFromVal(k))
+                    case "column" => key -> Some(k)
+                    case "description" => key -> Some(colDesc)
+                    case _  =>
+                      logger.error(s" $action does not match known actions")
+                       key -> None
+                  }
+              }
+              println(dataMap)
+              println(dataMap.asJson)
+              println()
+
+
+
+              // NEW
+
               Some(dataFormat(dataVal,Some(CFNMappingCook.getKeyFromVal(k)),Some(k),colDesc))
             case false => None
           }
