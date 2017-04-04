@@ -9,6 +9,8 @@ import scala.collection.JavaConversions.mapAsScalaMap
 import collection.JavaConverters._
 import com.typesafe.scalalogging.LazyLogging
 
+import scala.concurrent.JavaConversions
+
 
 case class dataFormat(data:Option[String],label:Option[String],column_header:Option[String],column_description:String)
 case class validNDJSONFile(filename:String,source:S3Bucket,valid:Boolean) //TODO: susbtitute valid with type field ( i.e type: JSON, CSV)
@@ -50,6 +52,7 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     * It checks whether each file is a valid NDJSON file or not and creates a validNDSJON object. The vector of NDSJON objects is then
     * used to read the files and aggregate all the data based on the input label. The vector of dataFormat objects it is then passed on
     * and saved to S3.
+    *
     * @param fv - vector of filenames
     * @param source - input S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
     * @param destination - output S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
@@ -62,21 +65,22 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     logger.info(s"Aggregating data from ${fv.length} files")
     val jsonVec : Vector[Json] = ndjson.flatMap( j => readFile(j)).flatten // flatMap flattens the Options and flatten turns Vec[Vec] into just Vec. Does it makes sense?
     logger.info(s"Entree detected ${jsonVec.size} possible objects")
-    val dataFormatVec : Vector[dataFormat] = jsonVec.flatMap(createDataFormat(_)).flatten
-    logger.info(s"${dataFormatVec.size} dataFormat objects were created out of ${jsonVec.size} Json objects")
-    val filteredDataFormatVec : Vector[dataFormat]  = filterDataFormat(dataFormatVec)
-    logger.info(s"The vector dataFormat objects was sized down to ${filteredDataFormatVec.size}")
-    val unknownsDataFormat = createUnknows(filteredDataFormatVec)
-    logger.info(s"Create vector of ${unknownsDataFormat.size} unknown data format objects")
-    val dataModels = (filteredDataFormatVec ++ unknownsDataFormat).map(_.asJson.noSpaces)
-    logger.info(s"Saving ${dataModels.size}  data format objects")
-    logger.info(s"Saving to Bucket: ${destination.bucket}, Path:${destination.folderPath}")
-    batchSave(dataModels,destination,label)
+    val dataFormatVec = jsonVec.flatMap(createDataFormat(_)).flatten
+//    logger.info(s"${dataFormatVec.size} dataFormat objects were created out of ${jsonVec.size} Json objects")
+//    val filteredDataFormatVec : Vector[dataFormat]  = filterDataFormat(dataFormatVec)
+//    logger.info(s"The vector dataFormat objects was sized down to ${filteredDataFormatVec.size}")
+//    val unknownsDataFormat = createUnknows(filteredDataFormatVec)
+//    logger.info(s"Create vector of ${unknownsDataFormat.size} unknown data format objects")
+//    val dataModels = (filteredDataFormatVec ++ unknownsDataFormat).map(_.asJson.noSpaces)
+//    logger.info(s"Saving ${dataModels.size}  data format objects")
+//    logger.info(s"Saving to Bucket: ${destination.bucket}, Path:${destination.folderPath}")
+//    batchSave(dataModels,destination,label)
   }
 
   /**
     * Takes a filename and its source S3 bucket, reads the first line of the file and determines whether the file has a NDJSON or just
     * regular JSON. It then creates a validNDSJONFile object for the file
+    *
     * @param f - filename
     * @param source - input S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
     * @return - validNDSJONFile object. Look at HeadChef for validNDSJONFile implementation
@@ -93,6 +97,7 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
   /**
     * readFile takes a validNDJSONFile object streams the content of the file in the object,
     * and maps to a Vector of Json. Conversion to JSON differs between and NDJSON and JSON.
+    *
     * @param vnf - validNDSJONFile object. See HeadChef for implementation
     * @return - Optional vector of Json where Json represents an object in the file.
     */
@@ -117,14 +122,15 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
   /**
     * createDataFormat takes Json casts it as a JsonObject and traverses its keys,creating
     * a dataFormat object for each key.
+    *
     * @param j - Json
     * @return Optional vector of dataFormat objects.
     */
-  def createDataFormat (j:Json): Option[Vector[dataFormat]] = {
+  def createDataFormat (j:Json) = {
     //
     val dfSchema = mapAsScalaMap(conf.getObject("local.DATA_FORMAT").unwrapped())
     val dfSchemaMap = dfSchema.toMap.map{case (k,v) => k -> mapAsScalaMap(v.asInstanceOf[java.util.HashMap[String,AnyRef]]).toMap}
-    println(dfSchemaMap)
+    //println(dfSchemaMap)
 
 
     j.asObject match {
@@ -142,28 +148,46 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
               //TODO: for each object based on action, do one action and get value
               //TODO: create new Map/Object/data format.
               //TODO: cast Map/object/thing as Json
-              val dataMap = dfSchemaMap.map{case (key,value) =>
+              val dataMap  = dfSchemaMap.map{case (key,value) =>
                   val keyMap = dfSchemaMap.getOrElse(key,Map[String,AnyRef]())
                   val action = keyMap.get("action").asInstanceOf[Option[String]]
                   action.getOrElse("") match {
-                    case "value" => key -> dataVal
-                    case "label" => key -> Some(CFNMappingCook.getKeyFromVal(k))
-                    case "column" => key -> Some(k)
-                    case "description" => key -> Some(colDesc)
+                    case "value" => key -> dataVal.asJson
+                    case "label" => key -> Some(CFNMappingCook.getKeyFromVal(k)).asJson
+                    case "column" => key -> Some(k).asJson
+                    case "description" => key -> Some(colDesc).asJson
+                    case "decomposition" =>
+                      val parts = keyMap.getOrElse("parts",new java.util.ArrayList[java.util.HashMap[String,AnyRef]]()).asInstanceOf[java.util.ArrayList[java.util.HashMap[String,AnyRef]]]
+                      val partsVec = parts.asScala.toVector
+                      val scPartsVec = partsVec.map(m => mapAsScalaMap(m).toMap) //scPartsVec = scala Parts Vector
+                      val partsMap = scPartsVec(0).map{case (k,v) =>
+                        k -> mapAsScalaMap(v.asInstanceOf[java.util.HashMap[String,AnyRef]]).get("action").asInstanceOf[Option[String]]}
+                      println(partsMap)
+                      //key -> scPartsVec.asJson
+                      key -> None
+//                      val label = CFNMappingCook.getKeyFromVal(k)
+//                      BreakdownCook.isKeyPresent(label) match {
+//                        case false => key -> Vector[Map[String,String]]().asJson
+//                        case true =>
+//                          println(label)
+//                          val parts : Vector[String] = BreakdownCook.getCompositeFields(label)
+//                          val breakdown:Vector[Map[String,String]] = parts.map( field => Map("value" -> "", "sub_label" -> field))
+//                          key -> breakdown.asJson
+//                      }
                     case _  =>
                       logger.error(s" $action does not match known actions")
-                       key -> None
+                       key -> None.asJson
                   }
               }
-              println(dataMap)
-              println(dataMap.asJson)
+              //println(dataMap.asJson)
+
               println()
 
 
 
               // NEW
 
-              Some(dataFormat(dataVal,Some(CFNMappingCook.getKeyFromVal(k)),Some(k),colDesc))
+              Some(dataMap)
             case false => None
           }
         }
@@ -173,6 +197,7 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
   /**
     * filterDataFormat takes a vector of dataFormat objects and filters out any object
     * that returns true to either the "isDataInvalid" or the "isDataEmpty" methods.
+    *
     * @param mv - vector of dataFormat objects
     * @return - vector of dataFormat objects.
     */
@@ -205,6 +230,7 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
 
   /**
     * Takes a vector of strings and saves it to a File and then pushes the file to S3.
+    *
     * @param v - vector of strings/ file content
     * @param dest - output/destination S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
     * @param fname - filename used to save the file contents
@@ -222,6 +248,7 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
   /**
     * Takes all aggregated data in the form of a vector of strings and saves a batch of the strings at a time. The batch size
     * is determined by rowsPerFile.
+    *
     * @param v
     * @param dest
     * @param label
