@@ -159,35 +159,47 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
                     case "decomposition" =>
                       val parts = keyMap.getOrElse("parts",new java.util.ArrayList[java.util.HashMap[String,AnyRef]]()).asInstanceOf[java.util.ArrayList[java.util.HashMap[String,AnyRef]]]
                       val partsVec = parts.asScala.toVector
-                      val scPartsVec = partsVec.map(m => mapAsScalaMap(m).toMap) //scPartsVec = scala Parts Vector
-                      val partsMap = scPartsVec(0).map{case (k,v) =>
-                        k -> mapAsScalaMap(v.asInstanceOf[java.util.HashMap[String,AnyRef]]).get("action").asInstanceOf[Option[String]]}
-                      println(partsMap)
-                      //key -> scPartsVec.asJson
-                      key -> None
-//                      val label = CFNMappingCook.getKeyFromVal(k)
-//                      BreakdownCook.isKeyPresent(label) match {
-//                        case false => key -> Vector[Map[String,String]]().asJson
-//                        case true =>
-//                          println(label)
-//                          val parts : Vector[String] = BreakdownCook.getCompositeFields(label)
-//                          val breakdown:Vector[Map[String,String]] = parts.map( field => Map("value" -> "", "sub_label" -> field))
-//                          key -> breakdown.asJson
-//                      }
+                      val scPartsVec = partsVec.map(m => mapAsScalaMap(m)) //scPartsVec = scala Parts Vector
+                      val partsMap = scPartsVec(0).map{case (pk,pv) =>
+                        pk -> mapAsScalaMap(pv.asInstanceOf[java.util.HashMap[String,AnyRef]]).get("action").asInstanceOf[Option[String]]}
+
+                      val label = CFNMappingCook.getKeyFromVal(k)
+                      BreakdownCook.isKeyPresent(label) match {
+                        case false => key -> Vector[Map[String,String]]().asJson
+                        case true =>
+                          //println(label)
+                          val fields : Vector[String] = BreakdownCook.getCompositeFields(label)
+                          //ASSUMPTION HERE that since we are decomposition and label is composed of elements, we
+                          // can create N number of partsMap where N number of feilds in composite fields
+                          val partsMapVector = Vector.fill(fields.size)(partsMap)
+                          val fieldsMapComposition = fields.zip(partsMapVector)
+                          val breakdown = fieldsMapComposition.map{ composition =>
+                            val m = composition._2
+                            val field = composition._1
+                            val newMap = m.map{case (npk,npv) =>
+                              npv.getOrElse("") match {
+                                case "sub_label" => npk -> field
+                                case  _ => npk -> ""
+                              }
+
+                            }
+                            newMap.toMap
+
+                            }
+                          key -> breakdown.asJson
+                      }
                     case _  =>
                       logger.error(s" $action does not match known actions")
                        key -> None.asJson
                   }
               }
-              //println(dataMap.asJson)
-
+              println(dataMap.asJson)
               println()
 
 
 
               // NEW
-
-              Some(dataMap)
+              Some(dataMap.asJson)
             case false => None
           }
         }
