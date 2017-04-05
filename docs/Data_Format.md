@@ -36,9 +36,9 @@ parameter and has a set of properties : action,type and components. All keys sho
 #### Action
 Action is a property that relates to the action that Entree will need to do to get the value for its key. Entree has a number of defined
 actions :
-* **value** : Entree grabs the value stored in the data point. (i.e {"first_name":"Frank"}, "Frank" is the value of the data point.
-* **label** : Entree gets the label for the key in the data point (i.e {"first_name":"Frank"}, "name" is the label for the key "first_name".
-* **column** : Entree gets the key used in the original data point ((i.e {"first_name":"Frank"}, "first_name" is the key/column in this data point.
+* **value** : Entree grabs the value stored in the data point. (i.e {"first_name":"Frank"}, "Frank" is the value of the data point).
+* **label** : Entree gets the label for the key in the data point (i.e {"first_name":"Frank"}, "name" is the label for the key "first_name").
+* **column** : Entree gets the key used in the original data point (i.e {"first_name":"Frank"}, "first_name" is the key/column in this data point).
 * **description** : Entree gets the column description in the data point. If none is found, then column description is a set as an empty String.
 * **decomposition** : Entree looks at the value stored under the property "components" and uses it to create the schema for the breakdown data. Any key whose action is set to "decomposition", will also have components mapped to an non empty array.For more look at the Components section(below)
 * sub_label: Entree looks at the label for the data point and then checks if the label is made of composite field. This done by looking at at "breakdown" Map, which can be either user defined or default one. If label has composite fields, then these fields are stored under the key whose action property is set as "sub_label"

@@ -31,6 +31,8 @@ object CFNMappingCook {
     "all" -> Array()
   )
 
+  //TODO: add val to generate reverse Map from cfnMap
+
   /**
     * Given a certain string or value, it finds the key in cfnMap that maps to that string/value
     * @param v - string of value

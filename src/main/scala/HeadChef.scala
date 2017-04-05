@@ -5,12 +5,11 @@ import io.circe.{Json, JsonObject}
 import io.circe.{Decoder, Encoder}
 import io.circe.syntax._
 
-import scala.collection.JavaConversions.mapAsScalaMap
+import scala.collection.JavaConverters._
 import collection.JavaConverters._
 import com.typesafe.scalalogging.LazyLogging
 
 import scala.collection.mutable
-import scala.concurrent.JavaConversions
 
 
 case class dataFormat(data:Option[String],label:Option[String],column_header:Option[String],column_description:String)
@@ -127,16 +126,16 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     * @param j - Json
     * @return Optional vector of dataFormat objects.
     */
-  def createDataFormat (j:Json): Option[Vector[Json]] = {
+  def createDataFormat (j: Json): Option[Vector[Json]] = {
     //
     //println(dfSchemaMap)
     j.asObject match {
       case None => None
       case Some(obj) =>
         val keys = obj.fields
-        val dfv : Vector[Option[Json]] = keys.map{k => //dfv = data format vector
+        val dfv: Vector[Option[Json]] = keys.map{k => //dfv = data format vector
           if (CFNMappingCook.isLabelWithKeyPresent(k)) {
-            createDataMap(obj,k)
+            createDataMap(obj, k)
           } else {
             None
           }
@@ -145,70 +144,31 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     }
   }
 
-  def createDataMap(obj:JsonObject, k:String): Option[Json] = {
+  def createDataMap(obj: JsonObject, k: String): Option[Json] = {
 
-    val dfSchema: mutable.Map[String,AnyRef] = mapAsScalaMap(conf.getObject("local.DATA_FORMAT").unwrapped())
-    val dfSchemaMap: Map[String,Map[String,AnyRef]] = dfSchema.toMap.map{case (schemaK,schemaV) => schemaK -> mapAsScalaMap(schemaV.asInstanceOf[java.util.HashMap[String,AnyRef]]).toMap}
+    val dfSchema: Map[String, AnyRef] = conf.getObject("local.DATA_FORMAT").unwrapped().asScala.toMap
+    val dfSchemaMap: Map[String, Map[String, AnyRef]] = dfSchema.map{case (schemaK, schemaV) => schemaK ->
+      mapAsScalaMap(schemaV.asInstanceOf[java.util.HashMap[String, AnyRef]]).toMap}
 
     //Call label here?
     val label: String = CFNMappingCook.getKeyFromVal(k)
 
 
-    val dataMap: Map[String,Json]  = dfSchemaMap.map{case (key,keyMap) =>
+    val dataMap: Map[String, Json]  = dfSchemaMap.map{case (key,keyMap) =>
+
 
       val action = keyMap.get("action").asInstanceOf[Option[String]]
-      action.getOrElse("") match {
-        case "value" =>
+      action match {
+        case Some("value") =>
           val dataVal = Some(obj.apply(k).getOrElse(Json.Null).asString.getOrElse("").trim)
           key -> dataVal.asJson
-        case "label" => key -> Some(label).asJson
-        case "column" => key -> Some(k).asJson
-        case "description" =>
+        case Some("label") => key -> Some(label).asJson
+        case Some("column") => key -> Some(k).asJson
+        case Some("description")=>
           val colDesc = obj.apply("column_description").getOrElse(Json.Null).asString.getOrElse("")
           key -> Some(colDesc).asJson
-        case "decomposition" =>
-
-          if (BreakdownCook.isKeyPresent(label)) {
-            /** Converting Object in config to HasMap and then to Map */
-            // 1
-            val parts = keyMap.getOrElse("components",new java.util.ArrayList[java.util.HashMap[String,AnyRef]]()).asInstanceOf[java.util.ArrayList[java.util.HashMap[String,AnyRef]]]
-            val partsVec: Vector[java.util.HashMap[String,AnyRef]] = parts.asScala.toVector
-            //2
-            val scPartsVec: Vector[mutable.Map[String,AnyRef]] = partsVec.map(m => mapAsScalaMap(m)) //scPartsVec = scala Parts Vector
-
-            //TODO:Clusterfucky code , refactor this
-            // Map( key -> action) where key is the key inside components and action is the property for key.
-            //TODO: Be careful of doing scPartsVec(0). What if that Vector is empty? Correct this!
-            //3
-            val partsMap: mutable.Map[String,Option[String]] = scPartsVec(0).map{case (pk,pv) =>
-              pk -> mapAsScalaMap(pv.asInstanceOf[java.util.HashMap[String,AnyRef]]).get("action")
-                .asInstanceOf[Option[String]]}
-            //4
-            val fields : Vector[String] = BreakdownCook.getCompositeFields(label)
-            /** ASSUMPTION HERE that since we are doing  decomposition and label is composed of elements, we
-            can create N number of partsMap where N number of fields in composite fields */
-            //5
-            val partsMapVector: Vector[mutable.Map[String,Option[String]]] = Vector.fill(fields.size)(partsMap)
-            //6
-            val fieldsMapComposition: Vector[(String,mutable.Map[String,Option[String]])]= fields.zip(partsMapVector)
-            //7
-            val breakdown: Vector[Map[String,String]] = fieldsMapComposition.map{ composition =>
-              val m : mutable.Map[String,Option[String]] = composition._2 //m = partsMap
-              val field : String = composition._1 //field = composite field/element to be adde in m under the key that has action set as "sub_label"
-              val newMap: mutable.Map[String,String] = m.map{case (npk,npv) =>
-                npv.getOrElse("") match {
-                  case "sub_label" => npk -> field
-                  case  _ => npk -> ""
-                }
-              }
-              newMap.toMap //this is what composition is "transformed to"
-            }
-            //8
-            key -> breakdown.asJson
-
-          } else {
-            key -> Vector[Map[String,String]]().asJson
-          }
+        case Some("decomposition") =>
+          getBreakdown(key,keyMap,label)
         case _  =>
           logger.error(s" $action does not match known actions")
           key ->  Json.Null
@@ -221,6 +181,51 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     Some(dataMap.asJson)
 
   }
+  def getBreakdown(key:String,keyMap:Map[String,AnyRef], label:String): (String, Json) = {
+    if (BreakdownCook.isKeyPresent(label)) {
+      /** Converting Object in config to HasMap and then to Map */
+      // 1
+      val parts = keyMap.getOrElse("components",new java.util.ArrayList[java.util.HashMap[String,AnyRef]]())
+        .asInstanceOf[java.util.ArrayList[java.util.HashMap[String,AnyRef]]]
+      val partsVec: Vector[java.util.HashMap[String,AnyRef]] = parts.asScala.toVector
+      //2
+      val scPartsVec: Vector[mutable.Map[String,AnyRef]] = partsVec.map(m => mapAsScalaMap(m)) //scPartsVec = scala Parts Vector
+
+      //TODO:Clusterfucky code , refactor this
+      // Map( key -> action) where key is the key inside components and action is the property for key.
+      //TODO: Be careful of doing scPartsVec(0). What if that Vector is empty? Correct this!
+      //3
+      val partsMap: mutable.Map[String,Option[String]] = scPartsVec(0).map{case (pk,pv) =>
+        pk -> mapAsScalaMap(pv.asInstanceOf[java.util.HashMap[String,AnyRef]]).get("action")
+          .asInstanceOf[Option[String]]}
+      //4
+      val fields : Vector[String] = BreakdownCook.getCompositeFields(label)
+      /** ASSUMPTION HERE that since we are doing  decomposition and label is composed of elements, we
+            can create N number of partsMap where N number of fields in composite fields */
+      //5
+      val partsMapVector: Vector[mutable.Map[String,Option[String]]] = Vector.fill(fields.size)(partsMap)
+      //6
+      val fieldsMapComposition: Vector[(String,mutable.Map[String,Option[String]])]= fields.zip(partsMapVector)
+      //7
+      val breakdown: Vector[Map[String,String]] = fieldsMapComposition.map{ composition =>
+        val m : mutable.Map[String,Option[String]] = composition._2 //m = partsMap
+      val field : String = composition._1 //field = composite field/element to be adde in m under the key that has action set as "sub_label"
+      val newMap: mutable.Map[String,String] = m.map{case (npk,npv) =>
+        npv.getOrElse("") match {
+          case "sub_label" => npk -> field
+          case  _ => npk -> ""
+        }
+      }
+        newMap.toMap //this is what composition is "transformed to"
+      }
+      //8
+      key -> breakdown.asJson
+
+    } else {
+      key -> Vector[Map[String,String]]().asJson
+    }
+  }
+
   /**
     * filterDataFormat takes a vector of dataFormat objects and filters out any object
     * that returns true to either the "isDataInvalid" or the "isDataEmpty" methods.
