@@ -57,22 +57,21 @@ For example, if the DATA_FORMAT object had the following key defined :
     ......
     ......
     division{
-        action:decomposition
-        type: "type": "Vector[Map[String,String]"
-        components:[
+        "action":"decomposition"
+        "type": "Vector[Map[String,String]"
+        "components":[
             {
-                composite_field{
-                    action:sub_label
-                    type:String
-                    components:[]
+                "composite_field" {
+                    "action": "sub_label"
+                    "type": "String"
+                    "components":[]
                 }
-                data{
-                    action:"no_action"
-                    type:String
-                    components:[]
+                "data"{
+                    "action":"no_action"
+                    "type": "String"
+                    "components":[]
                 }
             }
-
         ]
     }
     .....
@@ -195,16 +194,16 @@ breakdownMap = Map (
 ``` {"companyName": "Datalogue","jobTitle":"Software Engineer"} ```
 
 Entree detects that this data point has two keys that have labels. "companyName" has a label "company_name"
-and "jobTitle" has "job_title". Since two labels were detected, Entree will create to seperate DATA_FORMAT object
+and "jobTitle" has "job_title". Since two labels were detected, Entree will create two seperate DATA_FORMAT object
 for each label.
 
 **(JSON) Object for company_name**
 
-"data" -> "Datalogue" (value stored in data point)
-"label" ->  "company_name" (label detected for value)
-"column_header" -> "companyName" (key used to store the value in the data point)
-"column_description" -> "" (empty string because data point had no column_description")
-"breakdown" -> [] ( empty array because the label is not one of the keys in the breakdownMap and thus has no composite fields)
+- "data" -> "Datalogue" (value stored in data point)
+- "label" ->  "company_name" (label detected for value)
+- "column_header" -> "companyName" (key used to store the value in the data point)
+- "column_description" -> "" (empty string because data point had no column_description")
+- "breakdown" -> [] ( empty array because the label is not one of the keys in the breakdownMap and thus has no composite fields)
 
 *Note that the following DATA_FORMAT object will be shown in JSON*.
 
@@ -221,11 +220,11 @@ for each label.
 
 **(JSON) Object for job_title**
 
-"data" -> "Software Engineer" (value stored in data point)
-"label" ->  "job_title" (label detected for value)
-"column_header" -> "jobTitle" (key used to store the value in the data point)
-"column_description" -> "" (empty string because data point had no column_description")
-"breakdown" -> [] ( empty array because the label is not one of the keys in the breakdownMap and thus has no composite fields)
+- "data" -> "Software Engineer" (value stored in data point)
+- "label" ->  "job_title" (label detected for value)
+- "column_header" -> "jobTitle" (key used to store the value in the data point)
+- "column_description" -> "" (empty string because data point had no column_description")
+- "breakdown" -> [] ( empty array because the label is not one of the keys in the breakdownMap and thus has no composite fields)
 
 *Note that the following DATA_FORMAT object will be shown in JSON*.
 
@@ -248,11 +247,11 @@ Entree will create one  DATA_FORMAT object for this data point.
 
 **(JSON) Object for full_name**
 
-"data" -> "Samuel Donovan" (value stored in data point)
-"label" ->  "full_name" (label detected for value)
-"column_header" -> "name" (key used to store the value in the data point)
-"column_description" -> "" (empty string because data point had no column_description")
-"breakdown" -> [
+- "data" -> "Samuel Donovan" (value stored in data point)
+- "label" ->  "full_name" (label detected for value)
+- "column_header" -> "name" (key used to store the value in the data point)
+- "column_description" -> "" (empty string because data point had no column_description")
+- "breakdown" -> [
         {
             "field":"first_name",
             "data":""
@@ -309,11 +308,11 @@ Entree will create one  DATA_FORMAT object for this data point.
 
 **(JSON) Object for first_name**
 
-"data" -> "Eric" (value stored in data point)
-"label" ->  "first_name" (label detected for value)
-"column_header" -> "" (key used to store the value in the data point)
-"column_description" -> "first name of employee" (value under the key column_description in the data point)
-"breakdown" -> [] ( empty array because the label is not one of the keys in the breakdownMap and thus has no composite fields)
+- "data" -> "Eric" (value stored in data point)
+- "label" ->  "first_name" (label detected for value)
+- "column_header" -> "" (key used to store the value in the data point)
+- "column_description" -> "first name of employee" (value under the key column_description in the data point)
+- "breakdown" -> [] ( empty array because the label is not one of the keys in the breakdownMap and thus has no composite fields)
 
 *Note that the following DATA_FORMAT object will be shown in JSON*.
 
