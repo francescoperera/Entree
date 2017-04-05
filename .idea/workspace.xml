@@ -2,19 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e24fb3f7-ed2b-480d-ac0c-7a7e527ac1c2" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/scala-2.12/classes/CFNMappingCook$.class" afterPath="$PROJECT_DIR$/target/scala-2.12/classes/CFNMappingCook$.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/scala-2.12/classes/CFNMappingCook.class" afterPath="$PROJECT_DIR$/target/scala-2.12/classes/CFNMappingCook.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/scala-2.12/classes/HeadChef$.class" afterPath="$PROJECT_DIR$/target/scala-2.12/classes/HeadChef$.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/scala-2.12/classes/HeadChef.class" afterPath="$PROJECT_DIR$/target/scala-2.12/classes/HeadChef.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/streams/$global/dependencyPositions/$global/streams/update_cache_2.12/output_dsp" afterPath="$PROJECT_DIR$/target/streams/$global/dependencyPositions/$global/streams/update_cache_2.12/output_dsp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/streams/compile/compileIncremental/$global/streams/export" afterPath="$PROJECT_DIR$/target/streams/compile/compileIncremental/$global/streams/export" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/streams/compile/copyResources/$global/streams/copy-resources" afterPath="$PROJECT_DIR$/target/streams/compile/copyResources/$global/streams/copy-resources" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/CFNMappingCook.scala" afterPath="$PROJECT_DIR$/src/main/scala/CFNMappingCook.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/HeadChef.scala" afterPath="$PROJECT_DIR$/src/main/scala/HeadChef.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/scala-2.12/classes/application.conf" afterPath="$PROJECT_DIR$/target/scala-2.12/classes/application.conf" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/streams/compile/compileIncremental/$global/streams/out" afterPath="$PROJECT_DIR$/target/streams/compile/compileIncremental/$global/streams/out" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/streams/compile/incCompileSetup/$global/streams/inc_compile_2.12" afterPath="$PROJECT_DIR$/target/streams/compile/incCompileSetup/$global/streams/inc_compile_2.12" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/docs/Data_Format.md" afterPath="$PROJECT_DIR$/docs/Data_Format.md" />
     </list>
     <ignored path="Entree.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -50,7 +38,7 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="HeadChef.scala" pinned="false" current-in-tab="true">
+      <file leaf-file-name="HeadChef.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/scala/HeadChef.scala">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="563">
@@ -67,6 +55,16 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="648">
               <caret line="52" column="6" lean-forward="false" selection-start-line="52" selection-start-column="6" selection-end-line="52" selection-end-column="6" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Data_Format.md" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/docs/Data_Format.md">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="316">
+              <caret line="302" column="4" lean-forward="false" selection-start-line="302" selection-start-column="4" selection-end-line="302" selection-end-column="4" />
               <folding />
             </state>
           </provider>
@@ -119,10 +117,10 @@
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/.idea/workspace.xml" />
         <option value="$PROJECT_DIR$/src/main/resources/user-input.conf" />
-        <option value="$PROJECT_DIR$/docs/Data_Format.md" />
         <option value="$PROJECT_DIR$/src/main/scala/CFNMappingCook.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/HeadChef.scala" />
         <option value="$PROJECT_DIR$/src/main/resources/application.conf" />
+        <option value="$PROJECT_DIR$/docs/Data_Format.md" />
       </list>
     </option>
   </component>
@@ -880,12 +878,12 @@
       <workItem from="1489507107936" duration="10921000" />
       <workItem from="1489607530962" duration="2313000" />
       <workItem from="1489615750744" duration="440000" />
-      <workItem from="1491345296716" duration="14965000" />
+      <workItem from="1491345296716" duration="15046000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="107675000" />
+    <option name="totallyTimeSpent" value="107756000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="997" height="900" extended-state="6" />
@@ -1034,14 +1032,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/docs/Data_Format.md">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="432">
-          <caret line="314" column="2" lean-forward="false" selection-start-line="314" selection-start-column="2" selection-end-line="314" selection-end-column="2" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/resources/user-input.conf">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="615">
@@ -1081,6 +1071,14 @@
           <folding>
             <element signature="e#0#16#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/docs/Data_Format.md">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="316">
+          <caret line="302" column="4" lean-forward="false" selection-start-line="302" selection-start-column="4" selection-end-line="302" selection-end-column="4" />
+          <folding />
         </state>
       </provider>
     </entry>

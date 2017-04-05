@@ -300,7 +300,7 @@ Entree will create one  DATA_FORMAT object for this data point.
 
 ```
 
-###Data Point Example 3:
+### Data Point Example 3:
 ```{"first_name": "Eric", "column_description": "first name of employee"} ```
 
 Entree detects that this data point has one key that has a label. The key is "first_name" and its label is "first_name".
