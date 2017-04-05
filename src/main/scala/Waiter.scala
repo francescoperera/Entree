@@ -11,12 +11,6 @@ object Waiter extends LazyLogging {
     CFNMappingCook.cfnMap.keySet.contains(label) match {
       case false => logger.error(s"$label is an unrecognized label. Entree does not know it.")
       case true =>
-//        val conf = ConfigFactory.load()
-//        val p1 = conf.getInt("local.ROWS_PER_FILE")
-//        val p2 = conf.getObject("local.DATA_FORMAT").unwrapped().asInstanceOf[java.util.Map[String,String]]
-//        println(p2)
-//        val ch = p2.get("column_header")
-//        println(ch)
         logger.info(s"Waiter is going to send your order -> Aggregate all files with label :$label")
         HeadChef.getFilesWithLabel(s3Source,s3Dest,label)
     }

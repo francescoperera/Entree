@@ -1,6 +1,6 @@
 import java.io._
 
-import com.typesafe.config.ConfigObject
+import com.typesafe.config.{ConfigObject, ConfigRenderOptions}
 import io.circe.{Json, JsonObject}
 import io.circe.{Decoder, Encoder}
 import io.circe.syntax._
@@ -127,7 +127,6 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     * @return Optional vector of dataFormat objects.
     */
   def createDataFormat (j: Json): Option[Vector[Json]] = {
-    //
     //println(dfSchemaMap)
     j.asObject match {
       case None => None
@@ -145,6 +144,9 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
   }
 
   def createDataMap(obj: JsonObject, k: String): Option[Json] = {
+    val schema = userInput
+    //.render(ConfigRenderOptions.concise().setJson(true))
+    println(schema)
 
     val dfSchema: Map[String, AnyRef] = conf.getObject("local.DATA_FORMAT").unwrapped().asScala.toMap
     val dfSchemaMap: Map[String, Map[String, AnyRef]] = dfSchema.map{case (schemaK, schemaV) => schemaK ->
