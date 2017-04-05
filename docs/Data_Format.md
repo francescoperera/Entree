@@ -191,7 +191,7 @@ breakdownMap = Map (
 5) Steps 1-4 are repeated for all datapoints
 6) The JSON representation of the DATA_FORMAT objects are then saved.
 
-#### Data Point Example 1:
+### Data Point Example 1:
 ``` {"companyName": "Datalogue","jobTitle":"Software Engineer"} ```
 
 Entree detects that this data point has two keys that have labels. "companyName" has a label "company_name"
@@ -240,7 +240,7 @@ for each label.
 ```
 
 
-#### Data Point Example 2:
+### Data Point Example 2:
 ``` {"name": "Samuel Donovan"} ```
 
 Entree detects that this data point has one key that has a label. The key is "name" and its label is "full_name".
@@ -255,20 +255,20 @@ Entree will create one  DATA_FORMAT object for this data point.
 "breakdown" -> [
         {
             "field":"first_name",
-            "data":""   
+            "data":""
         },
         {
             "field":"middle_name",
-            "data":""   
+            "data":""
         },
         {
             "field":"last_name",
-            "data":""   
+            "data":""
         },
         {
             "field":"name_modifier",
-            "data":""   
-        }   
+            "data":""
+        }
     ](full_name was detected as a label with composite fields ,check breakdownMap in the Breakdown Map section.)
 
 *Note that the following DATA_FORMAT object will be shown in JSON*.
@@ -278,19 +278,19 @@ Entree will create one  DATA_FORMAT object for this data point.
     "breakdown": [
         {
             "field":"first_name",
-            "data":""   
+            "data":""
         },
         {
             "field":"middle_name",
-            "data":""   
+            "data":""
         },
         {
             "field":"last_name",
-            "data":""   
+            "data":""
         },
         {
             "field":"name_modifier",
-            "data":""   
+            "data":""
         }
     ],
     "column_header":"name",
@@ -301,7 +301,7 @@ Entree will create one  DATA_FORMAT object for this data point.
 
 ```
 
-#### Data Point Example 3:
+###Data Point Example 3:
 ```{"first_name": "Eric", "column_description": "first name of employee"} ```
 
 Entree detects that this data point has one key that has a label. The key is "first_name" and its label is "first_name".
