@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e24fb3f7-ed2b-480d-ac0c-7a7e527ac1c2" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/docs/Data_Format.md" afterPath="$PROJECT_DIR$/docs/Data_Format.md" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/HeadChef.scala" afterPath="$PROJECT_DIR$/src/main/scala/HeadChef.scala" />
     </list>
     <ignored path="Entree.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -38,41 +38,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="Data_Format.md" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/docs/Data_Format.md">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="432">
-              <caret line="314" column="2" lean-forward="false" selection-start-line="314" selection-start-column="2" selection-end-line="314" selection-end-column="2" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="user-input.conf" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/resources/user-input.conf">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="615">
-              <caret line="41" column="1" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="41" selection-end-column="1" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="HeadChef.scala" pinned="false" current-in-tab="false">
+      <file leaf-file-name="HeadChef.scala" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/scala/HeadChef.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="603">
-              <caret line="267" column="67" lean-forward="false" selection-start-line="267" selection-start-column="67" selection-end-line="267" selection-end-column="67" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="application.conf" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/resources/application.conf">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="570">
-              <caret line="38" column="9" lean-forward="false" selection-start-line="38" selection-start-column="9" selection-end-line="38" selection-end-column="9" />
+            <state relative-caret-position="360">
+              <caret line="146" column="49" lean-forward="true" selection-start-line="146" selection-start-column="49" selection-end-line="146" selection-end-column="49" />
               <folding />
             </state>
           </provider>
@@ -112,8 +82,8 @@
         <option value="$PROJECT_DIR$/.idea/workspace.xml" />
         <option value="$PROJECT_DIR$/src/main/resources/application.conf" />
         <option value="$PROJECT_DIR$/src/main/resources/user-input.conf" />
-        <option value="$PROJECT_DIR$/src/main/scala/HeadChef.scala" />
         <option value="$PROJECT_DIR$/docs/Data_Format.md" />
+        <option value="$PROJECT_DIR$/src/main/scala/HeadChef.scala" />
       </list>
     </option>
   </component>
@@ -871,12 +841,12 @@
       <workItem from="1489507107936" duration="10921000" />
       <workItem from="1489607530962" duration="2313000" />
       <workItem from="1489615750744" duration="440000" />
-      <workItem from="1491345296716" duration="9959000" />
+      <workItem from="1491345296716" duration="10377000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="102669000" />
+    <option name="totallyTimeSpent" value="103087000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1073" height="900" extended-state="6" />
@@ -1048,6 +1018,14 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/docs/Data_Format.md">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="432">
+          <caret line="314" column="2" lean-forward="false" selection-start-line="314" selection-start-column="2" selection-end-line="314" selection-end-column="2" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/resources/user-input.conf">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="615">
@@ -1058,16 +1036,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/HeadChef.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="603">
-          <caret line="267" column="67" lean-forward="false" selection-start-line="267" selection-start-column="67" selection-end-line="267" selection-end-column="67" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/docs/Data_Format.md">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="432">
-          <caret line="314" column="2" lean-forward="false" selection-start-line="314" selection-start-column="2" selection-end-line="314" selection-end-column="2" />
+        <state relative-caret-position="360">
+          <caret line="146" column="49" lean-forward="true" selection-start-line="146" selection-start-column="49" selection-end-line="146" selection-end-column="49" />
           <folding />
         </state>
       </provider>

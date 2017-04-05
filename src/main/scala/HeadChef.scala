@@ -128,83 +128,81 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     */
   def createDataFormat (j:Json) = {
     //
-    val dfSchema = mapAsScalaMap(conf.getObject("local.DATA_FORMAT").unwrapped())
-    val dfSchemaMap = dfSchema.toMap.map{case (k,v) => k -> mapAsScalaMap(v.asInstanceOf[java.util.HashMap[String,AnyRef]]).toMap}
     //println(dfSchemaMap)
-
-
     j.asObject match {
       case None => None
       case Some(obj) =>
         val keys = obj.fields
         val dfv = keys.map{k => //dfv = data format vector
           CFNMappingCook.isValPresent(k) match {
-            case true =>
-              val colDesc = obj.apply("column_description").getOrElse(Json.Null).asString.getOrElse("")
-              val dataVal = Some(obj.apply(k).getOrElse(Json.Null).asString.getOrElse("").trim)
-
-              //NEW , make this its own function
-              //TODO: traverse config object for DATA_FORMAT
-              //TODO: for each object based on action, do one action and get value
-              //TODO: create new Map/Object/data format.
-              //TODO: cast Map/object/thing as Json
-              val dataMap  = dfSchemaMap.map{case (key,value) =>
-                  val keyMap = dfSchemaMap.getOrElse(key,Map[String,AnyRef]())
-                  val action = keyMap.get("action").asInstanceOf[Option[String]]
-                  action.getOrElse("") match {
-                    case "value" => key -> dataVal.asJson
-                    case "label" => key -> Some(CFNMappingCook.getKeyFromVal(k)).asJson
-                    case "column" => key -> Some(k).asJson
-                    case "description" => key -> Some(colDesc).asJson
-                    case "decomposition" =>
-                      val parts = keyMap.getOrElse("components",new java.util.ArrayList[java.util.HashMap[String,AnyRef]]()).asInstanceOf[java.util.ArrayList[java.util.HashMap[String,AnyRef]]]
-                      val partsVec = parts.asScala.toVector
-                      val scPartsVec = partsVec.map(m => mapAsScalaMap(m)) //scPartsVec = scala Parts Vector
-                      val partsMap = scPartsVec(0).map{case (pk,pv) =>
-                        pk -> mapAsScalaMap(pv.asInstanceOf[java.util.HashMap[String,AnyRef]]).get("action").asInstanceOf[Option[String]]}
-
-                      val label = CFNMappingCook.getKeyFromVal(k)
-                      BreakdownCook.isKeyPresent(label) match {
-                        case false => key -> Vector[Map[String,String]]().asJson
-                        case true =>
-                          //println(label)
-                          val fields : Vector[String] = BreakdownCook.getCompositeFields(label)
-                          //ASSUMPTION HERE that since we are decomposition and label is composed of elements, we
-                          // can create N number of partsMap where N number of feilds in composite fields
-                          val partsMapVector = Vector.fill(fields.size)(partsMap)
-                          val fieldsMapComposition = fields.zip(partsMapVector)
-                          val breakdown = fieldsMapComposition.map{ composition =>
-                            val m = composition._2
-                            val field = composition._1
-                            val newMap = m.map{case (npk,npv) =>
-                              npv.getOrElse("") match {
-                                case "sub_label" => npk -> field
-                                case  _ => npk -> ""
-                              }
-
-                            }
-                            newMap.toMap
-
-                            }
-                          key -> breakdown.asJson
-                      }
-                    case _  =>
-                      logger.error(s" $action does not match known actions")
-                       key -> None.asJson
-                  }
-              }
-              println(dataMap.asJson)
-              println()
-
-
-
-              // NEW
-              Some(dataMap.asJson)
+            case true => createDataMap(obj,k)
             case false => None
           }
         }
         Some(dfv.flatten)
     }
+  }
+
+  def createDataMap(obj:JsonObject, k:String): Option[Json] = {
+    val dfSchema = mapAsScalaMap(conf.getObject("local.DATA_FORMAT").unwrapped())
+    val dfSchemaMap = dfSchema.toMap.map{case (k,v) => k -> mapAsScalaMap(v.asInstanceOf[java.util.HashMap[String,AnyRef]]).toMap}
+
+    val colDesc = obj.apply("column_description").getOrElse(Json.Null).asString.getOrElse("")
+    val dataVal = Some(obj.apply(k).getOrElse(Json.Null).asString.getOrElse("").trim)
+
+    //NEW , make this its own function
+    //TODO: traverse config object for DATA_FORMAT
+    //TODO: for each object based on action, do one action and get value
+    //TODO: create new Map/Object/data format.
+    //TODO: cast Map/object/thing as Json
+    val dataMap  = dfSchemaMap.map{case (key,value) =>
+      val keyMap = dfSchemaMap.getOrElse(key,Map[String,AnyRef]())
+      val action = keyMap.get("action").asInstanceOf[Option[String]]
+      action.getOrElse("") match {
+        case "value" => key -> dataVal.asJson
+        case "label" => key -> Some(CFNMappingCook.getKeyFromVal(k)).asJson
+        case "column" => key -> Some(k).asJson
+        case "description" => key -> Some(colDesc).asJson
+        case "decomposition" =>
+          val parts = keyMap.getOrElse("components",new java.util.ArrayList[java.util.HashMap[String,AnyRef]]()).asInstanceOf[java.util.ArrayList[java.util.HashMap[String,AnyRef]]]
+          val partsVec = parts.asScala.toVector
+          val scPartsVec = partsVec.map(m => mapAsScalaMap(m)) //scPartsVec = scala Parts Vector
+        val partsMap = scPartsVec(0).map{case (pk,pv) =>
+          pk -> mapAsScalaMap(pv.asInstanceOf[java.util.HashMap[String,AnyRef]]).get("action").asInstanceOf[Option[String]]}
+
+          val label = CFNMappingCook.getKeyFromVal(k)
+          BreakdownCook.isKeyPresent(label) match {
+            case false => key -> Vector[Map[String,String]]().asJson
+            case true =>
+              val fields : Vector[String] = BreakdownCook.getCompositeFields(label)
+              //ASSUMPTION HERE that since we are decomposition and label is composed of elements, we
+              // can create N number of partsMap where N number of feilds in composite fields
+              val partsMapVector = Vector.fill(fields.size)(partsMap)
+              val fieldsMapComposition = fields.zip(partsMapVector)
+              val breakdown = fieldsMapComposition.map{ composition =>
+                val m = composition._2
+                val field = composition._1
+                val newMap = m.map{case (npk,npv) =>
+                  npv.getOrElse("") match {
+                    case "sub_label" => npk -> field
+                    case  _ => npk -> ""
+                  }
+                }
+                newMap.toMap
+
+              }
+              key -> breakdown.asJson
+          }
+        case _  =>
+          logger.error(s" $action does not match known actions")
+          key ->  Json.Null
+      }
+    }
+    println(dataMap.asJson)
+    println()
+
+    Some(dataMap.asJson)
+
   }
   /**
     * filterDataFormat takes a vector of dataFormat objects and filters out any object
