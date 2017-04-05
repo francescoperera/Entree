@@ -138,9 +138,9 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
       case Some(obj) =>
         val keys = obj.fields
         val dfv = keys.map{k => //dfv = data format vector
-          val colDesc = obj.apply("column_description").getOrElse(Json.Null).asString.getOrElse("")
           CFNMappingCook.isValPresent(k) match {
             case true =>
+              val colDesc = obj.apply("column_description").getOrElse(Json.Null).asString.getOrElse("")
               val dataVal = Some(obj.apply(k).getOrElse(Json.Null).asString.getOrElse("").trim)
 
               //NEW , make this its own function
@@ -157,7 +157,7 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
                     case "column" => key -> Some(k).asJson
                     case "description" => key -> Some(colDesc).asJson
                     case "decomposition" =>
-                      val parts = keyMap.getOrElse("parts",new java.util.ArrayList[java.util.HashMap[String,AnyRef]]()).asInstanceOf[java.util.ArrayList[java.util.HashMap[String,AnyRef]]]
+                      val parts = keyMap.getOrElse("components",new java.util.ArrayList[java.util.HashMap[String,AnyRef]]()).asInstanceOf[java.util.ArrayList[java.util.HashMap[String,AnyRef]]]
                       val partsVec = parts.asScala.toVector
                       val scPartsVec = partsVec.map(m => mapAsScalaMap(m)) //scPartsVec = scala Parts Vector
                       val partsMap = scPartsVec(0).map{case (pk,pv) =>
@@ -247,7 +247,7 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     * @param dest - output/destination S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
     * @param fname - filename used to save the file contents
     */
-  def saveToS3(v:Vector[String],dest:S3Bucket,fname:String) = {
+  def saveToS3(v:Vector[String],dest:S3Bucket,fname:String) : Unit = {
     val f = new File(s"$fname.json")
     val bw = new BufferedWriter(new FileWriter(f))
     v.foreach(s => bw.write( s + "\n"))
@@ -265,7 +265,7 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     * @param dest
     * @param label
     */
-  def batchSave(v:Vector[String],dest:S3Bucket,label:String) = {
+  def batchSave(v:Vector[String],dest:S3Bucket,label:String) : Unit = {
     val randomV: Vector[String] = util.Random.shuffle(v)
     val splitV = randomV.grouped(rowsPerFile).toVector.zipWithIndex
     splitV.foreach{ case (vec,idx) => saveToS3(vec,dest,label + "_" + idx.toString)}
