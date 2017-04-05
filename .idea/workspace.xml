@@ -2,24 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e24fb3f7-ed2b-480d-ac0c-7a7e527ac1c2" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/scala-2.12/classes/HeadChef$.class" afterPath="$PROJECT_DIR$/target/scala-2.12/classes/HeadChef$.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/scala-2.12/classes/dataFormat$.class" afterPath="$PROJECT_DIR$/target/scala-2.12/classes/dataFormat$.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/scala-2.12/classes/dataFormat$anon$lazy$macro$19$1$$anon$1.class" afterPath="$PROJECT_DIR$/target/scala-2.12/classes/dataFormat$anon$lazy$macro$19$1$$anon$1.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/scala-2.12/classes/dataFormat$anon$lazy$macro$19$1$$anon$2.class" afterPath="$PROJECT_DIR$/target/scala-2.12/classes/dataFormat$anon$lazy$macro$19$1$$anon$2.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/scala-2.12/classes/dataFormat$anon$lazy$macro$19$1$anon$macro$11$1.class" afterPath="$PROJECT_DIR$/target/scala-2.12/classes/dataFormat$anon$lazy$macro$19$1$anon$macro$11$1.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/scala-2.12/classes/dataFormat$anon$lazy$macro$19$1.class" afterPath="$PROJECT_DIR$/target/scala-2.12/classes/dataFormat$anon$lazy$macro$19$1.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/scala-2.12/classes/dataFormat$anon$lazy$macro$35$1$$anon$3.class" afterPath="$PROJECT_DIR$/target/scala-2.12/classes/dataFormat$anon$lazy$macro$35$1$$anon$3.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/scala-2.12/classes/dataFormat$anon$lazy$macro$35$1$$anon$4.class" afterPath="$PROJECT_DIR$/target/scala-2.12/classes/dataFormat$anon$lazy$macro$35$1$$anon$4.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/scala-2.12/classes/dataFormat$anon$lazy$macro$35$1$anon$macro$31$1.class" afterPath="$PROJECT_DIR$/target/scala-2.12/classes/dataFormat$anon$lazy$macro$35$1$anon$macro$31$1.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/scala-2.12/classes/dataFormat$anon$lazy$macro$35$1.class" afterPath="$PROJECT_DIR$/target/scala-2.12/classes/dataFormat$anon$lazy$macro$35$1.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/scala-2.12/classes/dataFormat.class" afterPath="$PROJECT_DIR$/target/scala-2.12/classes/dataFormat.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/scala-2.12/classes/validNDJSONFile$.class" afterPath="$PROJECT_DIR$/target/scala-2.12/classes/validNDJSONFile$.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/scala-2.12/classes/validNDJSONFile.class" afterPath="$PROJECT_DIR$/target/scala-2.12/classes/validNDJSONFile.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/streams/$global/dependencyPositions/$global/streams/update_cache_2.12/output_dsp" afterPath="$PROJECT_DIR$/target/streams/$global/dependencyPositions/$global/streams/update_cache_2.12/output_dsp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/HeadChef.scala" afterPath="$PROJECT_DIR$/src/main/scala/HeadChef.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/streams/compile/compileIncremental/$global/streams/out" afterPath="$PROJECT_DIR$/target/streams/compile/compileIncremental/$global/streams/out" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/streams/compile/incCompileSetup/$global/streams/inc_compile_2.12" afterPath="$PROJECT_DIR$/target/streams/compile/incCompileSetup/$global/streams/inc_compile_2.12" />
     </list>
     <ignored path="Entree.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -58,8 +41,8 @@
       <file leaf-file-name="HeadChef.scala" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/scala/HeadChef.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="271">
-              <caret line="136" column="58" lean-forward="false" selection-start-line="136" selection-start-column="58" selection-end-line="136" selection-end-column="58" />
+            <state relative-caret-position="11">
+              <caret line="216" column="50" lean-forward="false" selection-start-line="216" selection-start-column="50" selection-end-line="216" selection-end-column="50" />
               <folding>
                 <element signature="e#0#16#0" expanded="true" />
               </folding>
@@ -870,12 +853,12 @@
       <workItem from="1489507107936" duration="10921000" />
       <workItem from="1489607530962" duration="2313000" />
       <workItem from="1489615750744" duration="440000" />
-      <workItem from="1491345296716" duration="14102000" />
+      <workItem from="1491345296716" duration="14252000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="106812000" />
+    <option name="totallyTimeSpent" value="106962000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1106" height="900" extended-state="6" />
@@ -1065,8 +1048,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/HeadChef.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="271">
-          <caret line="136" column="58" lean-forward="false" selection-start-line="136" selection-start-column="58" selection-end-line="136" selection-end-column="58" />
+        <state relative-caret-position="11">
+          <caret line="216" column="50" lean-forward="false" selection-start-line="216" selection-start-column="50" selection-end-line="216" selection-end-column="50" />
           <folding>
             <element signature="e#0#16#0" expanded="true" />
           </folding>
