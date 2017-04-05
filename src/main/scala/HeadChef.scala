@@ -127,15 +127,15 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     * @param j - Json
     * @return Optional vector of dataFormat objects.
     */
-  def createDataFormat (j:Json) = {
+  def createDataFormat (j:Json): Option[Vector[Json]] = {
     //
     //println(dfSchemaMap)
     j.asObject match {
       case None => None
       case Some(obj) =>
         val keys = obj.fields
-        val dfv = keys.map{k => //dfv = data format vector
-          if (CFNMappingCook.isValPresent(k)) {
+        val dfv : Vector[Option[Json]] = keys.map{k => //dfv = data format vector
+          if (CFNMappingCook.isLabelWithKeyPresent(k)) {
             createDataMap(obj,k)
           } else {
             None
@@ -154,11 +154,6 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     val label: String = CFNMappingCook.getKeyFromVal(k)
 
 
-    //NEW , make this its own function
-    //TODO: traverse config object for DATA_FORMAT
-    //TODO: for each object based on action, do one action and get value
-    //TODO: create new Map/Object/data format.
-    //TODO: cast Map/object/thing as Json
     val dataMap: Map[String,Json]  = dfSchemaMap.map{case (key,keyMap) =>
 
       val action = keyMap.get("action").asInstanceOf[Option[String]]
@@ -173,47 +168,6 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
           key -> Some(colDesc).asJson
         case "decomposition" =>
 
-//          BreakdownCook.isKeyPresent(label) match {
-//            case false => key -> Vector[Map[String,String]]().asJson
-//            case true =>
-//              /** Converting Object in config to HasMap and then to Map */
-//
-//              // 1
-//              val parts = keyMap.getOrElse("components",new java.util.ArrayList[java.util.HashMap[String,AnyRef]]()).asInstanceOf[java.util.ArrayList[java.util.HashMap[String,AnyRef]]]
-//              val partsVec: Vector[java.util.HashMap[String,AnyRef]] = parts.asScala.toVector
-//              //2
-//              val scPartsVec: Vector[mutable.Map[String,AnyRef]] = partsVec.map(m => mapAsScalaMap(m)) //scPartsVec = scala Parts Vector
-//
-//              //TODO:Clusterfucky code , refactor this
-//              // Map( key -> action) where key is the key inside components and action is the property for key.
-//              //TODO: Be careful of doing scPartsVec(0). What if that Vector is empty? Correct this!
-//              //3
-//              val partsMap: mutable.Map[String,Option[String]] = scPartsVec(0).map{case (pk,pv) =>
-//                pk -> mapAsScalaMap(pv.asInstanceOf[java.util.HashMap[String,AnyRef]]).get("action")
-//                  .asInstanceOf[Option[String]]}
-//              //4
-//              val fields : Vector[String] = BreakdownCook.getCompositeFields(label)
-//              /** ASSUMPTION HERE that since we are doing  decomposition and label is composed of elements, we
-//              can create N number of partsMap where N number of fields in composite fields */
-//              //5
-//              val partsMapVector: Vector[mutable.Map[String,Option[String]]] = Vector.fill(fields.size)(partsMap)
-//              //6
-//              val fieldsMapComposition: Vector[(String,mutable.Map[String,Option[String]])]= fields.zip(partsMapVector)
-//              //7
-//              val breakdown: Vector[Map[String,String]] = fieldsMapComposition.map{ composition =>
-//                val m : mutable.Map[String,Option[String]] = composition._2 //m = partsMap
-//                val field : String = composition._1 //field = composite field/element to be adde in m under the key that has action set as "sub_label"
-//                val newMap: mutable.Map[String,String] = m.map{case (npk,npv) =>
-//                  npv.getOrElse("") match {
-//                    case "sub_label" => npk -> field
-//                    case  _ => npk -> ""
-//                  }
-//                }
-//                newMap.toMap //this is what composition is "transformed to"
-//              }
-//              //8
-//              key -> breakdown.asJson
-//          }
           if (BreakdownCook.isKeyPresent(label)) {
             /** Converting Object in config to HasMap and then to Map */
             // 1

@@ -51,5 +51,5 @@ object CFNMappingCook {
     * @param str - value/string
     * @return - boolean
     */
-  def isValPresent(str:String):Boolean = cfnMap.values.exists(_.contains(str))
+  def isLabelWithKeyPresent(str:String):Boolean = cfnMap.values.exists(_.contains(str))
 }
