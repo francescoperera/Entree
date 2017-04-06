@@ -6,7 +6,7 @@
       "type":"String"
     },
     "label":{
-      "action":"value",
+      "action":"label",
       "type":"String"
     },
     "column_header":{

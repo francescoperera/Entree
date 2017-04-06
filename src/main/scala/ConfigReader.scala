@@ -16,7 +16,7 @@ trait ConfigReader {
   }
   val userInputDF: Option[JsonObject] = {
     this.userInput.asObject match {
-      case None => None
+      case None => None //TODO: Replace None with a a default data format schema
       case Some(obj) => obj.apply("DATA_FORMAT").get.asObject //check this get
     }
   }

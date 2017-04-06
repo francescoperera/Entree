@@ -11,12 +11,14 @@ import com.typesafe.scalalogging.LazyLogging
 import scala.collection.mutable
 
 
-case class dataFormat(data:Option[String],label:Option[String],column_header:Option[String],column_description:String)
-case class validNDJSONFile(filename:String,source:S3Bucket,valid:Boolean) //TODO: susbtitute valid with type field ( i.e type: JSON, CSV)
+case class DataFormat(data:Option[String], label:Option[String],
+                      column_header:Option[String], column_description:String)
+case class ValidNDJSONFile(filename:String, source:S3Bucket, valid:Boolean) //TODO: susbtitute valid with type field ( i.e type: JSON, CSV)
+case class KeyAndAction(key:String, action: String)
 
-object  dataFormat{
-  implicit val encoder: Encoder[dataFormat] = io.circe.generic.semiauto.deriveEncoder
-  implicit val decoder: Decoder[dataFormat] = io.circe.generic.semiauto.deriveDecoder
+object  DataFormat{
+  implicit val encoder: Encoder[DataFormat] = io.circe.generic.semiauto.deriveEncoder
+  implicit val decoder: Decoder[DataFormat] = io.circe.generic.semiauto.deriveDecoder
 }
 
 object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
@@ -69,10 +71,10 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     logger.info(s"Aggregating data from ${fv.length} files")
     val jsonVec : Vector[Json] = ndjson.flatMap( j => readFile(j)).flatten // flatMap flattens the Options and flatten turns Vec[Vec] into just Vec. Does it makes sense?
     logger.info(s"Entree detected ${jsonVec.size} possible objects")
-    val dataFormatVec: Vector[Json] = jsonVec.flatMap(createDataFormat(_)).flatten
+    val dataFormatVec: Vector[JsonObject] = jsonVec.flatMap(createDataFormat(_)).flatten
     logger.info(s"${dataFormatVec.size} dataFormat objects were created out of ${jsonVec.size} Json objects")
-    val filteredDataFormatVec : Vector[Json]  = filterDataFormat(dataFormatVec)
-//    logger.info(s"The vector dataFormat objects was sized down to ${filteredDataFormatVec.size}")
+    val filteredDataFormatVec : Vector[JsonObject]  = filterDataFormat(dataFormatVec)
+    logger.info(s"The vector dataFormat objects was sized down to ${filteredDataFormatVec.size}")
 //    val unknownsDataFormat = createUnknows(filteredDataFormatVec)
 //    logger.info(s"Create vector of ${unknownsDataFormat.size} unknown data format objects")
 //    val dataModels = (filteredDataFormatVec ++ unknownsDataFormat).map(_.asJson.noSpaces)
@@ -89,13 +91,13 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     * @param source - input S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
     * @return - validNDSJONFile object. Look at HeadChef for validNDSJONFile implementation
     */
-  def isNDJSON(f:String,source:S3Bucket): validNDJSONFile = {
+  def isNDJSON(f:String,source:S3Bucket): ValidNDJSONFile = {
     val input = DtlS3Cook.apply.getFileStream(source.bucket,source.folderPath.getOrElse("") + f)
     val reader = new BufferedReader(new InputStreamReader(input))
     val fileString = Stream.continually(reader.readLine()).take(1).mkString("")
     reader.close()
     val isValid = fileString.startsWith("{") && fileString.endsWith("}") //NDJSON object start with { and end with } on the same line
-    validNDJSONFile(f,source,isValid)
+    ValidNDJSONFile(f,source,isValid)
   }
 
   /**
@@ -105,7 +107,7 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     * @param vnf - validNDSJONFile object. See HeadChef for implementation
     * @return - Optional vector of Json where Json represents an object in the file.
     */
-  def readFile(vnf:validNDJSONFile):Option[Vector[Json]] = {
+  def readFile(vnf:ValidNDJSONFile):Option[Vector[Json]] = {
     logger.info(s"Reading file - ${vnf.filename}")
     val input = DtlS3Cook.apply.getFileStream(vnf.source.bucket,vnf.source.folderPath.getOrElse("") + vnf.filename)
     val reader = new BufferedReader(new InputStreamReader(input))
@@ -129,12 +131,12 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     * @param j - Json
     * @return Optional vector of dataFormat objects.
     */
-  def createDataFormat (j: Json): Option[Vector[Json]] = {
+  def createDataFormat (j: Json): Option[Vector[JsonObject]] = {
     j.asObject match {
       case None => None
       case Some(obj) =>
         val keys = obj.fields
-        val dfv: Vector[Option[Json]] = keys.map{k => //dfv = data format vector
+        val dfv: Vector[Option[JsonObject]] = keys.map{k => //dfv = data format vector
           if (CFNMappingCook.isLabelWithKeyPresent(k)) {
             createDataObject(obj, k)
           } else {
@@ -152,11 +154,11 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     * @param k - key for which an object should be created
     * @return - Option[Json], where Json represents the data format object.
     */
-  def createDataObject(obj: JsonObject, k: String): Option[Json] = {
+  def createDataObject(obj: JsonObject, k: String): Option[JsonObject] = {
     val label: String = CFNMappingCook.getKeyFromVal(k)
     userInputDF match {
       case None =>
-        logger.error(s"user-input.json was not properly formatted.Check docs for proper formatting")
+        logger.error(s"user-input.json was not properly formatted. Check docs for proper formatting")
         None
       case Some(ui) =>
         val uiMap: Map[String,Json] = ui.toMap
@@ -187,7 +189,7 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
             kv
         }
         println(dataObject.asJson) //TODO: Remove this
-        Some(dataObject.asJson)
+        dataObject.asJson.asObject
     }
   }
 
@@ -234,10 +236,10 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     * filterDataFormat takes a vector of dataFormat objects and filters out any object
     * that returns true to either the "isDataInvalid" or the "isDataEmpty" methods.
     *
-    * @param mv - vector of dataFormat objects
+    * @param dfv - vector of dataFormat objects
     * @return - vector of dataFormat objects.
     */
-  def filterDataFormat(mv:Vector[dataFormat]): Vector[dataFormat] = {
+  def filterDataFormat(dfv:Vector[JsonObject]): Vector[JsonObject] = {
     def isDataInvalid(d:Option[String]): Boolean = d.getOrElse("").toLowerCase() match {
       case "na"| "n/a"|"n/d"|"none"|""|"[redacted]"|"unfilled"|"address redacted"|"redacted address"|"redacted"|
            "unknown"|"null"|"no registra"|"no informa"|"no reporta"|"no aporta"|"no tiene"| "no"=> true
@@ -253,45 +255,67 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     // case None => false
     // }
     // }
-    mv.filterNot(od => filterData(od.data,isDataInvalid _, isDataEmpty _))
+    val dataKeyName: String = getNameForDataKey()
+    dfv.filterNot(df =>
+      filterData(df.apply(dataKeyName).get.asString,isDataInvalid _, isDataEmpty _))
+    //.get here is reasonable bc you if you dataKeyName then, there is a key in df with that name.
   }
 
-  def createUnknows(dfv: Vector[dataFormat]): Vector[dataFormat] = {
-    dfv.map{ df =>
-      val fn = util.Random.shuffle(UnknownCook.generators).head //fn = random function from Unknown.generators
-      val unknownData = fn(df.data.getOrElse(""))
-      dataFormat(Some(unknownData),Some("unknown"),Some("unknown"),"")
+  //TODO: re-look at implementation here.Too many assumptions are made here on what the data format will have.
+  def getNameForDataKey(): String = {
+    val df = userInputDF.get
+    val keys: Vector[String] = df.fields
+    val keyActionVec: Vector[KeyAndAction] = keys.map { k =>
+      val kp = df.apply(k).get.asObject.get //watch out for the .get here
+      val action: String = kp.apply("action").get.asString.get // an action should always exist and it be a String value
+      KeyAndAction(k,action)
+    }
+    val filteredKey: Vector[KeyAndAction] = keyActionVec.filter(ka => ka.action.contains("value"))
+    if ( filteredKey.size > 1){
+      logger.warn("Entree detected that the Data Format schema in user-input.json contains multiple" +
+        "keys with the action: value. The first key will be used in the filtering process.")
+      filteredKey.head.key
+    } else {
+      filteredKey.head.key
     }
   }
 
-  /**
-    * Takes a vector of strings and saves it to a File and then pushes the file to S3.
-    *
-    * @param v - vector of strings/ file content
-    * @param dest - output/destination S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
-    * @param fname - filename used to save the file contents
-    */
-  def saveToS3(v:Vector[String],dest:S3Bucket,fname:String) : Unit = {
-    val f = new File(s"$fname.json")
-    val bw = new BufferedWriter(new FileWriter(f))
-    v.foreach(s => bw.write( s + "\n"))
-    bw.close()
-//    val f = v.map(_.toByte).toArray  //TODO:Figure out to stream the content (v) back to S3.
-    logger.info(s"Saving to S3:$fname")
-    DtlS3Cook.apply.saveFile(dest.bucket,dest.folderPath.getOrElse(""),f)
-  }
+//  def createUnknows(dfv: Vector[DataFormat]): Vector[DataFormat] = {
+//    dfv.map{ df =>
+//      val fn = util.Random.shuffle(UnknownCook.generators).head //fn = random function from Unknown.generators
+//      val unknownData = fn(df.data.getOrElse(""))
+//      dataFormat(Some(unknownData),Some("unknown"),Some("unknown"),"")
+//    }
+//  }
 
-  /**
-    * Takes all aggregated data in the form of a vector of strings and saves a batch of the strings at a time. The batch size
-    * is determined by rowsPerFile.
-    *
-    * @param v
-    * @param dest
-    * @param label
-    */
-  def batchSave(v:Vector[String],dest:S3Bucket,label:String) : Unit = {
-    val randomV: Vector[String] = util.Random.shuffle(v)
-    val splitV = randomV.grouped(rowsPerFile).toVector.zipWithIndex
-    splitV.foreach{ case (vec,idx) => saveToS3(vec,dest,label + "_" + idx.toString)}
-  }
+//  /**
+//    * Takes a vector of strings and saves it to a File and then pushes the file to S3.
+//    *
+//    * @param v - vector of strings/ file content
+//    * @param dest - output/destination S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
+//    * @param fname - filename used to save the file contents
+//    */
+//  def saveToS3(v:Vector[String],dest:S3Bucket,fname:String) : Unit = {
+//    val f = new File(s"$fname.json")
+//    val bw = new BufferedWriter(new FileWriter(f))
+//    v.foreach(s => bw.write( s + "\n"))
+//    bw.close()
+////    val f = v.map(_.toByte).toArray  //TODO:Figure out to stream the content (v) back to S3.
+//    logger.info(s"Saving to S3:$fname")
+//    DtlS3Cook.apply.saveFile(dest.bucket,dest.folderPath.getOrElse(""),f)
+//  }
+//
+//  /**
+//    * Takes all aggregated data in the form of a vector of strings and saves a batch of the strings at a time. The batch size
+//    * is determined by rowsPerFile.
+//    *
+//    * @param v
+//    * @param dest
+//    * @param label
+//    */
+//  def batchSave(v:Vector[String],dest:S3Bucket,label:String) : Unit = {
+//    val randomV: Vector[String] = util.Random.shuffle(v)
+//    val splitV = randomV.grouped(rowsPerFile).toVector.zipWithIndex
+//    splitV.foreach{ case (vec,idx) => saveToS3(vec,dest,label + "_" + idx.toString)}
+//  }
 }
