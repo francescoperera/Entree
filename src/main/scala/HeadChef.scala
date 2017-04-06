@@ -77,10 +77,10 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     logger.info(s"The vector dataFormat objects was sized down to ${filteredDataFormatVec.size}")
     val unknownsDataFormat = createUnknowns(filteredDataFormatVec)
     logger.info(s"Create vector of ${unknownsDataFormat.size} unknown data format objects")
-//    val dataModels = (filteredDataFormatVec ++ unknownsDataFormat).map(_.asJson.noSpaces)
-//    logger.info(s"Saving ${dataModels.size}  data format objects")
-//    logger.info(s"Saving to Bucket: ${destination.bucket}, Path:${destination.folderPath}")
-//    batchSave(dataModels,destination,label)
+    val dataModels = (filteredDataFormatVec ++ unknownsDataFormat).map(_.asJson.noSpaces)
+    logger.info(s"Saving ${dataModels.size}  data format objects")
+    logger.info(s"Saving to Bucket: ${destination.bucket}, Path:${destination.folderPath}")
+    batchSave(dataModels,destination,label)
   }
 
   /**
@@ -321,34 +321,34 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     unknownsVector.flatten
   }
 
-//  /**
-//    * Takes a vector of strings and saves it to a File and then pushes the file to S3.
-//    *
-//    * @param v - vector of strings/ file content
-//    * @param dest - output/destination S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
-//    * @param fname - filename used to save the file contents
-//    */
-//  def saveToS3(v:Vector[String],dest:S3Bucket,fname:String) : Unit = {
-//    val f = new File(s"$fname.json")
-//    val bw = new BufferedWriter(new FileWriter(f))
-//    v.foreach(s => bw.write( s + "\n"))
-//    bw.close()
-////    val f = v.map(_.toByte).toArray  //TODO:Figure out to stream the content (v) back to S3.
-//    logger.info(s"Saving to S3:$fname")
-//    DtlS3Cook.apply.saveFile(dest.bucket,dest.folderPath.getOrElse(""),f)
-//  }
-//
-//  /**
-//    * Takes all aggregated data in the form of a vector of strings and saves a batch of the strings at a time. The batch size
-//    * is determined by rowsPerFile.
-//    *
-//    * @param v
-//    * @param dest
-//    * @param label
-//    */
-//  def batchSave(v:Vector[String],dest:S3Bucket,label:String) : Unit = {
-//    val randomV: Vector[String] = util.Random.shuffle(v)
-//    val splitV = randomV.grouped(rowsPerFile).toVector.zipWithIndex
-//    splitV.foreach{ case (vec,idx) => saveToS3(vec,dest,label + "_" + idx.toString)}
-//  }
+  /**
+    * Takes a vector of strings and saves it to a File and then pushes the file to S3.
+    *
+    * @param v - vector of strings/ file content
+    * @param dest - output/destination S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
+    * @param fname - filename used to save the file contents
+    */
+  def saveToS3(v:Vector[String],dest:S3Bucket,fname:String) : Unit = {
+    val f = new File(s"$fname.json")
+    val bw = new BufferedWriter(new FileWriter(f))
+    v.foreach(s => bw.write( s + "\n"))
+    bw.close()
+//    val f = v.map(_.toByte).toArray  //TODO:Figure out to stream the content (v) back to S3.
+    logger.info(s"Saving to S3:$fname")
+    DtlS3Cook.apply.saveFile(dest.bucket,dest.folderPath.getOrElse(""),f)
+  }
+
+  /**
+    * Takes all aggregated data in the form of a vector of strings and saves a batch of the strings at a time. The batch size
+    * is determined by rowsPerFile.
+    *
+    * @param v
+    * @param dest
+    * @param label
+    */
+  def batchSave(v:Vector[String],dest:S3Bucket,label:String) : Unit = {
+    val randomV: Vector[String] = util.Random.shuffle(v)
+    val splitV = randomV.grouped(rowsPerFile).toVector.zipWithIndex
+    splitV.foreach{ case (vec,idx) => saveToS3(vec,dest,label + "_" + idx.toString)}
+  }
 }
