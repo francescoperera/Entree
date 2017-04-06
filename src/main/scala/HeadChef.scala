@@ -75,8 +75,8 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     logger.info(s"${dataFormatVec.size} dataFormat objects were created out of ${jsonVec.size} Json objects")
     val filteredDataFormatVec : Vector[JsonObject]  = filterDataFormat(dataFormatVec)
     logger.info(s"The vector dataFormat objects was sized down to ${filteredDataFormatVec.size}")
-//    val unknownsDataFormat = createUnknows(filteredDataFormatVec)
-//    logger.info(s"Create vector of ${unknownsDataFormat.size} unknown data format objects")
+    val unknownsDataFormat = createUnknowns(filteredDataFormatVec)
+    logger.info(s"Create vector of ${unknownsDataFormat.size} unknown data format objects")
 //    val dataModels = (filteredDataFormatVec ++ unknownsDataFormat).map(_.asJson.noSpaces)
 //    logger.info(s"Saving ${dataModels.size}  data format objects")
 //    logger.info(s"Saving to Bucket: ${destination.bucket}, Path:${destination.folderPath}")
@@ -178,8 +178,6 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
                     key -> Some(colDesc).asJson
                   case Some("decomposition") =>
                      getBreakdown(key,keyMap,label)
-                    //key -> Json.Null
-                    //TODO: call get breakdown here
                   case _ =>
                     logger.error(s" $action does not match known actions")
                     key ->  Json.Null
@@ -280,13 +278,48 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     }
   }
 
-//  def createUnknows(dfv: Vector[DataFormat]): Vector[DataFormat] = {
-//    dfv.map{ df =>
-//      val fn = util.Random.shuffle(UnknownCook.generators).head //fn = random function from Unknown.generators
-//      val unknownData = fn(df.data.getOrElse(""))
-//      dataFormat(Some(unknownData),Some("unknown"),Some("unknown"),"")
-//    }
-//  }
+  //TODO: this almost a copy of create Data Object. Think of how to combine, if possible
+  def createUnknowns(dfv: Vector[JsonObject]): Vector[JsonObject] = {
+    val unknownsVector: Vector[Option[JsonObject]] = dfv.map {df =>
+      val unknownLabel: String = "unknown" // the label and column valus for unknowns is the same
+      val colDesc: String = "" //unknowns have empty column description.
+      val unknown: Option[JsonObject] = userInputDF match {
+        case None =>
+          logger.error(s"user-input.json was not properly formatted. Check docs for proper formatting")
+          None
+        case Some(ui) =>
+          val uiMap: Map[String,Json] = ui.toMap
+          val unknownObject: Map[String, Json] = uiMap.map{case (key,keyMap) =>
+            val kv: (String, Json) = keyMap.asObject match {
+              case None => key -> Json.Null
+              case Some(km) =>
+                val action: Option[String] = km.apply("action").get.asString //check get here, assuming action is always present
+                val kvPair: (String,Json) =  action match {
+                    case Some("value") =>
+                      val fn = util.Random.shuffle(UnknownCook.generators).head //fn = random function from Unknown.generators
+                      val unknownData = fn(df.apply(key).get.asString.get) //TODO: watch out for .get here
+                      key -> unknownData.asJson
+                    case Some("label") => key -> unknownLabel.asJson
+                    case Some("column") => key -> unknownLabel.asJson
+                    case Some("description") =>
+                      key -> colDesc.asJson
+                    case Some("decomposition") =>
+                      key ->  Vector[Map[String,String]]().asJson // unknowns have no decomposition
+                    case _ =>
+                      logger.error(s" $action does not match known actions")
+                      key ->  Json.Null
+                }
+                kvPair
+            }
+            kv
+          }
+          println(unknownObject.asJson) //TODO: Remove this
+          unknownObject.asJson.asObject
+      }
+      unknown
+    }
+    unknownsVector.flatten
+  }
 
 //  /**
 //    * Takes a vector of strings and saves it to a File and then pushes the file to S3.
