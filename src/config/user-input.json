@@ -27,7 +27,7 @@
             "type":"String"
           },
           "data":{
-            "action":"no_value",
+            "action":"empty_value",
             "type":"String"
           }
         }

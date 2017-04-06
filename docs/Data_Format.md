@@ -1,9 +1,13 @@
 ## Data Format Object
 
-DATA_FORMAT is an object that users will use to define the structure and the content of the object that Entree will use
-to label and aggregate data. Users can define this object in **user-input.conf**.
+DATA_FORMAT is an object that users will use to define the structure and the content of the object
+that Entree will use to label and aggregate data. Users can define this object in **user-input.json**.
 The DATA_FORMAT object should handle and store the data and its contextual information. Most key-value pairs in the
-objectshould be first level entries( not nested).
+object should be first level entries( not nested).
+
+The base unit of this object is a key-value pair. In order to build this pair, the user needs to
+provide the name of the key and a set of properties. See the Structure section below for more information
+
 
 ### Breakdown
 If a "breakdown" of the data into its composite fields should be needed, it can be added to the DATA_FORMAT object and
@@ -23,27 +27,110 @@ Users can define which labels if any have composite fields  by adding a Map to *
 An example of a user defined Map for relating labels with its components is :
 
 ```
+....
 "BREAKDOWN_MAP": {
     "full_name": ["first_name","middle_name","last_name","name_modifier"],
     "address": ["house_number","street address","apartment_number","city",
       "state","zip_code"]
   }
+....
 ```
 
 ### Structure
 The object should be composed of n key - value pairs, where n is defined by the user. Each key is defined as an object
-parameter and has a set of properties : action,type and components. All keys should have an action ,type and components defined.
+parameter and has a set of properties : action,type and components. All keys should have an action and type. Keys have
+a components property **only** if its action property is set to be decomposition.
+
+##### Important
+Each key structure in the JSON configuration file must follow the structure delineated in this doc.
+Specifically, all keys **must** have the properties: action and type. Moreoever, the action property
+must be set to be one of the actions that Entree supports ( see below for Actions).
+
+##### Example of Key Structure
+
+```
+    "key_name":{
+        "action": "value"
+        "type": "String"
+    }
+
+```
+In this example key was named *key_name* and its properties were set, such that *key_name*'s
+action property is set to be "value" and the its type is set as String.
+
+##### Special Example of Key Structure with Components Property.
+
+```
+    "another_key_name":{
+        "action": "decomposition"
+        "type": "Vector[Map[String,String]]"
+        "components:[
+            {
+              "field":{
+                "action":"sub_label",
+                "type":"String"
+              },
+              "data":{
+                "action":"empty_value",
+                "type":"String"
+              }
+            }
+        ]
+    }
+
+```
+In this example, the key was named *another_key_name* and it was given 3 properties. Since the action
+property was set to be "decomposition", then Entree expects to also be given the "components" property.
+Check the Action and Components sections for more information on decomposition and  components.
 
 #### Action
-Action is a property that relates to the action that Entree will need to do to get the value for its key. Entree has a number of defined
-actions :
-* **value** : Entree grabs the value stored in the data point. (i.e {"first_name":"Frank"}, "Frank" is the value of the data point).
-* **label** : Entree gets the label for the key in the data point (i.e {"first_name":"Frank"}, "name" is the label for the key "first_name").
-* **column** : Entree gets the key used in the original data point (i.e {"first_name":"Frank"}, "first_name" is the key/column in this data point).
-* **description** : Entree gets the column description in the data point. If none is found, then column description is a set as an empty String.
-* **decomposition** : Entree looks at the value stored under the property "components" and uses it to create the schema for the breakdown data. Any key whose action is set to "decomposition", will also have components mapped to an non empty array.For more look at the Components section(below)
-* sub_label: Entree looks at the label for the data point and then checks if the label is made of composite field. This done by looking at at "breakdown" Map, which can be either user defined or default one. If label has composite fields, then these fields are stored under the key whose action property is set as "sub_label"
-* no_value: Entree performs no action and maps the corresponding key to an empty string
+Action is a property that relates to the action that Entree will need to do to get the value for its key. E
+ntree has a number of defined actions :
+
+##### value
+Entree grabs the value stored in the data point.
+
+```{"first_name":"Frank"} ```
+
+"Frank" is the value of the data point. So the key whose action property is *value* will map to value "Frank".
+**Important**: Only key per object can have an action property set to "value".
+
+##### label
+Entree gets the label for the key in the data point
+
+```{"first_name":"Frank"}```
+
+Entree grabs the key, in this case "first_name", and looks for its associated label. The label for "first_name"
+is "full_name". Thus the key whose action property is *label* will map to the value "full_name".
+
+##### column
+Entree gets the key used in the original data point
+
+```{"first_name":"Frank"}```
+
+"first_name" is the key in this data points. The key whose action property is *column* will map to value "first_name".
+
+##### description
+Entree gets the column description in the data point.
+If no column description is found, then column description is a set as an empty String.
+
+```{"first_name":"Frank","column_description":"Some random person"}```
+
+Entree grabs the value under "column_description",in this case "Some random person". The key whose action property
+is *description* will map to the value "Some random person".
+
+#### decomposition**
+Entree looks at the value stored under the property "components" and uses it to create the schema for the
+breakdown data. Any key whose action is set to "decomposition", will also have components mapped to an non empty array.
+For more information, check the Breakdown and Components section.
+
+#### sub_label
+Entree looks at the label for the data point and then checks if the label is made of composite field.
+This done by looking at at "breakdown" Map, which can be either user defined or default one.
+If label has composite fields, then these fields are stored under the key whose action property is set as "sub_label".
+
+###empty_value
+Entree performs no action and maps the corresponding key to an empty string.
 
 
 #### Type

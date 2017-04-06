@@ -233,7 +233,6 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
   /**
     * filterDataFormat takes a vector of dataFormat objects and filters out any object
     * that returns true to either the "isDataInvalid" or the "isDataEmpty" methods.
-    *
     * @param dfv - vector of dataFormat objects
     * @return - vector of dataFormat objects.
     */
