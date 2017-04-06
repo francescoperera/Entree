@@ -26,4 +26,11 @@ trait ConfigReader {
       case Some(obj) => obj.apply("ROWS_PER_FILE").get.asNumber //check this get
     }
   }
+
+  val userInputBD: Option[JsonObject] = {
+    this.userInput.asObject match {
+      case None => None
+      case Some(obj) => obj.apply("BREAKDOWN_MAP").get.asObject //check this get
+    }
+  }
 }
