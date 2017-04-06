@@ -22,9 +22,11 @@ object  dataFormat{
 object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
   /** HeadChef is the main resource of Entree and will direct every other resource. */
 
+    private val defaultRPF: Int = 100000
+
   private val rowsPerFile: Int = userInputRPF match {
-    case None => 100000 //default value if no value is found in the config file
-    case Some(num) => num.toInt.get
+    case None => defaultRPF//default value if no value is found in the config file
+    case Some(num) => num.toInt.getOrElse(defaultRPF)
   }//conf.getInt("local.ROWS_PER_FILE")//Important: this value determines the size of the output files.
 
   /**
@@ -67,9 +69,9 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     logger.info(s"Aggregating data from ${fv.length} files")
     val jsonVec : Vector[Json] = ndjson.flatMap( j => readFile(j)).flatten // flatMap flattens the Options and flatten turns Vec[Vec] into just Vec. Does it makes sense?
     logger.info(s"Entree detected ${jsonVec.size} possible objects")
-    val dataFormatVec = jsonVec.flatMap(createDataFormat(_)).flatten
-//    logger.info(s"${dataFormatVec.size} dataFormat objects were created out of ${jsonVec.size} Json objects")
-//    val filteredDataFormatVec : Vector[dataFormat]  = filterDataFormat(dataFormatVec)
+    val dataFormatVec: Vector[Json] = jsonVec.flatMap(createDataFormat(_)).flatten
+    logger.info(s"${dataFormatVec.size} dataFormat objects were created out of ${jsonVec.size} Json objects")
+    val filteredDataFormatVec : Vector[Json]  = filterDataFormat(dataFormatVec)
 //    logger.info(s"The vector dataFormat objects was sized down to ${filteredDataFormatVec.size}")
 //    val unknownsDataFormat = createUnknows(filteredDataFormatVec)
 //    logger.info(s"Create vector of ${unknownsDataFormat.size} unknown data format objects")
@@ -123,20 +125,18 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
 
   /**
     * createDataFormat takes Json casts it as a JsonObject and traverses its keys,creating
-    * a dataFormat object for each key.
-    *
+    * a data format object for each key (if the key has a label).
     * @param j - Json
     * @return Optional vector of dataFormat objects.
     */
   def createDataFormat (j: Json): Option[Vector[Json]] = {
-    //println(dfSchemaMap)
     j.asObject match {
       case None => None
       case Some(obj) =>
         val keys = obj.fields
         val dfv: Vector[Option[Json]] = keys.map{k => //dfv = data format vector
           if (CFNMappingCook.isLabelWithKeyPresent(k)) {
-            createDataMap(obj, k)
+            createDataObject(obj, k)
           } else {
             None
           }
@@ -145,7 +145,14 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     }
   }
 
-  def createDataMap(obj: JsonObject, k: String): Option[Json] = {
+  /**
+    * createDataObjects takes the jsonObject and a key and creates a data format object
+    * for the key. It then casts the object as Json.
+    * @param obj - Json Object
+    * @param k - key for which an object should be created
+    * @return - Option[Json], where Json represents the data format object.
+    */
+  def createDataObject(obj: JsonObject, k: String): Option[Json] = {
     val label: String = CFNMappingCook.getKeyFromVal(k)
     userInputDF match {
       case None =>
@@ -179,11 +186,12 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
             }
             kv
         }
-        println(dataObject.asJson)
+        println(dataObject.asJson) //TODO: Remove this
         Some(dataObject.asJson)
     }
   }
 
+  //TODO: Refactor this
   def getBreakdown(key: String, keyMap: Json, label: String): (String, Json) = {
     if (BreakdownCook.isKeyPresent(label)) {
       //use get here because when you call this function, keyMap has already been casted as JsonObject successfully
