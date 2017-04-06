@@ -5,6 +5,7 @@ import io.circe.{Json, JsonNumber, JsonObject, parser}
 
 trait ConfigReader {
   val conf: Config = ConfigFactory.load()
+
   val userInput: Json = {
     val reader = new BufferedReader(new FileReader("src/config/user-input.json"))
     val ui: String = Stream.continually(reader.readLine()).takeWhile(_ != null).mkString("")

@@ -2,8 +2,8 @@
 
 DATA_FORMAT is an object that users will use to define the structure and the content of the object that Entree will use
 to label and aggregate data. Users can define this object in **user-input.conf**.
-The DATA_FORMAT object should handle and store the data and its contextual information. Most key-value pairs in the object
-should be first level entries( not nested).
+The DATA_FORMAT object should handle and store the data and its contextual information. Most key-value pairs in the
+objectshould be first level entries( not nested).
 
 ### Breakdown
 If a "breakdown" of the data into its composite fields should be needed, it can be added to the DATA_FORMAT object and
@@ -14,19 +14,20 @@ address | house_number | street_address | apartment_number | state | city | zip_
 -------- | ------------ | -------------- | ---------------- | ----- | ---- | -------- |
 123 Washington Avenue, Apt 3B, NY , NY 10000 | 123 | Washington Avenue | Apt 3B | NY | NY | 10000 |
 
-Note that a breakdown occurs only if the label detected by Entree for the datapoint is made of composite fields. In this case
-Entree looked at datapoint ```123 Washington Avenue, Apt 3B, NY , NY 10000``` labeled it as **address**  and recognized that
-address is a label made of composite fields : house_number, street_address, apartment_number, state, city and zip_code.
+Note that a breakdown occurs only if the label detected by Entree for the datapoint is made of composite fields.
+In this case Entree looked at datapoint ```123 Washington Avenue, Apt 3B, NY , NY 10000``` labeled it as **address**
+and recognized that address is a label made of composite fields : house_number, street_address, apartment_number,
+state, city and zip_code.
 Users can define which labels if any have composite fields  by adding a Map to **user-input.conf**.
 
 An example of a user defined Map for relating labels with its components is :
 
 ```
-breakdownMap = Map (
-   "full_name" -> Array("first_name","middle_name","last_name","name_modifier"),
-   "address" -> Array("house_number","street address","apartment_number","city",
-     "state","zip_code")
-   )
+"BREAKDOWN_MAP": {
+    "full_name": ["first_name","middle_name","last_name","name_modifier"],
+    "address": ["house_number","street address","apartment_number","city",
+      "state","zip_code"]
+  }
 ```
 
 ### Structure
@@ -56,23 +57,21 @@ For example, if the DATA_FORMAT object had the following key defined :
 ```
     ......
     ......
-    division{
-        "action":"decomposition"
-        "type": "Vector[Map[String,String]"
-        "components":[
-            {
-                "composite_field" {
-                    "action": "sub_label"
-                    "type": "String"
-                    "components":[]
-                }
-                "data"{
-                    "action":"no_action"
-                    "type": "String"
-                    "components":[]
-                }
-            }
-        ]
+    "division": {
+      "action": "decomposition",
+      "type": "Vector[Map[String,String]",
+      "components" : [
+        {
+          "composite_field":{
+            "action":"sub_label",
+            "type":"String"
+          },
+          "data":{
+            "action":"no_value",
+            "type":"String"
+          }
+        }
+      ]
     }
     .....
     .....
@@ -116,60 +115,60 @@ The  "breakdown"  portion for the DATA_FORMAT object ( in this case the "breakdo
 
 ## Example
 
-### user-input.conf
+### user-input.json
 
 ```
-user-input{
-  DATA_FORMAT {
+{
+  "ROWS_PER_FILE" : 100000,
+  "DATA_FORMAT" : {
     "data":{
-      "action":"value"
+      "action":"value",
       "type":"String"
-      "parts":[]
-    }
+    },
     "label":{
-      "action":"label"
+      "action":"label",
       "type":"String"
-      "parts":[]
-    }
+    },
     "column_header":{
-      "action":"column"
+      "action":"column",
       "type":"String"
-      "parts":[]
-    }
+    },
     "column_description":{
-      "action":"description"
+      "action":"description",
       "type":"String"
-      "parts":[]
-    }
+    },
     "breakdown": {
-      "action": "decomposition"
-      "type": "Vector[Map[String,String]"
-      "parts" : [
+      "action": "decomposition",
+      "type": "Vector[Map[String,String]",
+      "components" : [
         {
           "field":{
-            "action":"sub_label"
+            "action":"sub_label",
             "type":"String"
-            "parts":[]
-          }
+          },
           "data":{
-            "action":"no_value"
+            "action":"no_value",
             "type":"String"
-            "parts":[]
           }
         }
       ]
     }
+  },
+  "BREAKDOWN_MAP": {
+    "full_name": ["first_name","middle_name","last_name","name_modifier"],
+    "address": ["house_number","street address","apartment_number","city",
+      "state","zip_code"]
   }
 }
 ```
 ### Breakdown Map
 
 ```
-breakdownMap = Map (
-   "full_name" -> Array("first_name","middle_name","last_name","name_modifier"),
-   "address" -> Array("house_number","street address","apartment_number","city",
-     "state","zip_code")
-   )
+"BREAKDOWN_MAP": {
+    "full_name": ["first_name","middle_name","last_name","name_modifier"],
+    "address": ["house_number","street address","apartment_number","city",
+      "state","zip_code"]
+  }
 ```
 
 ### Data Points
@@ -322,7 +321,7 @@ Entree will create one  DATA_FORMAT object for this data point.
     "column_header":"first_name",
     "data": "Eric",
     "label":"first_name",
-    "column_description":""
+    "column_description":"first name of employee"
 }
 ```
 
