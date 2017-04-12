@@ -1,7 +1,14 @@
 import java.io.{BufferedReader, File, FileReader}
 
 import com.typesafe.config.{Config, ConfigFactory}
-import io.circe.{Json, JsonNumber, JsonObject, parser}
+import io.circe._
+
+case class Properties(action:String,_type:String,components:Option[Vector[Map[String,Properties]]])
+
+object Properties{
+  implicit val encoder: Encoder[Properties] = io.circe.generic.semiauto.deriveEncoder
+  implicit val decoder: Decoder[Properties] = io.circe.generic.semiauto.deriveDecoder
+}
 
 trait ConfigReader {
   val conf: Config = ConfigFactory.load()
@@ -31,7 +38,10 @@ trait ConfigReader {
   val userInputBD: Option[JsonObject] = {
     this.userInput.asObject match {
       case None => None
-      case Some(obj) => obj.apply("BREAKDOWN_MAP").get.asObject //check this get
+      case Some(obj) =>
+        val ui: Option[JsonObject] = obj.apply("BREAKDOWN_MAP").get.asObject //check this get
+        val newUI = ui.get.toMap.map{case (k,v) => k ->  }
+        ui
     }
   }
 }
