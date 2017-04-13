@@ -3,7 +3,7 @@ import java.io.{BufferedReader, File, FileReader}
 import com.typesafe.config.{Config, ConfigFactory}
 import io.circe._
 
-case class Properties(action:String,_type:String,components:Option[Vector[Map[String,Properties]]])
+case class Properties(action: String, _type: String, breakdown_schema: Option[Map[String, Properties]])
 
 object Properties{
   implicit val encoder: Encoder[Properties] = io.circe.generic.semiauto.deriveEncoder
@@ -22,10 +22,16 @@ trait ConfigReader {
       case Right(j) => j
     }
   }
-  val userInputDF: Option[JsonObject] = {
+  val userInputDF: Option[Map[String,Properties]] = {
     this.userInput.asObject match {
       case None => None //TODO: Replace None with a a default data format schema
-      case Some(obj) => obj.apply("DATA_FORMAT").get.asObject //check this get
+      case Some(obj) =>
+        val df: Option[JsonObject] = obj.apply("DATA_FORMAT").get.asObject //check this get
+        val newDF: Map[String,Properties] = df.get.toMap.map{case (k,v) =>
+          val properties = v.as[Properties].right.get //check this get, risky?
+          k -> properties
+        }
+        Some(newDF)
     }
   }
   val userInputRPF: Option[JsonNumber] = {
@@ -38,10 +44,8 @@ trait ConfigReader {
   val userInputBD: Option[JsonObject] = {
     this.userInput.asObject match {
       case None => None
-      case Some(obj) =>
-        val ui: Option[JsonObject] = obj.apply("BREAKDOWN_MAP").get.asObject //check this get
-        val newUI = ui.get.toMap.map{case (k,v) => k ->  }
-        ui
+      case Some(obj) => obj.apply("BREAKDOWN_MAP").get.asObject //check this get
+
     }
   }
 }

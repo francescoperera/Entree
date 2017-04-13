@@ -3,35 +3,34 @@
   "DATA_FORMAT" : {
     "data":{
       "action":"value",
-      "type":"String"
+      "_type":"String"
     },
     "label":{
       "action":"label",
-      "type":"String"
+      "_type":"String"
     },
     "column_header":{
       "action":"column",
-      "type":"String"
+      "_type":"String"
     },
     "column_description":{
       "action":"description",
-      "type":"String"
+      "_type":"String"
     },
     "breakdown": {
       "action": "decomposition",
-      "type": "Vector[Map[String,String]",
-      "components" : [
+      "_type": "Vector[Map[String,String]",
+      "breakdown_schema" :
         {
           "field":{
             "action":"sub_label",
-            "type":"String"
+            "_type":"String"
           },
           "data":{
             "action":"empty_value",
-            "type":"String"
+            "_type":"String"
           }
         }
-      ]
     }
   },
   "BREAKDOWN_MAP": {
