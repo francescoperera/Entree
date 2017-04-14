@@ -77,10 +77,10 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     logger.info(s"Aggregating data from ${fv.length} files")
     val jsonVec : Vector[Json] = ndjson.flatMap( j => readFile(j)).flatten // flatMap flattens the Options and flatten turns Vec[Vec] into just Vec. Does it makes sense?
     logger.info(s"Entree detected ${jsonVec.size} possible objects")
-    val dataFormatVec  = jsonVec.flatMap(createDataFormat(_)).flatten //Vector[JsonObject]
-//    logger.info(s"${dataFormatVec.size} dataFormat objects were created out of ${jsonVec.size} Json objects")
-//    val filteredDataFormatVec : Vector[JsonObject]  = filterDataFormat(dataFormatVec)
-//    logger.info(s"The vector dataFormat objects was sized down to ${filteredDataFormatVec.size}")
+    val dataFormatVec: Vector[JsonObject]  = jsonVec.flatMap(createDataFormat(_)).flatten
+    logger.info(s"${dataFormatVec.size} dataFormat objects were created out of ${jsonVec.size} Json objects")
+    val filteredDataFormatVec : Vector[JsonObject]  = filterDataFormat(dataFormatVec)
+    logger.info(s"The vector dataFormat objects was sized down to ${filteredDataFormatVec.size}")
 //    val unknownsDataFormat = createUnknowns(filteredDataFormatVec)
 //    logger.info(s"Create vector of ${unknownsDataFormat.size} unknown data format objects")
 //    val dataModels = (filteredDataFormatVec ++ unknownsDataFormat).map(_.asJson.noSpaces)
@@ -153,10 +153,14 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     }
   }
 
-
-
+  /**
+    * createDataObjects takes the jsonObject and a key and creates a data format object
+    * for the key. It then casts the object as Json.
+    * @param obj - Json Object
+    * @param k - key for which an object should be created
+    * @return - Option[Json], where Json represents the data format object.
+    */
   def createDataObject(obj:JsonObject,k:String):Option[JsonObject] = {
-    val label: String = CFNMappingCook.getKeyFromVal(k)
     userInputDF match {
       case None =>
         logger.error(s"user-input.json was not properly formatted. Check docs for proper formatting")
@@ -164,32 +168,30 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
         None
       case Some(df) =>
         val dataObject: Map[String, Json] = df.map{case (key,properties) =>
-          getKeyValuePair(properties,key,Some(label),Some(obj),Some(k),None)
+          val dataVal: Option[String] = Some(obj.apply(k).getOrElse(Json.Null).asString.getOrElse("").trim)
+          val colDesc: String = obj.apply("column_description").getOrElse(Json.Null).asString.getOrElse("")
+          val label: String = CFNMappingCook.getKeyFromVal(k)
+          getKeyValuePair(properties,key,dataVal,Some(label),colDesc,Some(obj),Some(k),None)
         }
         dataObject.asJson.asObject
     }
   }
 
-  def getKeyValuePair(p: Properties, dfKey: String, label: Option[String],
+  //TODO: re-order arguments! Too many args?
+  def getKeyValuePair(p: Properties, dfKey: String, dataVal:Option[String], label: Option[String], colDesc: String,
                       obj: Option[JsonObject], k: Option[String], compositeField:Option[String]) : (String,Json) = {
     p.action match {
       case Actions.value =>
         obj match {
-          case None => dfKey -> Json.Null
-          case Some(o) =>
-            val dataVal = Some(o.apply(k.getOrElse("")).getOrElse(Json.Null).asString.getOrElse("").trim)
-            // More nested pattern matching and eliminate the "" with the getOrElse ?
-            dfKey -> dataVal.asJson
+          case None => dfKey -> Json.Null //TODO: Do we need this?
+          case Some(o) => dfKey -> dataVal.asJson
         }
       case Actions.label => dfKey -> label.asJson
       case Actions.column => dfKey -> k.asJson
       case Actions.description =>
         obj match {
-          case None => dfKey -> Json.Null
-          case Some(o) =>
-            val colDesc: String = o.apply("column_description").getOrElse(Json.Null).asString.getOrElse("")
-            // More nested pattern matching and eliminate the "" with the getOrElse ?
-            dfKey -> Some(colDesc).asJson
+          case None => dfKey -> Json.Null //TODO: Do we need this?
+          case Some(o) => dfKey -> colDesc.asJson
         }
       case Actions.subLabel => dfKey -> compositeField.asJson
       case Actions.emptyValue => dfKey -> "".asJson
@@ -199,91 +201,6 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     }
   }
 
-  /**
-    * createDataObjects takes the jsonObject and a key and creates a data format object
-    * for the key. It then casts the object as Json.
-    * @param obj - Json Object
-    * @param k - key for which an object should be created
-    * @return - Option[Json], where Json represents the data format object.
-    */
-//  def createDataObject(obj: JsonObject, k: String): Option[JsonObject] = {
-//    val label: String = CFNMappingCook.getKeyFromVal(k)
-//    userInputDF match {
-//      case None =>
-//        logger.error(s"user-input.json was not properly formatted. Check docs for proper formatting")
-//        None
-//      case Some(ui) =>
-//        val uiMap: Map[String,Json] = ui.toMap
-//        val dataObject: Map[String, Json] = uiMap.map{case (key,keyMap) =>
-//            val kv: (String, Json) = keyMap.asObject match {
-//              case None => key -> Json.Null
-//              case Some(km) =>
-//                val action: Option[String] = km.apply("action").get.asString //check get here, assuming action is always present
-//                val kvPair: (String,Json) =  action match {
-//                  case Some("value") =>
-//                    val dataVal = Some(obj.apply(k).getOrElse(Json.Null).asString.getOrElse("").trim)
-//                    key -> dataVal.asJson
-//                  case Some("label") => key -> Some(label).asJson
-//                  case Some("column") => key -> Some(k).asJson
-//                  case Some("description") =>
-//                    val colDesc: String = obj.apply("column_description").getOrElse(Json.Null).asString.getOrElse("")
-//                    key -> Some(colDesc).asJson
-//                  case Some("decomposition") =>
-//                     getBreakdown(key,keyMap,label)
-//                  case _ =>
-//                    logger.error(s" $action does not match known actions")
-//                    key ->  Json.Null
-//                }
-//                kvPair
-//            }
-//            kv
-//        }
-//        println(dataObject.asJson) //TODO: Remove this
-//        dataObject.asJson.asObject
-//    }
-//  }
-
-
-
-//  //TODO: Refactor this
-//  def getBreakdown(key: String, keyMap: Json, label: String): (String, Json) = {
-//    if (BreakdownCook.isKeyPresent(label)) {
-//      //use get here because when you call this function, keyMap has already been casted as JsonObject successfully
-//      val components: Option[Vector[Json]] = keyMap.asObject.get.apply("components").get.asArray
-//      val breakdownSchema: Option[JsonObject] = components.get(0).asObject //Assumption: Vector is not empty and only has 1 element
-//      val breakdown: Json = breakdownSchema match {
-//        case None => Json.Null
-//        case Some(bds) =>
-//          val fields : Vector[String] = BreakdownCook.getCompositeFields(label)
-//          val bdMap: Map[String, Json] = bds.toMap
-//          val bdMapVector: Vector[Map[String, Json]] = Vector.fill(fields.size)(bdMap)
-//          val fbdComposition: Vector[(String, Map[String, Json])] = fields.zip(bdMapVector)
-//          val bd: Vector[Json] = fbdComposition.map {composite =>
-//            val field: String = composite._1
-//            val m: Map[String,Json] = composite._2
-//            val newM:Map[String,Json] = m.map{case(bdk,bdv) =>
-//                val newKV: (String, Json) = bdv.asObject match{
-//                  case None => bdk -> Json.Null
-//                  case Some(properties) =>
-//                    val action: Option[String] = properties.apply("action").get.asString
-//                    val kv: (String,Json) = action match {
-//                      case Some("sub_label") => bdk -> field.asJson
-//                      case _ => bdk -> "".asJson
-//                    }
-//                    kv
-//                }
-//                newKV //the new key-value pair that will substitute bdk,ddv
-//            }
-//            newM.asJson
-//          }
-//          bd.asJson
-//      }
-//      key -> breakdown
-//    } else {
-//      key -> Vector[Map[String, String]]().asJson
-//    }
-//  }
-
   def getBreakdown(dfKey:String, p: Properties,label: String): (String, Json) = {
     if(BreakdownCook.isKeyPresent(label)){
       val bdSchema: Map[String, Properties] = p.breakdown_schema.get //assumption: if you are doing a breakdown, then p.breakdown_schema needs to be defined
@@ -291,7 +208,8 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
       val bdMapVector: Vector[Map[String, Properties]] = Vector.fill(bdFields.size)(bdSchema)
       val bdComposition: Vector[FieldAndMap] = bdFields.zip(bdMapVector) map{ (tp:(String, Map[String, Properties])) => FieldAndMap(tp) }
       val breakdown: Json = bdComposition.map{ fam =>
-        val updatedBDMap: Map[String, Json] = fam.bdm.map { case(bdk,bdp) => getKeyValuePair(bdp, bdk,None,None,None,Some(fam.field))
+        val updatedBDMap: Map[String, Json] = fam.bdm.map { case(bdk,bdp) =>
+          getKeyValuePair(bdp, bdk,None,None,"",None,None,Some(fam.field))
         }
         updatedBDMap.asJson
       }.asJson
@@ -322,73 +240,47 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     // case None => false
     // }
     // }
-    val dataKeyName: String =  "" //getNameForDataKey()
+    //TODO: Use for loop here
+    val dataKeyName: String =  getNameForDataKey()
     dfv.filterNot(df =>
       filterData(df.apply(dataKeyName).get.asString,isDataInvalid _, isDataEmpty _))
     //.get here is reasonable bc you if you dataKeyName then, there is a key in df with that name.
   }
 
-  //TODO: re-look at implementation here.Too many assumptions are made here on what the data format will have.
-//  def getNameForDataKey(): String = {
-//    val df = userInputDF.get
-//    val keys: Vector[String] = df.fields
-//    val keyActionVec: Vector[KeyAndAction] = keys.map { k =>
-//      val kp = df.apply(k).get.asObject.get //watch out for the .get here
-//      val action: String = kp.apply("action").get.asString.get // an action should always exist and it be a String value
-//      KeyAndAction(k,action)
-//    }
-//    val filteredKey: Vector[KeyAndAction] = keyActionVec.filter(ka => ka.action.contains("value"))
-//    if ( filteredKey.size > 1){
-//      logger.warn("Entree detected that the Data Format schema in user-input.json contains multiple" +
-//        "keys with the action: value. The first key will be used in the filtering process.")
-//      filteredKey.head.key
-//    } else {
-//      filteredKey.head.key
-//    }
-//  }
 
-  //TODO: this almost a copy of create Data Object. Think of how to combine, if possible
-//  def createUnknowns(dfv: Vector[JsonObject]): Vector[JsonObject] = {
-//    val unknownsVector: Vector[Option[JsonObject]] = dfv.map {df =>
-//      val unknownLabel: String = "unknown" // the label and column valus for unknowns is the same
-//      val colDesc: String = "" //unknowns have empty column description.
-//      val unknown: Option[JsonObject] = userInputDF match {
-//        case None =>
-//          logger.error(s"user-input.json was not properly formatted. Check docs for proper formatting")
-//          None
-//        case Some(ui) =>
-//          val uiMap: Map[String,Json] = ui.toMap
-//          val unknownObject: Map[String, Json] = uiMap.map{case (key,keyMap) =>
-//            val kv: (String, Json) = keyMap.asObject match {
-//              case None => key -> Json.Null
-//              case Some(km) =>
-//                val action: Option[String] = km.apply("action").get.asString //check get here, assuming action is always present
-//                val kvPair: (String,Json) =  action match {
-//                    case Some("value") =>
-//                      val fn = util.Random.shuffle(UnknownCook.generators).head //fn = random function from Unknown.generators
-//                      val unknownData = fn(df.apply(key).get.asString.get) //TODO: watch out for .get here
-//                      key -> unknownData.asJson
-//                    case Some("label") => key -> unknownLabel.asJson
-//                    case Some("column") => key -> unknownLabel.asJson
-//                    case Some("description") =>
-//                      key -> colDesc.asJson
-//                    case Some("decomposition") =>
-//                      key ->  Vector[Map[String,String]]().asJson // unknowns have no decomposition
-//                    case _ =>
-//                      logger.error(s" $action does not match known actions")
-//                      key ->  Json.Null
-//                }
-//                kvPair
-//            }
-//            kv
-//          }
-//          println(unknownObject.asJson) //TODO: Remove this
-//          unknownObject.asJson.asObject
-//      }
-//      unknown
-//    }
-//    unknownsVector.flatten
-//  }
+  def getNameForDataKey(): String = {
+    val df = userInputDF.get
+    val vka: Vector[KeyAndAction] = df.map{case (k,p) => KeyAndAction(k,p.action)}.filter(ka =>
+      ka.action.contains("value")).toVector
+    println(vka)
+    if(vka.size > 1){
+      logger.warn("Entree detected that the Data Format schema in user-input.json contains multiple" +
+              "keys with the action: value. The first key will be used in the filtering process.")
+    }
+    vka.head.key
+  }
+
+  def createUnknowns(dfv: Vector[JsonObject]): Vector[JsonObject] = {
+    val unknownsVector: Vector[Option[JsonObject]] = dfv.map {df =>
+      val unknownLabel: String = "unknown" // the label and column values for unknowns is the same
+      val colDesc: String = "" //unknowns have empty column description.
+      val unknown: Option[JsonObject] = userInputDF match {
+        case None =>
+          logger.error(s"user-input.json was not properly formatted. Check docs for proper formatting")
+          None
+        case Some(ui) =>
+            val unKnownMap: Map[String, Json] = ui.map{case (k,p) =>
+              val fn: String => String = util.Random.shuffle(UnknownCook.generators).head
+              val dkn : String = getNameForDataKey()
+              val unKnownVal: String = fn(df.apply(dkn).getOrElse(Json.Null).asString.get)
+              getKeyValuePair(p,k,Some(unKnownVal),Some(unknownLabel),colDesc,None,Some(unknownLabel),None)
+          }
+          unKnownMap.asJson.asObject
+      }
+      unknown
+    }
+    unknownsVector.flatten
+  }
 
   /**
     * Takes a vector of strings and saves it to a File and then pushes the file to S3.
