@@ -81,8 +81,8 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     logger.info(s"${dataFormatVec.size} dataFormat objects were created out of ${jsonVec.size} Json objects")
     val filteredDataFormatVec : Vector[JsonObject]  = filterDataFormat(dataFormatVec)
     logger.info(s"The vector dataFormat objects was sized down to ${filteredDataFormatVec.size}")
-//    val unknownsDataFormat = createUnknowns(filteredDataFormatVec)
-//    logger.info(s"Create vector of ${unknownsDataFormat.size} unknown data format objects")
+    val unknownsDataFormat = createUnknowns(filteredDataFormatVec)
+    logger.info(s"Create vector of ${unknownsDataFormat.size} unknown data format objects")
 //    val dataModels = (filteredDataFormatVec ++ unknownsDataFormat).map(_.asJson.noSpaces)
 //    logger.info(s"Saving ${dataModels.size}  data format objects")
 //    logger.info(s"Saving to Bucket: ${destination.bucket}, Path:${destination.folderPath}")
@@ -144,7 +144,9 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
         val keys = obj.fields
         val dfv: Vector[Option[JsonObject]] = keys.map{k => //dfv = data format vector
           if (CFNMappingCook.isLabelWithKeyPresent(k)) {
-            createDataObject(obj,k)
+            val o = createDataObject(obj, k)//TODO: consider moving method body here
+            println(o)
+            o
           } else {
             None
           }
@@ -181,18 +183,18 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
   def getKeyValuePair(p: Properties, dfKey: String, dataVal:Option[String], label: Option[String], colDesc: String,
                       obj: Option[JsonObject], k: Option[String], compositeField:Option[String]) : (String,Json) = {
     p.action match {
-      case Actions.value =>
-        obj match {
-          case None => dfKey -> Json.Null //TODO: Do we need this?
-          case Some(o) => dfKey -> dataVal.asJson
-        }
+      case Actions.value => dfKey -> dataVal.asJson
+//        obj match {
+//          case None => dfKey -> Json.Null //TODO: Do we need this?
+//          case Some(o) => dfKey -> dataVal.asJson
+//        }
       case Actions.label => dfKey -> label.asJson
       case Actions.column => dfKey -> k.asJson
-      case Actions.description =>
-        obj match {
-          case None => dfKey -> Json.Null //TODO: Do we need this?
-          case Some(o) => dfKey -> colDesc.asJson
-        }
+      case Actions.description => dfKey -> colDesc.asJson
+//        obj match {
+//          case None => dfKey -> Json.Null //TODO: Do we need this?
+//          case Some(o) => dfKey -> colDesc.asJson
+//        }
       case Actions.subLabel => dfKey -> compositeField.asJson
       case Actions.emptyValue => dfKey -> "".asJson
       case Actions.decomposition => getBreakdown(dfKey, p, label.getOrElse(""))
@@ -252,7 +254,6 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     val df = userInputDF.get
     val vka: Vector[KeyAndAction] = df.map{case (k,p) => KeyAndAction(k,p.action)}.filter(ka =>
       ka.action.contains("value")).toVector
-    println(vka)
     if(vka.size > 1){
       logger.warn("Entree detected that the Data Format schema in user-input.json contains multiple" +
               "keys with the action: value. The first key will be used in the filtering process.")
@@ -271,14 +272,16 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
         case Some(ui) =>
             val unKnownMap: Map[String, Json] = ui.map{case (k,p) =>
               val fn: String => String = util.Random.shuffle(UnknownCook.generators).head
-              val dkn : String = getNameForDataKey()
+              val dkn : String = getNameForDataKey() //dkn = data key name
               val unKnownVal: String = fn(df.apply(dkn).getOrElse(Json.Null).asString.get)
+              println(unKnownVal)
               getKeyValuePair(p,k,Some(unKnownVal),Some(unknownLabel),colDesc,None,Some(unknownLabel),None)
           }
           unKnownMap.asJson.asObject
       }
       unknown
     }
+    unknownsVector.flatten.foreach(println)
     unknownsVector.flatten
   }
 
