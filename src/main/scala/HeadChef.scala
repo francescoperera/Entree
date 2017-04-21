@@ -83,10 +83,10 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     logger.info(s"The vector dataFormat objects was sized down to ${filteredDataFormatVec.size}")
     val unknownsDataFormat = createUnknowns(filteredDataFormatVec)
     logger.info(s"Create vector of ${unknownsDataFormat.size} unknown data format objects")
-//    val dataModels = (filteredDataFormatVec ++ unknownsDataFormat).map(_.asJson.noSpaces)
-//    logger.info(s"Saving ${dataModels.size}  data format objects")
-//    logger.info(s"Saving to Bucket: ${destination.bucket}, Path:${destination.folderPath}")
-//    batchSave(dataModels,destination,label)
+    val dataModels = (filteredDataFormatVec ++ unknownsDataFormat).map(_.asJson.noSpaces)
+    logger.info(s"Saving ${dataModels.size}  data format objects")
+    logger.info(s"Saving to Bucket: ${destination.bucket}, Path:${destination.folderPath}")
+    batchSave(dataModels,destination,label)
   }
 
   /**
