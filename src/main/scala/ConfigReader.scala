@@ -1,6 +1,7 @@
 import java.io.{BufferedReader, File, FileReader}
 
 import com.typesafe.config.{Config, ConfigFactory}
+import com.typesafe.scalalogging.LazyLogging
 import io.circe._
 
 case class Properties(action: String, _type: String, breakdown_schema: Option[Map[String, Properties]])
@@ -10,7 +11,7 @@ object Properties{
   implicit val decoder: Decoder[Properties] = io.circe.generic.semiauto.deriveDecoder
 }
 
-trait ConfigReader {
+trait ConfigReader extends LazyLogging {
   val conf: Config = ConfigFactory.load()
 
   val userInput: Json = {
@@ -48,4 +49,22 @@ trait ConfigReader {
 
     }
   }
+
+  /**
+    * getKeyName uses the input, ap ( action property), to get the name of the key( with the given ap) in
+    * the DATA_FORMAT object defined in user-input.json
+    * @param ap - String ( action property)
+    * @return - name of the key that has ap as its action property value.
+    */
+  def getKeyName(ap: String) : String = {
+    val df = userInputDF.get
+    val vka: Vector[KeyAndAction] = df.map{case (k,p) => KeyAndAction(k,p.action)}.filter(ka =>
+      ka.action.contains(ap)).toVector
+    if(vka.size > 1){
+      logger.warn("Entree detected that the Data Format schema in user-input.json contains multiple" +
+        "keys with the action: value. The first key will be used in the filtering process.")
+    }
+    vka.head.key
+  }
+
 }
