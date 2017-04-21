@@ -246,7 +246,6 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
   /**
     * Takes all aggregated data in the form of a vector of strings and saves a batch of the strings at a time. The batch size
     * is determined by rowsPerFile.
-    *
     * @param v
     * @param dest
     * @param label

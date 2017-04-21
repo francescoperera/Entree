@@ -12,8 +12,8 @@ object Properties{
 }
 
 trait ConfigReader extends LazyLogging {
-  val conf: Config = ConfigFactory.load()
 
+  //JSON Config
   val userInput: Json = {
     val reader = new BufferedReader(new FileReader("src/config/user-input.json"))
     val ui: String = Stream.continually(reader.readLine()).takeWhile(_ != null).mkString("")
@@ -74,4 +74,17 @@ trait ConfigReader extends LazyLogging {
     vka.head.key
   }
 
+}
+
+object AppConfig {
+  // HOCON Config for tokens etc..
+  val mode: String = Mode.test
+  val conf: Config = ConfigFactory.load().getConfig(mode)
+  val S3ClientID: String = conf.getString("aws.s3.clientId")
+  val S3ClientSecret: String = conf.getString("aws.s3.clientSecret")
+}
+
+object Mode {
+  val test = "test"
+  val dev = "dev"
 }

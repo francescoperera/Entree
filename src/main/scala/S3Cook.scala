@@ -70,12 +70,10 @@ class S3Cook(val accessKeyId: String, val secretAccessKey: String){
   }
 }
 
-object DtlS3Cook {
+object DtlS3Cook extends ConfigReader {
   /** DtlS3Cook is S3Cook that only works for Datalogue and uses Datalogue creds. */
-//  private val accessKeyId = sys.env.getOrElse("S3_KEY_ID", "AKIAJZUC55ZOLZSRM7RQ")
-//  private val secretAccessKey = sys.env.getOrElse("S3_KEY_SECRET", "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")
-  private val accessKeyId = sys.env.getOrElse("S3_KEY_ID", "AKIAJMVPH47YHSLXVXTA") //test
-  private val secretAccessKey = sys.env.getOrElse("S3_KEY_SECRET", "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") //test
+  private val accessKeyId: String = AppConfig.S3ClientID //sys.env.getOrElse("S3_KEY_ID", clientID) //test
+  private val secretAccessKey: String = AppConfig.S3ClientSecret //sys.env.getOrElse("S3_KEY_SECRET", secretKey) //test
 
   implicit val region = awscala.Region.US_EAST_1
   implicit val s3 = S3(accessKeyId, secretAccessKey)

@@ -4,7 +4,7 @@
 		module="entree-build"
 		revision="0.1-SNAPSHOT"
 		status="integration"
-		publication="20170421132932"
+		publication="20170421154812"
 		e:sbtVersion="0.13" e:scalaVersion="2.10"
 	>
 		<description>
