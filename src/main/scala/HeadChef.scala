@@ -25,12 +25,17 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
 
   private val defaultRPF: Int = 100000
 
-  private val classSize: Int = 10000
+  private val defaultCS: Int = 10000
 
   private val rowsPerFile: Int = userInputRPF match {
     case None => defaultRPF//default value if no value is found in the config file
     case Some(num) => num.toInt.getOrElse(defaultRPF)
   }//conf.getInt("local.ROWS_PER_FILE")//Important: this value determines the size of the output files.
+
+  private val classSize: Int = userInputCS match {
+    case None => defaultCS
+    case Some(num) => num.toInt.getOrElse(defaultRPF)
+  }
 
   /**
     * takes the source S3 bucket and gets all the filenames according to the label. It then aggregates all the files.

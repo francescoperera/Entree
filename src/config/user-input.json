@@ -1,5 +1,6 @@
 {
   "ROWS_PER_FILE" : 100000,
+  "CLASS_SIZE":1000,
   "DATA_FORMAT" : {
     "data":{
       "action":"value",

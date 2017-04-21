@@ -42,6 +42,13 @@ trait ConfigReader extends LazyLogging {
     }
   }
 
+  val userInputCS: Option[JsonNumber] = {
+    this.userInput.asObject match {
+      case None => None
+      case Some(obj) => obj.apply("CLASS_SIZE").get.asNumber //check this get
+    }
+  }
+
   val userInputBD: Option[JsonObject] = {
     this.userInput.asObject match {
       case None => None
