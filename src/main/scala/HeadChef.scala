@@ -23,7 +23,9 @@ object FieldAndMap{
 object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
   /** HeadChef is the main resource of Entree and will direct every other resource. */
 
-    private val defaultRPF: Int = 100000
+  private val defaultRPF: Int = 100000
+
+  private val classSize: Int = 10000
 
   private val rowsPerFile: Int = userInputRPF match {
     case None => defaultRPF//default value if no value is found in the config file
@@ -72,19 +74,30 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     logger.info(s"${dataFormatVec.size} dataFormat objects were created out of ${jsonVec.size} Json objects")
     val filteredDataFormatVec : Vector[JsonObject]  = FilteringCook.filterDataFormat(dataFormatVec)
     logger.info(s"The vector dataFormat objects was sized down to ${filteredDataFormatVec.size}")
-    val chunkedDataFormat: Map[ Option[Json], Vector[JsonObject]] = filteredDataFormatVec.groupBy{ df =>
-      val labelKey: String = getKeyName(Actions.label)
+
+    val labelKey: String = getKeyName(Actions.label)
+    val chunkedDataFormat: Map[ Option[Json], Vector[JsonObject]] = filteredDataFormatVec.groupBy(df =>
       df.apply(labelKey)
+    )
+    //For warning purposes
+    chunkedDataFormat.foreach {case (k,v)=>
+        if (v.size < classSize) {
+          val className: String = k.get.asString.get //TODO: is this good? .get?
+          logger.warn(s"$className has less than $classSize data points.")
+        }
     }
-    println(chunkedDataFormat)
-
-
-//    val unknownsDataFormat = UnknownCook.createUnknowns(filteredDataFormatVec)
-//    logger.info(s"Create vector of ${unknownsDataFormat.size} unknown data format objects")
-//    val dataModels = (filteredDataFormatVec ++ unknownsDataFormat).map(_.asJson.noSpaces)
-//    logger.info(s"Saving ${dataModels.size}  data format objects")
-//    logger.info(s"Saving to Bucket: ${destination.bucket}, Path:${destination.folderPath}")
-//    batchSave(dataModels,destination,label)
+    //
+    val balancedDataClasses:Vector[JsonObject] = chunkedDataFormat.flatMap{case(k,v) =>
+        // rather shuffle than random indices because we don't know how many random elements we need and the size of v
+        val shuffledData: Vector[JsonObject] = util.Random.shuffle(v)
+        shuffledData.take(classSize)
+    }.toVector
+    val unknownsDataFormat = UnknownCook.createUnknowns(balancedDataClasses)
+    logger.info(s"Create vector of ${unknownsDataFormat.size} unknown data format objects")
+    val dataModels = (balancedDataClasses ++ unknownsDataFormat).map(_.asJson.noSpaces)
+    logger.info(s"Saving ${dataModels.size}  data format objects")
+    logger.info(s"Saving to Bucket: ${destination.bucket}, Path:${destination.folderPath}")
+    batchSave(dataModels,destination,label)
   }
 
   /**

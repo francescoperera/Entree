@@ -43,14 +43,12 @@ object UnknownCook extends LazyLogging with ConfigReader {
           val fn: String => String = util.Random.shuffle(UnknownCook.generators).head
           val dkn : String = getKeyName(Actions.value) //dkn = data key name
         val unKnownVal: String = fn(df.apply(dkn).getOrElse(Json.Null).asString.get)
-          println(unKnownVal)
           getKeyValuePair(p,k,Some(unKnownVal),Some(unknownLabel),colDesc,None,Some(unknownLabel),None)
         }
         unKnownMap.asJson.asObject
     }
       unknown
     }
-    unknownsVector.flatten.foreach(println)
     unknownsVector.flatten
   }
 
