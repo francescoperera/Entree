@@ -10,9 +10,6 @@ import com.typesafe.scalalogging.LazyLogging
 
 import scala.collection.mutable
 
-
-//case class DataFormat(data:Option[String], label:Option[String],
-//                      column_header:Option[String], column_description:String)
 case class ValidNDJSONFile(filename:String, source:S3Bucket, valid:Boolean) //TODO: susbtitute valid with type field ( i.e type: JSON, CSV)
 case class KeyAndAction(key:String, action: String)
 case class FieldAndMap(field: String, bdm: Map[String, Properties])
@@ -20,26 +17,28 @@ case class FieldAndMap(field: String, bdm: Map[String, Properties])
 object FieldAndMap{
   def apply(tp: (String, Map[String, Properties])) : FieldAndMap = FieldAndMap(tp._1,tp._2)
 }
-//
-//object  DataFormat{
-//  implicit val encoder: Encoder[DataFormat] = io.circe.generic.semiauto.deriveEncoder
-//  implicit val decoder: Decoder[DataFormat] = io.circe.generic.semiauto.deriveDecoder
-//}
+
 
 
 object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
   /** HeadChef is the main resource of Entree and will direct every other resource. */
 
-    private val defaultRPF: Int = 100000
+  private val defaultRPF: Int = 100000
+
+  private val defaultCS: Int = 10000
 
   private val rowsPerFile: Int = userInputRPF match {
     case None => defaultRPF//default value if no value is found in the config file
     case Some(num) => num.toInt.getOrElse(defaultRPF)
   }//conf.getInt("local.ROWS_PER_FILE")//Important: this value determines the size of the output files.
 
+  private val classSize: Int = userInputCS match {
+    case None => defaultCS
+    case Some(num) => num.toInt.getOrElse(defaultRPF)
+  }
+
   /**
     * takes the source S3 bucket and gets all the filenames according to the label. It then aggregates all the files.
-    *
     * @param source -  input S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
     * @param destination - output S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
     * @param label - greater ontology/column field name for which data needs to be aggregated. Could be "all" vs "specific_label"
@@ -64,7 +63,6 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     * It checks whether each file is a valid NDJSON file or not and creates a validNDSJON object. The vector of NDSJON objects is then
     * used to read the files and aggregate all the data based on the input label. The vector of dataFormat objects it is then passed on
     * and saved to S3.
-    *
     * @param fv - vector of filenames
     * @param source - input S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
     * @param destination - output S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
@@ -79,11 +77,29 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     logger.info(s"Entree detected ${jsonVec.size} possible objects")
     val dataFormatVec: Vector[JsonObject]  = jsonVec.flatMap(createDataFormat(_)).flatten
     logger.info(s"${dataFormatVec.size} dataFormat objects were created out of ${jsonVec.size} Json objects")
-    val filteredDataFormatVec : Vector[JsonObject]  = filterDataFormat(dataFormatVec)
+    val filteredDataFormatVec : Vector[JsonObject]  = FilteringCook.filterDataFormat(dataFormatVec)
     logger.info(s"The vector dataFormat objects was sized down to ${filteredDataFormatVec.size}")
-    val unknownsDataFormat = createUnknowns(filteredDataFormatVec)
+
+    val labelKey: String = getKeyName(Actions.label)
+    val chunkedDataFormat: Map[ Option[Json], Vector[JsonObject]] = filteredDataFormatVec.groupBy(df =>
+      df.apply(labelKey)
+    )
+    //For warning purposes
+    chunkedDataFormat.foreach {case (k,v)=>
+        if (v.size < classSize) {
+          val className: String = k.get.asString.get //TODO: is this good? .get?
+          logger.warn(s"$className has less than $classSize data points.")
+        }
+    }
+    //
+    val balancedDataClasses:Vector[JsonObject] = chunkedDataFormat.flatMap{case(k,v) =>
+        // rather shuffle than random indices because we don't know how many random elements we need and the size of v
+        val shuffledData: Vector[JsonObject] = util.Random.shuffle(v)
+        shuffledData.take(classSize)
+    }.toVector
+    val unknownsDataFormat = UnknownCook.createUnknowns(balancedDataClasses)
     logger.info(s"Create vector of ${unknownsDataFormat.size} unknown data format objects")
-    val dataModels = (filteredDataFormatVec ++ unknownsDataFormat).map(_.asJson.noSpaces)
+    val dataModels = (balancedDataClasses ++ unknownsDataFormat).map(_.asJson.noSpaces)
     logger.info(s"Saving ${dataModels.size}  data format objects")
     logger.info(s"Saving to Bucket: ${destination.bucket}, Path:${destination.folderPath}")
     batchSave(dataModels,destination,label)
@@ -92,7 +108,6 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
   /**
     * Takes a filename and its source S3 bucket, reads the first line of the file and determines whether the file has a NDJSON or just
     * regular JSON. It then creates a validNDSJONFile object for the file
-    *
     * @param f - filename
     * @param source - input S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
     * @return - validNDSJONFile object. Look at HeadChef for validNDSJONFile implementation
@@ -109,7 +124,6 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
   /**
     * readFile takes a validNDJSONFile object streams the content of the file in the object,
     * and maps to a Vector of Json. Conversion to JSON differs between and NDJSON and JSON.
-    *
     * @param vnf - validNDSJONFile object. See HeadChef for implementation
     * @return - Optional vector of Json where Json represents an object in the file.
     */
@@ -137,15 +151,14 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     * @param j - Json
     * @return Optional vector of dataFormat objects.
     */
-  def createDataFormat (j: Json)  = { //Option[Vector[JsonObject]]
+  def createDataFormat (j: Json) : Option[Vector[JsonObject]] = {
     j.asObject match {
       case None => None
       case Some(obj) =>
         val keys = obj.fields
         val dfv: Vector[Option[JsonObject]] = keys.map{k => //dfv = data format vector
           if (CFNMappingCook.isLabelWithKeyPresent(k)) {
-            val o = createDataObject(obj, k)//TODO: consider moving method body here
-            println(o)
+            val o = createDataObject(obj, k)//TODO: consider moving method body her
             o
           } else {
             None
@@ -162,7 +175,7 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     * @param k - key for which an object should be created
     * @return - Option[Json], where Json represents the data format object.
     */
-  def createDataObject(obj:JsonObject,k:String):Option[JsonObject] = {
+  def createDataObject(obj: JsonObject, k: String) : Option[JsonObject] = {
     userInputDF match {
       case None =>
         logger.error(s"user-input.json was not properly formatted. Check docs for proper formatting")
@@ -184,17 +197,9 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
                       obj: Option[JsonObject], k: Option[String], compositeField:Option[String]) : (String,Json) = {
     p.action match {
       case Actions.value => dfKey -> dataVal.asJson
-//        obj match {
-//          case None => dfKey -> Json.Null //TODO: Do we need this?
-//          case Some(o) => dfKey -> dataVal.asJson
-//        }
       case Actions.label => dfKey -> label.asJson
       case Actions.column => dfKey -> k.asJson
       case Actions.description => dfKey -> colDesc.asJson
-//        obj match {
-//          case None => dfKey -> Json.Null //TODO: Do we need this?
-//          case Some(o) => dfKey -> colDesc.asJson
-//        }
       case Actions.subLabel => dfKey -> compositeField.asJson
       case Actions.emptyValue => dfKey -> "".asJson
       case Actions.decomposition => getBreakdown(dfKey, p, label.getOrElse(""))
@@ -219,70 +224,6 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     }else{
       dfKey -> Vector[Map[String,String]]().asJson
     }
-  }
-  /**
-    * filterDataFormat takes a vector of dataFormat objects and filters out any object
-    * that returns true to either the "isDataInvalid" or the "isDataEmpty" methods.
-    * @param dfv - vector of dataFormat objects
-    * @return - vector of dataFormat objects.
-    */
-  def filterDataFormat(dfv:Vector[JsonObject]): Vector[JsonObject] = {
-    def isDataInvalid(d:Option[String]): Boolean = d.getOrElse("").toLowerCase() match {
-      case "na"| "n/a"|"n/d"|"none"|""|"[redacted]"|"unfilled"|"address redacted"|"redacted address"|"redacted"|
-           "unknown"|"null"|"no registra"|"no informa"|"no reporta"|"no aporta"|"no tiene"| "no"=> true
-      case _ => false
-    }
-    def isDataEmpty (d:Option[String]) : Boolean = d.getOrElse("").trim().isEmpty //true if d.get is only whitespace i.e "   "
-    def filterData[A](a:A,f1: A=>Boolean,f2: A => Boolean) : Boolean = f1(a) || f2(a) //TODO: Expand this to handle a list of functions
-    //def filterData[A](a:A):Boolean = {
-    // val lfn: List[A => Boolean] = List(isDataInvalid _, isDataEmpty _) //lfn = List of Functions
-    // val fr : Boolean = lfn.map ( f => f(a)) fr = filter results 
-    // fr.find(_ == true) match {
-    // case Some(bool) => bool
-    // case None => false
-    // }
-    // }
-    //TODO: Use for loop here
-    val dataKeyName: String =  getNameForDataKey()
-    dfv.filterNot(df =>
-      filterData(df.apply(dataKeyName).get.asString,isDataInvalid _, isDataEmpty _))
-    //.get here is reasonable bc you if you dataKeyName then, there is a key in df with that name.
-  }
-
-
-  def getNameForDataKey(): String = {
-    val df = userInputDF.get
-    val vka: Vector[KeyAndAction] = df.map{case (k,p) => KeyAndAction(k,p.action)}.filter(ka =>
-      ka.action.contains("value")).toVector
-    if(vka.size > 1){
-      logger.warn("Entree detected that the Data Format schema in user-input.json contains multiple" +
-              "keys with the action: value. The first key will be used in the filtering process.")
-    }
-    vka.head.key
-  }
-
-  def createUnknowns(dfv: Vector[JsonObject]): Vector[JsonObject] = {
-    val unknownsVector: Vector[Option[JsonObject]] = dfv.map {df =>
-      val unknownLabel: String = "unknown" // the label and column values for unknowns is the same
-      val colDesc: String = "" //unknowns have empty column description.
-      val unknown: Option[JsonObject] = userInputDF match {
-        case None =>
-          logger.error(s"user-input.json was not properly formatted. Check docs for proper formatting")
-          None
-        case Some(ui) =>
-            val unKnownMap: Map[String, Json] = ui.map{case (k,p) =>
-              val fn: String => String = util.Random.shuffle(UnknownCook.generators).head
-              val dkn : String = getNameForDataKey() //dkn = data key name
-              val unKnownVal: String = fn(df.apply(dkn).getOrElse(Json.Null).asString.get)
-              println(unKnownVal)
-              getKeyValuePair(p,k,Some(unKnownVal),Some(unknownLabel),colDesc,None,Some(unknownLabel),None)
-          }
-          unKnownMap.asJson.asObject
-      }
-      unknown
-    }
-    unknownsVector.flatten.foreach(println)
-    unknownsVector.flatten
   }
 
   /**
