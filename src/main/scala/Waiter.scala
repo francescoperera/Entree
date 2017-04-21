@@ -1,3 +1,4 @@
+import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
 
 object Waiter extends LazyLogging {

@@ -4,7 +4,7 @@ object CFNMappingCook {
     * that can interact with it.
     * */
 
-  val cfnMap:Map[String,Array[String]] = Map ( //TODO: Fucking manual work. Automate this ASAP
+  val cfnMap:Map[String,Array[String]] = Map (
     "email_address" -> Array("email_address","email","emailaddress","emails"),
     "full_name" -> Array("full_name","fullname","name","employee"),
 //    "name"  -> Array("first_name","firstname","last_name",
@@ -31,12 +31,14 @@ object CFNMappingCook {
     "all" -> Array()
   )
 
+  //TODO: add val to generate reverse Map from cfnMap
+
   /**
     * Given a certain string or value, it finds the key in cfnMap that maps to that string/value
     * @param v - string of value
     * @return - key that maps to the input value
     */
-  def getKeyFromVal(v:String):String = cfnMap.find(_._2.contains(v)).get._1
+  def getKeyFromVal(v:String):String = cfnMap.find(_._2.contains(v)).get._1 //TODO: make this safe, make this Option
 
   /**
     * Checks whether a value,v, is present in cfnMap with a specific key,k
@@ -51,5 +53,5 @@ object CFNMappingCook {
     * @param str - value/string
     * @return - boolean
     */
-  def isValPresent(str:String):Boolean = cfnMap.values.exists(_.contains(str))
+  def isLabelWithKeyPresent(str:String):Boolean = cfnMap.values.exists(_.contains(str))
 }

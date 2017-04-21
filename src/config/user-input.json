@@ -1,0 +1,41 @@
+{
+  "ROWS_PER_FILE" : 100000,
+  "DATA_FORMAT" : {
+    "data":{
+      "action":"value",
+      "_type":"String"
+    },
+    "label":{
+      "action":"label",
+      "_type":"String"
+    },
+    "column_header":{
+      "action":"column",
+      "_type":"String"
+    },
+    "column_description":{
+      "action":"description",
+      "_type":"String"
+    },
+    "breakdown": {
+      "action": "decomposition",
+      "_type": "Vector[Map[String,String]",
+      "breakdown_schema" :
+        {
+          "field":{
+            "action":"sub_label",
+            "_type":"String"
+          },
+          "data":{
+            "action":"empty_value",
+            "_type":"String"
+          }
+        }
+    }
+  },
+  "BREAKDOWN_MAP": {
+    "full_name": ["first_name","middle_name","last_name","name_modifier"],
+    "address": ["house_number","street address","apartment_number","city",
+      "state","zip_code"]
+  }
+}

@@ -1,54 +1,63 @@
 [0m[[0mdebug[0m] [0m[naha] [0m
 [0m[[0mdebug[0m] [0m[naha] Initial source changes: [0m
 [0m[[0mdebug[0m] [0m[naha] 	removed:Set()[0m
-[0m[[0mdebug[0m] [0m[naha] 	added: Set(/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/JsonConverter.scala, /Users/francescoperera/Developer/datalogue/Entree/src/main/scala/CFNMappingCook.scala, /Users/francescoperera/Developer/datalogue/Entree/src/main/scala/Waiter.scala, /Users/francescoperera/Developer/datalogue/Entree/src/main/scala/S3Cook.scala, /Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala)[0m
+[0m[[0mdebug[0m] [0m[naha] 	added: Set(/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/JsonConverter.scala, /Users/francescoperera/Developer/datalogue/Entree/src/main/scala/CFNMappingCook.scala, /Users/francescoperera/Developer/datalogue/Entree/src/main/scala/Waiter.scala, /Users/francescoperera/Developer/datalogue/Entree/src/main/scala/S3Cook.scala, /Users/francescoperera/Developer/datalogue/Entree/src/main/scala/BreakdownCook.scala, /Users/francescoperera/Developer/datalogue/Entree/src/main/scala/UnknownCook.scala, /Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala, /Users/francescoperera/Developer/datalogue/Entree/src/main/scala/ConfigReader.scala)[0m
 [0m[[0mdebug[0m] [0m[naha] 	modified: Set()[0m
 [0m[[0mdebug[0m] [0m[naha] Invalidated products: Set()[0m
 [0m[[0mdebug[0m] [0m[naha] External API changes: API Changes: Set()[0m
 [0m[[0mdebug[0m] [0m[naha] Modified binary dependencies: Set()[0m
-[0m[[0mdebug[0m] [0m[naha] Initial directly invalidated sources: Set(/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/JsonConverter.scala, /Users/francescoperera/Developer/datalogue/Entree/src/main/scala/CFNMappingCook.scala, /Users/francescoperera/Developer/datalogue/Entree/src/main/scala/Waiter.scala, /Users/francescoperera/Developer/datalogue/Entree/src/main/scala/S3Cook.scala, /Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala)[0m
+[0m[[0mdebug[0m] [0m[naha] Initial directly invalidated sources: Set(/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/JsonConverter.scala, /Users/francescoperera/Developer/datalogue/Entree/src/main/scala/CFNMappingCook.scala, /Users/francescoperera/Developer/datalogue/Entree/src/main/scala/Waiter.scala, /Users/francescoperera/Developer/datalogue/Entree/src/main/scala/S3Cook.scala, /Users/francescoperera/Developer/datalogue/Entree/src/main/scala/BreakdownCook.scala, /Users/francescoperera/Developer/datalogue/Entree/src/main/scala/UnknownCook.scala, /Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala, /Users/francescoperera/Developer/datalogue/Entree/src/main/scala/ConfigReader.scala)[0m
 [0m[[0mdebug[0m] [0m[naha] [0m
 [0m[[0mdebug[0m] [0m[naha] Sources indirectly invalidated by:[0m
 [0m[[0mdebug[0m] [0m[naha] 	product: Set()[0m
 [0m[[0mdebug[0m] [0m[naha] 	binary dep: Set()[0m
 [0m[[0mdebug[0m] [0m[naha] 	external source: Set()[0m
-[0m[[0mdebug[0m] [0mAll initially invalidated sources: Set(/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/JsonConverter.scala, /Users/francescoperera/Developer/datalogue/Entree/src/main/scala/CFNMappingCook.scala, /Users/francescoperera/Developer/datalogue/Entree/src/main/scala/Waiter.scala, /Users/francescoperera/Developer/datalogue/Entree/src/main/scala/S3Cook.scala, /Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala)[0m
-[0m[[0mdebug[0m] [0m[naha] Recompiling all 5 sources: invalidated sources (5) exceeded 50.0% of all sources[0m
-[0m[[0minfo[0m] [0mCompiling 5 Scala sources to /Users/francescoperera/Developer/datalogue/Entree/src/main/scala/target/scala-2.10/classes...[0m
+[0m[[0mdebug[0m] [0mAll initially invalidated sources: Set(/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/JsonConverter.scala, /Users/francescoperera/Developer/datalogue/Entree/src/main/scala/CFNMappingCook.scala, /Users/francescoperera/Developer/datalogue/Entree/src/main/scala/Waiter.scala, /Users/francescoperera/Developer/datalogue/Entree/src/main/scala/S3Cook.scala, /Users/francescoperera/Developer/datalogue/Entree/src/main/scala/BreakdownCook.scala, /Users/francescoperera/Developer/datalogue/Entree/src/main/scala/UnknownCook.scala, /Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala, /Users/francescoperera/Developer/datalogue/Entree/src/main/scala/ConfigReader.scala)[0m
+[0m[[0mdebug[0m] [0m[naha] Recompiling all 8 sources: invalidated sources (8) exceeded 50.0% of all sources[0m
+[0m[[0minfo[0m] [0mCompiling 8 Scala sources to /Users/francescoperera/Developer/datalogue/Entree/src/main/scala/target/scala-2.10/classes...[0m
 [0m[[0mdebug[0m] [0mGetting org.scala-sbt:compiler-interface:0.13.11:component from component compiler for Scala 2.10.6[0m
 [0m[[0mdebug[0m] [0mGetting org.scala-sbt:compiler-interface:0.13.11:component from component compiler for Scala 2.10.6[0m
-[0m[[0mdebug[0m] [0mRunning cached compiler 2782777a, interfacing (CompilerInterface) with Scala compiler version 2.10.6[0m
+[0m[[0mdebug[0m] [0mRunning cached compiler 597d2231, interfacing (CompilerInterface) with Scala compiler version 2.10.6[0m
 [0m[[0mdebug[0m] [0mCalling Scala compiler with arguments  (CompilerInterface):[0m
 [0m[[0mdebug[0m] [0m	-bootclasspath[0m
 [0m[[0mdebug[0m] [0m	/Library/Java/JavaVirtualMachines/jdk1.8.0_92.jdk/Contents/Home/jre/lib/resources.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_92.jdk/Contents/Home/jre/lib/rt.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_92.jdk/Contents/Home/jre/lib/sunrsasign.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_92.jdk/Contents/Home/jre/lib/jsse.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_92.jdk/Contents/Home/jre/lib/jce.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_92.jdk/Contents/Home/jre/lib/charsets.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_92.jdk/Contents/Home/jre/lib/jfr.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_92.jdk/Contents/Home/jre/classes:/Users/francescoperera/.sbt/boot/scala-2.10.6/lib/scala-library.jar[0m
 [0m[[0mdebug[0m] [0m	-classpath[0m
 [0m[[0mdebug[0m] [0m	/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/target/scala-2.10/classes[0m
-[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:3: object circe is not a member of package io[0m
+[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/ConfigReader.scala:1: object typesafe is not a member of package com[0m
+[0m[[31merror[0m] [0mimport com.typesafe.config.ConfigFactory[0m
+[0m[[31merror[0m] [0m           ^[0m
+[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/ConfigReader.scala:4: not found: value ConfigFactory[0m
+[0m[[31merror[0m] [0m  val conf = ConfigFactory.load()[0m
+[0m[[31merror[0m] [0m             ^[0m
+[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:3: object typesafe is not a member of package com[0m
+[0m[[31merror[0m] [0mimport com.typesafe.config.ConfigObject[0m
+[0m[[31merror[0m] [0m           ^[0m
+[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:4: object circe is not a member of package io[0m
 [0m[[31merror[0m] [0mimport io.circe.{Json, JsonObject}[0m
 [0m[[31merror[0m] [0m          ^[0m
-[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:4: object circe is not a member of package io[0m
+[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:5: object circe is not a member of package io[0m
 [0m[[31merror[0m] [0mimport io.circe.{Decoder, Encoder}[0m
 [0m[[31merror[0m] [0m          ^[0m
-[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:5: object circe is not a member of package io[0m
+[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:6: object circe is not a member of package io[0m
 [0m[[31merror[0m] [0mimport io.circe.syntax._[0m
 [0m[[31merror[0m] [0m          ^[0m
-[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:7: object typesafe is not a member of package com[0m
+[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:10: object typesafe is not a member of package com[0m
 [0m[[31merror[0m] [0mimport com.typesafe.scalalogging.LazyLogging[0m
 [0m[[31merror[0m] [0m           ^[0m
-[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:14: not found: type Encoder[0m
+[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:19: not found: type Encoder[0m
 [0m[[31merror[0m] [0m  implicit val encoder: Encoder[dataFormat] = io.circe.generic.semiauto.deriveEncoder[0m
 [0m[[31merror[0m] [0m                        ^[0m
-[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:14: object circe is not a member of package io[0m
+[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:19: object circe is not a member of package io[0m
 [0m[[31merror[0m] [0m  implicit val encoder: Encoder[dataFormat] = io.circe.generic.semiauto.deriveEncoder[0m
 [0m[[31merror[0m] [0m                                                 ^[0m
-[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:15: not found: type Decoder[0m
+[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:20: not found: type Decoder[0m
 [0m[[31merror[0m] [0m  implicit val decoder: Decoder[dataFormat] = io.circe.generic.semiauto.deriveDecoder[0m
 [0m[[31merror[0m] [0m                        ^[0m
-[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:15: object circe is not a member of package io[0m
+[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:20: object circe is not a member of package io[0m
 [0m[[31merror[0m] [0m  implicit val decoder: Decoder[dataFormat] = io.circe.generic.semiauto.deriveDecoder[0m
 [0m[[31merror[0m] [0m                                                 ^[0m
-[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:18: not found: type LazyLogging[0m
-[0m[[31merror[0m] [0mobject HeadChef extends JsonConverter with LazyLogging {[0m
+[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:23: not found: type LazyLogging[0m
+[0m[[31merror[0m] [0mobject HeadChef extends JsonConverter with LazyLogging with ConfigReader {[0m
 [0m[[31merror[0m] [0m                                           ^[0m
 [0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/JsonConverter.scala:2: object typesafe is not a member of package com[0m
 [0m[[31merror[0m] [0mimport com.typesafe.scalalogging.LazyLogging[0m
@@ -56,64 +65,37 @@
 [0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/JsonConverter.scala:7: not found: type LazyLogging[0m
 [0m[[31merror[0m] [0mtrait JsonConverter extends LazyLogging {[0m
 [0m[[31merror[0m] [0m                            ^[0m
-[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:31: not found: value logger[0m
+[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:36: not found: value logger[0m
 [0m[[31merror[0m] [0m    logger.info(s"Getting files from S3 Bucket: ${source.bucket}")[0m
 [0m[[31merror[0m] [0m    ^[0m
-[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:32: not found: value logger[0m
+[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:37: not found: value logger[0m
 [0m[[31merror[0m] [0m    logger.info(s"Following Folder Path : ${source.folderPath.getOrElse("")}")[0m
 [0m[[31merror[0m] [0m    ^[0m
-[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:59: not found: value logger[0m
+[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:65: not found: value logger[0m
 [0m[[31merror[0m] [0m    logger.info(s"Aggregating data from ${fv.length} files")[0m
 [0m[[31merror[0m] [0m    ^[0m
-[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:60: not found: type Json[0m
+[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:66: not found: type Json[0m
 [0m[[31merror[0m] [0m    val jsonVec : Vector[Json] = ndjson.flatMap( j => readFile(j)).flatten // flatMap flattens the Options and flatten turns Vec[Vec] into just Vec. Does it makes sense?[0m
 [0m[[31merror[0m] [0m                         ^[0m
-[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:93: not found: type Json[0m
+[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:104: not found: type Json[0m
 [0m[[31merror[0m] [0m  def readFile(vnf:validNDJSONFile):Option[Vector[Json]] = {[0m
 [0m[[31merror[0m] [0m                                                  ^[0m
-[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:61: not found: value logger[0m
+[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:67: not found: value logger[0m
 [0m[[31merror[0m] [0m    logger.info(s"Entree detected ${jsonVec.size} possible objects")[0m
 [0m[[31merror[0m] [0m    ^[0m
-[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:117: not found: type Json[0m
-[0m[[31merror[0m] [0m  def createDataFormat (j:Json): Option[Vector[dataFormat]] = {[0m
+[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:129: not found: type Json[0m
+[0m[[31merror[0m] [0m  def createDataFormat (j:Json) = {[0m
 [0m[[31merror[0m] [0m                          ^[0m
-[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:63: not found: value logger[0m
-[0m[[31merror[0m] [0m    logger.info(s"${dataFormatVec.size} dataFormat objects were created out of ${jsonVec.size} Json objects")[0m
-[0m[[31merror[0m] [0m    ^[0m
-[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:65: not found: value logger[0m
-[0m[[31merror[0m] [0m    logger.info(s" The vector dataFormat objects was sized down to ${filteredDataFormatVec.size}")[0m
-[0m[[31merror[0m] [0m    ^[0m
-[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:66: value asJson is not a member of dataFormat[0m
-[0m[[31merror[0m] [0m    val dataModels = filteredDataFormatVec.map(_.asJson.noSpaces)[0m
-[0m[[31merror[0m] [0m                                                 ^[0m
-[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:67: not found: value logger[0m
-[0m[[31merror[0m] [0m    logger.info(s"Saving to Bucket: ${destination.bucket}, Path:${destination.folderPath}")[0m
-[0m[[31merror[0m] [0m    ^[0m
-[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:182: not found: value logger[0m
-[0m[[31merror[0m] [0m    logger.info(s"Saving to S3:$fname")[0m
-[0m[[31merror[0m] [0m    ^[0m
-[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/S3Cook.scala:1: not found: object awscala[0m
-[0m[[31merror[0m] [0mimport awscala.File[0m
-[0m[[31merror[0m] [0m       ^[0m
-[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/S3Cook.scala:64: not found: type File[0m
-[0m[[31merror[0m] [0m  def saveFile(bucketName:String,folderPath:String,file: File) = {[0m
-[0m[[31merror[0m] [0m                                                         ^[0m
-[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/S3Cook.scala:2: not found: object awscala[0m
-[0m[[31merror[0m] [0mimport awscala.s3.{Bucket, S3}[0m
-[0m[[31merror[0m] [0m       ^[0m
-[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/S3Cook.scala:13: not found: value S3[0m
-[0m[[31merror[0m] [0m  implicit val s3 = S3(accessKeyId, secretAccessKey)[0m
-[0m[[31merror[0m] [0m                    ^[0m
+[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:139: value fields is not a member of Any[0m
+[0m[[31merror[0m] [0m        val keys = obj.fields[0m
+[0m[[31merror[0m] [0m                       ^[0m
 [0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/S3Cook.scala:3: object amazonaws is not a member of package com[0m
 [0m[[31merror[0m] [0mimport com.amazonaws.services.s3.model.{ObjectMetadata, S3ObjectInputStream}[0m
 [0m[[31merror[0m] [0m           ^[0m
-[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/S3Cook.scala:52: not found: type ObjectMetadata[0m
-[0m[[31merror[0m] [0m    val metadata = new ObjectMetadata()[0m
-[0m[[31merror[0m] [0m                       ^[0m
-[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/S3Cook.scala:41: not found: type S3ObjectInputStream[0m
+[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/S3Cook.scala:44: not found: type S3ObjectInputStream[0m
 [0m[[31merror[0m] [0m  def getFileStream(b: String, f: String): S3ObjectInputStream = s3.getObject(b, f).getObjectContent[0m
 [0m[[31merror[0m] [0m                                           ^[0m
-[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:94: not found: value logger[0m
+[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:105: not found: value logger[0m
 [0m[[31merror[0m] [0m    logger.info(s"Reading file - ${vnf.filename}")[0m
 [0m[[31merror[0m] [0m    ^[0m
 [0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/JsonConverter.scala:3: object circe is not a member of package io[0m
@@ -122,28 +104,46 @@
 [0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/JsonConverter.scala:18: not found: value parser[0m
 [0m[[31merror[0m] [0m  def toJson(str:String) = parser.parse(str).getOrElse(Json.Null)[0m
 [0m[[31merror[0m] [0m                           ^[0m
-[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:121: value fields is not a member of Any[0m
-[0m[[31merror[0m] [0m        val keys = obj.fields[0m
+[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/HeadChef.scala:256: not found: value logger[0m
+[0m[[31merror[0m] [0m    logger.info(s"Saving to S3:$fname")[0m
+[0m[[31merror[0m] [0m    ^[0m
+[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/S3Cook.scala:1: not found: object awscala[0m
+[0m[[31merror[0m] [0mimport awscala.File[0m
+[0m[[31merror[0m] [0m       ^[0m
+[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/S3Cook.scala:67: not found: type File[0m
+[0m[[31merror[0m] [0m  def saveFile(bucketName:String,folderPath:String,file: File) = {[0m
+[0m[[31merror[0m] [0m                                                         ^[0m
+[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/S3Cook.scala:2: not found: object awscala[0m
+[0m[[31merror[0m] [0mimport awscala.s3.{Bucket, S3}[0m
+[0m[[31merror[0m] [0m       ^[0m
+[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/S3Cook.scala:13: not found: value S3[0m
+[0m[[31merror[0m] [0m  implicit val s3 = S3(accessKeyId, secretAccessKey)[0m
+[0m[[31merror[0m] [0m                    ^[0m
+[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/S3Cook.scala:55: not found: type ObjectMetadata[0m
+[0m[[31merror[0m] [0m    val metadata = new ObjectMetadata()[0m
 [0m[[31merror[0m] [0m                       ^[0m
 [0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/S3Cook.scala:12: not found: value awscala[0m
 [0m[[31merror[0m] [0m  implicit val region = awscala.Region.US_EAST_1[0m
 [0m[[31merror[0m] [0m                        ^[0m
-[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/S3Cook.scala:77: not found: value awscala[0m
+[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/S3Cook.scala:80: not found: value awscala[0m
 [0m[[31merror[0m] [0m  implicit val region = awscala.Region.US_EAST_1[0m
 [0m[[31merror[0m] [0m                        ^[0m
-[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/S3Cook.scala:78: not found: value S3[0m
+[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/S3Cook.scala:81: not found: value S3[0m
 [0m[[31merror[0m] [0m  implicit val s3 = S3(accessKeyId, secretAccessKey)[0m
 [0m[[31merror[0m] [0m                    ^[0m
 [0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/Waiter.scala:1: object typesafe is not a member of package com[0m
+[0m[[31merror[0m] [0mimport com.typesafe.config.ConfigFactory[0m
+[0m[[31merror[0m] [0m           ^[0m
+[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/Waiter.scala:2: object typesafe is not a member of package com[0m
 [0m[[31merror[0m] [0mimport com.typesafe.scalalogging.LazyLogging[0m
 [0m[[31merror[0m] [0m           ^[0m
-[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/Waiter.scala:3: not found: type LazyLogging[0m
+[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/Waiter.scala:4: not found: type LazyLogging[0m
 [0m[[31merror[0m] [0mobject Waiter extends LazyLogging {[0m
 [0m[[31merror[0m] [0m                      ^[0m
-[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/Waiter.scala:11: not found: value logger[0m
+[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/Waiter.scala:12: not found: value logger[0m
 [0m[[31merror[0m] [0m      case false => logger.error(s"$label is an unrecognized label. Entree does not know it.")[0m
 [0m[[31merror[0m] [0m                    ^[0m
-[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/Waiter.scala:13: not found: value logger[0m
+[0m[[31merror[0m] [0m/Users/francescoperera/Developer/datalogue/Entree/src/main/scala/Waiter.scala:20: not found: value logger[0m
 [0m[[31merror[0m] [0m        logger.info(s"Waiter is going to send your order -> Aggregate all files with label :$label")[0m
 [0m[[31merror[0m] [0m        ^[0m
 [0m[[31merror[0m] [0m41 errors found[0m
