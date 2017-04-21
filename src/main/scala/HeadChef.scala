@@ -10,9 +10,6 @@ import com.typesafe.scalalogging.LazyLogging
 
 import scala.collection.mutable
 
-
-//case class DataFormat(data:Option[String], label:Option[String],
-//                      column_header:Option[String], column_description:String)
 case class ValidNDJSONFile(filename:String, source:S3Bucket, valid:Boolean) //TODO: susbtitute valid with type field ( i.e type: JSON, CSV)
 case class KeyAndAction(key:String, action: String)
 case class FieldAndMap(field: String, bdm: Map[String, Properties])
@@ -20,11 +17,8 @@ case class FieldAndMap(field: String, bdm: Map[String, Properties])
 object FieldAndMap{
   def apply(tp: (String, Map[String, Properties])) : FieldAndMap = FieldAndMap(tp._1,tp._2)
 }
-//
-//object  DataFormat{
-//  implicit val encoder: Encoder[DataFormat] = io.circe.generic.semiauto.deriveEncoder
-//  implicit val decoder: Decoder[DataFormat] = io.circe.generic.semiauto.deriveDecoder
-//}
+
+
 
 
 object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
@@ -137,7 +131,7 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     * @param j - Json
     * @return Optional vector of dataFormat objects.
     */
-  def createDataFormat (j: Json)  = { //Option[Vector[JsonObject]]
+  def createDataFormat (j: Json) : Option[Vector[JsonObject]] = {
     j.asObject match {
       case None => None
       case Some(obj) =>
@@ -162,7 +156,7 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     * @param k - key for which an object should be created
     * @return - Option[Json], where Json represents the data format object.
     */
-  def createDataObject(obj:JsonObject,k:String):Option[JsonObject] = {
+  def createDataObject(obj: JsonObject, k: String) : Option[JsonObject] = {
     userInputDF match {
       case None =>
         logger.error(s"user-input.json was not properly formatted. Check docs for proper formatting")
@@ -233,7 +227,9 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
       case _ => false
     }
     def isDataEmpty (d:Option[String]) : Boolean = d.getOrElse("").trim().isEmpty //true if d.get is only whitespace i.e "   "
-    def filterData[A](a:A,f1: A=>Boolean,f2: A => Boolean) : Boolean = f1(a) || f2(a) //TODO: Expand this to handle a list of functions
+    def filterData[A](a:A,f1: A=>Boolean,f2: A => Boolean) : Boolean = f1(a) || f2(a)
+    //TODO: Expand this to handle a list of functions
+
     //def filterData[A](a:A):Boolean = {
     // val lfn: List[A => Boolean] = List(isDataInvalid _, isDataEmpty _) //lfn = List of Functions
     // val fr : Boolean = lfn.map ( f => f(a)) fr = filter results 
@@ -243,6 +239,7 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     // }
     // }
     //TODO: Use for loop here
+
     val dataKeyName: String =  getNameForDataKey()
     dfv.filterNot(df =>
       filterData(df.apply(dataKeyName).get.asString,isDataInvalid _, isDataEmpty _))
