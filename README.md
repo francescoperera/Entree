@@ -73,7 +73,7 @@ This clt requires three inputs:
   1. s3 url pointing to bucket & folder path for source data (i.e https://s3.amazonaws.com/my_bucket/folderA/folderB)
   2. s3 url pointing to the bucket & folder path that you want to save the formatted data to.(i.e https://s3.amazonaws.com/my_bucket/folder1/folder2)
   3. label or column field name that you want to format data for. If you want to label all column field names in your bucket use "all",
-  else type the column field name ( i.e "email_address"). Entree will only accept labels that are stored as values in cfnMap. Look at Important section.
+  else type the column field name ( i.e "email_address"). Entree will only accept labels that are stored as values in cfnMap.
 
 
 ## Output
