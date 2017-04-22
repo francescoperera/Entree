@@ -43,7 +43,7 @@ a components property **only** if its action property is set to be decomposition
 
 ##### Important
 Each key structure in the JSON configuration file must follow the structure delineated in this doc.
-Specifically, all keys **must** have the properties: action and type. Moreoever, the action property
+Specifically, all keys **must** have the properties: action and type. Moreever, the action property
 must be set to be one of the actions that Entree supports ( see below for Actions).
 
 ##### Example of Key Structure
@@ -58,7 +58,7 @@ must be set to be one of the actions that Entree supports ( see below for Action
 In this example key was named *key_name* and its properties were set, such that *key_name*'s
 action property is set to be "value" and the its type is set as String.
 
-##### Special Example of Key Structure with Components Property.
+##### Example of Key Structure with Components Property.
 
 ```
     "another_key_name":{
@@ -119,7 +119,7 @@ If no column description is found, then column description is a set as an empty 
 Entree grabs the value under "column_description",in this case "Some random person". The key whose action property
 is *description* will map to the value "Some random person".
 
-#### decomposition**
+#### decomposition
 Entree looks at the value stored under the property "components" and uses it to create the schema for the
 breakdown data. Any key whose action is set to "decomposition", will also have components mapped to an non empty array.
 For more information, check the Breakdown and Components section.
@@ -129,7 +129,7 @@ Entree looks at the label for the data point and then checks if the label is mad
 This done by looking at at "breakdown" Map, which can be either user defined or default one.
 If label has composite fields, then these fields are stored under the key whose action property is set as "sub_label".
 
-###empty_value
+### empty_value
 Entree performs no action and maps the corresponding key to an empty string.
 
 
