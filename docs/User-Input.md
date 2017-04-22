@@ -23,7 +23,7 @@ If no value is specified, then Entree will use a default value of 10000.
 
 ### DATA_FORMAT
 This parameter is used to define the structure and format of the data objects used to label and aggregate data.
-More information can be found in [Data_Format](./docs/Data_Format.md)
+More information can be found in [Data_Format](./Data_Format.md)
 
 ### BREAKDOWN_MAP
 This parameter defines an object of where the keys are the labels that can be decomposed into smaller subfields. The

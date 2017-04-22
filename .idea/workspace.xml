@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e24fb3f7-ed2b-480d-ac0c-7a7e527ac1c2" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/docs/Data_Format.md" afterPath="$PROJECT_DIR$/docs/Data_Format.md" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/docs/User-Input.md" afterPath="$PROJECT_DIR$/docs/User-Input.md" />
     </list>
     <ignored path="Entree.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -51,8 +51,8 @@
       <file leaf-file-name="User-Input.md" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/docs/User-Input.md">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="374">
-              <caret line="25" column="54" lean-forward="false" selection-start-line="25" selection-start-column="54" selection-end-line="25" selection-end-column="54" />
+            <state relative-caret-position="369">
+              <caret line="25" column="48" lean-forward="false" selection-start-line="25" selection-start-column="48" selection-end-line="25" selection-end-column="48" />
               <folding />
             </state>
           </provider>
@@ -141,9 +141,9 @@
         <option value="$PROJECT_DIR$/docs/User-Input.md.cpt" />
         <option value="$PROJECT_DIR$/docs/Entree-Example.md" />
         <option value="$PROJECT_DIR$/docs/ColumnFieldName-Mapping.md" />
-        <option value="$PROJECT_DIR$/docs/User-Input.md" />
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/docs/Data_Format.md" />
+        <option value="$PROJECT_DIR$/docs/User-Input.md" />
       </list>
     </option>
   </component>
@@ -836,12 +836,12 @@
       <workItem from="1491836226408" duration="8000" />
       <workItem from="1492029149892" duration="11592000" />
       <workItem from="1492116241370" duration="6007000" />
-      <workItem from="1492791553537" duration="19584000" />
+      <workItem from="1492791553537" duration="19659000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="177265000" />
+    <option name="totallyTimeSpent" value="177340000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1166" height="900" extended-state="6" />
@@ -1173,8 +1173,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/docs/User-Input.md">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="374">
-          <caret line="25" column="54" lean-forward="false" selection-start-line="25" selection-start-column="54" selection-end-line="25" selection-end-column="54" />
+        <state relative-caret-position="369">
+          <caret line="25" column="48" lean-forward="false" selection-start-line="25" selection-start-column="48" selection-end-line="25" selection-end-column="48" />
           <folding />
         </state>
       </provider>
