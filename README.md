@@ -2,11 +2,11 @@
 Entree is a tool that enables you to aggregate and label files present in an S3 bucket
 into a one or more files with a standard data format.
 The data format is set to be a JSON object with the following keys:
-    - data
-    - label
-    - column header
-    - breakdown
-    - column description
+ - data
+ - label
+ - column header
+ - breakdown
+ - column description
 
 The key "data" maps to the actual value stored in either a CSV column or JSON object. "label" maps to the the greater ontology/column field name of the
 the key used in the original JSON object or column header in a CSV file. "column header" points to key used in the original JSON object or the column header
