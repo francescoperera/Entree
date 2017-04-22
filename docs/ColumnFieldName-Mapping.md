@@ -25,3 +25,5 @@
      "all" -> Array()
    )
 ```
+The keys in cfNMap are the labels known to Entree and the values contain all the column names that Entree will tag
+to the corresponding label.
