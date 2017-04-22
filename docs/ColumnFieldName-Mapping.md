@@ -1,6 +1,6 @@
  ## Column Field Name - Mapping
- Data aggregation relies on the column field name Map being up to date. Thus, if Entree complains that it cannot find a label, it might be because
- that label is not present in the the column field name Map ( look at CFNMappingCook).
+ Data aggregation relies on the column field name Map being up to date. Thus, if Entree complains that it cannot
+ find a label, it might be becausethat label is not present in the the column field name Map ( look at CFNMappingCook).
 
  This is the current Map:
 
