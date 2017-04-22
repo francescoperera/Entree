@@ -4,7 +4,8 @@ grouped together according to the assigned label.
 Individual data points are transformed into NDJSON format where the object parameters are defined by the user in
 user-input.json.
 Entree is able to read in files that are either in JSON or NDJSON format.
-Currently Entree works as a command line tool (clt).
+Currently Entree works as a command line tool (clt), where the user defines the inputs a json
+config file (user-input.json). For more information about this config file, check [User-Input](./docs/User-Input.md)
 
 ## Why?
 Data is messy and is defined in an inconsistent manner. Depending on the source, data that refer to the same concept
@@ -30,7 +31,6 @@ label can be written as.
 The keys in the map are the labels. The values refer to lists of column names that refer to the labels.
 
 For example
-
 ```
 ...
 "phone_number" : ["phone_number","phonenumber","phone"],
@@ -61,7 +61,7 @@ The following is a list of labels:
 
 
 Entree aggregates and stores data into a defined object by looking at how the user defined the DATA_FORMAT object
-in user-input.json. Refer to [Data_Format](./docs/Data_format.md) for more information.
+in user-input.json. Refer to [Data_Format](./docs/Data_format.md) and  for more information.
 
 
 ## Required
