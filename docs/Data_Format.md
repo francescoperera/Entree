@@ -119,7 +119,7 @@ If no column description is found, then column description is a set as an empty 
 Entree grabs the value under "column_description",in this case "Some random person". The key whose action property
 is *description* will map to the value "Some random person".
 
-#### decomposition**
+#### decomposition
 Entree looks at the value stored under the property "components" and uses it to create the schema for the
 breakdown data. Any key whose action is set to "decomposition", will also have components mapped to an non empty array.
 For more information, check the Breakdown and Components section.
