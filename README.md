@@ -61,7 +61,7 @@ The following is a list of labels:
 
 
 Entree aggregates and stores data into a defined object by looking at how the user defined the DATA_FORMAT object
-in user-input.json. Refer to [Data_Format](./docs/Data_format.md) and  for more information.
+in user-input.json. Refer to [Data_Format](./docs/Data_Format.md) and  for more information.
 
 
 ## Required

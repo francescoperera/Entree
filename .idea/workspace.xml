@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e24fb3f7-ed2b-480d-ac0c-7a7e527ac1c2" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/docs/User-Input.md" afterPath="$PROJECT_DIR$/docs/User-Input.md" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
     </list>
     <ignored path="Entree.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -41,8 +41,8 @@
       <file leaf-file-name="README.md" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/README.md">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="945">
-              <caret line="63" column="64" lean-forward="true" selection-start-line="63" selection-start-column="43" selection-end-line="63" selection-end-column="64" />
+            <state relative-caret-position="311">
+              <caret line="63" column="56" lean-forward="false" selection-start-line="63" selection-start-column="56" selection-end-line="63" selection-end-column="56" />
               <folding />
             </state>
           </provider>
@@ -140,10 +140,10 @@
         <option value="$PROJECT_DIR$/src/main/scala/S3Cook.scala" />
         <option value="$PROJECT_DIR$/docs/Data_Format.md" />
         <option value="$PROJECT_DIR$/docs/User-Input.md.cpt" />
-        <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/docs/Entree-Example.md" />
         <option value="$PROJECT_DIR$/docs/ColumnFieldName-Mapping.md" />
         <option value="$PROJECT_DIR$/docs/User-Input.md" />
+        <option value="$PROJECT_DIR$/README.md" />
       </list>
     </option>
   </component>
@@ -836,12 +836,12 @@
       <workItem from="1491836226408" duration="8000" />
       <workItem from="1492029149892" duration="11592000" />
       <workItem from="1492116241370" duration="6007000" />
-      <workItem from="1492791553537" duration="19403000" />
+      <workItem from="1492791553537" duration="19503000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="177084000" />
+    <option name="totallyTimeSpent" value="177184000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1166" height="900" extended-state="6" />
@@ -1131,14 +1131,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="945">
-          <caret line="63" column="64" lean-forward="true" selection-start-line="63" selection-start-column="43" selection-end-line="63" selection-end-column="64" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/CFNMappingCook.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="330">
@@ -1159,6 +1151,14 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="165">
           <caret line="11" column="52" lean-forward="true" selection-start-line="11" selection-start-column="52" selection-end-line="11" selection-end-column="52" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="311">
+          <caret line="63" column="56" lean-forward="false" selection-start-line="63" selection-start-column="56" selection-end-line="63" selection-end-column="56" />
           <folding />
         </state>
       </provider>
