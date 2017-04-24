@@ -91,7 +91,7 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
           logger.warn(s"$className has less than $classSize data points.")
         }
     }
-    //
+    
     val balancedDataClasses:Vector[JsonObject] = chunkedDataFormat.flatMap{case(k,v) =>
         // rather shuffle than random indices because we don't know how many random elements we need and the size of v
         val shuffledData: Vector[JsonObject] = util.Random.shuffle(v)
