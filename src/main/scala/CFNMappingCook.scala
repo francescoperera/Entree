@@ -32,6 +32,10 @@ object CFNMappingCook {
   )
 
   //TODO: add val to generate reverse Map from cfnMap
+  val rbdMap: Map[String,String] = cfnMap.flatMap {
+    case (label, destNodes) => destNodes map {
+      case nodes => nodes -> label }
+  } //TODO: revisit this
 
   /**
     * Given a certain string or value, it finds the key in cfnMap that maps to that string/value

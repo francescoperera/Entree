@@ -158,7 +158,7 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     j.asObject match {
       case None => None
       case Some(obj) =>
-        val keys = obj.fields
+        val keys: Vector[String] = obj.fields
         val dfv: Vector[Option[JsonObject]] = keys.map{k => //dfv = data format vector
           if (CFNMappingCook.isLabelWithKeyPresent(k)) {
             val o = createDataObject(obj, k)//TODO: consider moving method body her

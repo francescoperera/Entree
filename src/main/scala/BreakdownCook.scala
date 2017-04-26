@@ -20,11 +20,18 @@ object BreakdownCook extends ConfigReader {
       }
   }
 
+  val rbdMap: Map[String,String] = bdMap.flatMap {
+    case (label, destNodes) => destNodes map {
+      case nodes => nodes -> label }
+  } //TODO: revisit this
+
 
   def isKeyPresent(str:String): Boolean = bdMap.keySet.contains(str)
 
   def getCompositeFields(k:String):Vector[String] = bdMap.getOrElse(k,Vector[String]())
 
   def getSubLabelList(label:String): Vector[String] = bdMap.getOrElse(label,Vector.empty[String])
+
+
 
 }
