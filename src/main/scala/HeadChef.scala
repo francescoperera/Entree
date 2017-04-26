@@ -76,6 +76,9 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     val jsonVec : Vector[Json] = ndjson.flatMap( j => readFile(j)).flatten // flatMap flattens the Options and flatten turns Vec[Vec] into just Vec. Does it makes sense?
     logger.info(s"Entree detected ${jsonVec.size} possible objects")
     val dataFormatVec: Vector[JsonObject]  = jsonVec.flatMap(createDataFormat(_)).flatten
+
+
+
     logger.info(s"${dataFormatVec.size} dataFormat objects were created out of ${jsonVec.size} Json objects")
     val filteredDataFormatVec : Vector[JsonObject]  = FilteringCook.filterDataFormat(dataFormatVec)
     logger.info(s"The vector dataFormat objects was sized down to ${filteredDataFormatVec.size}")
@@ -203,6 +206,7 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
       case Actions.subLabel => dfKey -> compositeField.asJson
       case Actions.emptyValue => dfKey -> "".asJson
       case Actions.decomposition => getBreakdown(dfKey, p, label.getOrElse(""))
+      case Actions.sublabelList => dfKey -> BreakdownCook.getSubLabelList(label.getOrElse("")).asJson
       //ok to use getOrElse here bc label is checked in BreakdownMap, if not present nothing happens.
       case _ => dfKey -> Json.Null
     }
@@ -228,7 +232,6 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
 
   /**
     * Takes a vector of strings and saves it to a File and then pushes the file to S3.
-    *
     * @param v - vector of strings/ file content
     * @param dest - output/destination S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
     * @param fname - filename used to save the file contents

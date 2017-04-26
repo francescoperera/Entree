@@ -18,20 +18,9 @@
       "action":"description",
       "_type":"String"
     },
-    "breakdown": {
-      "action": "decomposition",
-      "_type": "Vector[Map[String,String]",
-      "breakdown_schema" :
-        {
-          "field":{
-            "action":"sub_label",
-            "_type":"String"
-          },
-          "data":{
-            "action":"empty_value",
-            "_type":"String"
-          }
-        }
+    "sub_labels":{
+      "action":"sub_label list",
+      "_type": "Vector[String]"
     }
   },
   "BREAKDOWN_MAP": {
