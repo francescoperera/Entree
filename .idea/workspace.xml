@@ -41,8 +41,8 @@
       <file leaf-file-name="HeadChef.scala" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/scala/HeadChef.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="713">
-              <caret line="312" column="4" lean-forward="false" selection-start-line="312" selection-start-column="4" selection-end-line="312" selection-end-column="4" />
+            <state relative-caret-position="196">
+              <caret line="82" column="67" lean-forward="false" selection-start-line="82" selection-start-column="67" selection-end-line="82" selection-end-column="67" />
               <folding>
                 <element signature="e#0#16#0" expanded="true" />
               </folding>
@@ -874,12 +874,12 @@
       <workItem from="1492116241370" duration="6007000" />
       <workItem from="1492791553537" duration="19715000" />
       <workItem from="1493146926289" duration="211000" />
-      <workItem from="1493147160501" duration="27124000" />
+      <workItem from="1493147160501" duration="27717000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="205851000" />
+    <option name="totallyTimeSpent" value="206444000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-392" y="-1200" width="1358" height="1200" extended-state="6" />
@@ -1192,8 +1192,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/HeadChef.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="713">
-          <caret line="312" column="4" lean-forward="false" selection-start-line="312" selection-start-column="4" selection-end-line="312" selection-end-column="4" />
+        <state relative-caret-position="196">
+          <caret line="82" column="67" lean-forward="false" selection-start-line="82" selection-start-column="67" selection-end-line="82" selection-end-column="67" />
           <folding>
             <element signature="e#0#16#0" expanded="true" />
           </folding>

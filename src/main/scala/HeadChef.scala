@@ -11,9 +11,15 @@ import com.typesafe.scalalogging.LazyLogging
 
 import scala.collection.mutable
 
-case class ValidNDJSONFile(filename:String, source:S3Bucket, valid:Boolean) //TODO: susbtitute valid with type field ( i.e type: JSON, CSV)
+sealed trait FileType
+case object JSON extends FileType
+case object NDJSON extends FileType
+
+case class FileMetaData(filename:String, source:S3Bucket, format: FileType)
 case class KeyAndAction(key:String, action: String)
 case class FieldAndMap(field: String, bdm: Map[String, Properties])
+
+
 
 
 
@@ -74,7 +80,7 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
   def aggregateFiles(fv:Vector[String],source:S3Bucket,destination:S3Bucket,label:String) = {
     //for each f in flist, create a validNDJSON object
     //depending on the valid type in validNDSJON object read normally or just call toNDJSON and then do what you do now
-    val ndjson: Vector[ValidNDJSONFile] = fv.map(f => isNDJSON(f,source))
+    val ndjson: Vector[FileMetaData] = fv.map(f => getFileMetaData(f,source))
     logger.info(s"Aggregating data from ${fv.length} files")
     val jsonVec : Vector[Json] = ndjson.flatMap( j => readFile(j)).flatten // flatMap flattens the Options and flatten turns Vec[Vec] into just Vec. Does it makes sense?
     logger.info(s"Entree detected ${jsonVec.size} possible objects")
@@ -119,13 +125,16 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     * @param source - input S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
     * @return - validNDSJONFile object. Look at HeadChef for validNDSJONFile implementation
     */
-  def isNDJSON(f:String,source:S3Bucket): ValidNDJSONFile = {
+  def getFileMetaData(f:String,source:S3Bucket): FileMetaData= {
     val input = DtlS3Cook.apply.getFileStream(source.bucket,source.folderPath.getOrElse("") + f)
     val reader = new BufferedReader(new InputStreamReader(input))
     val fileString = Stream.continually(reader.readLine()).take(1).mkString("")
     reader.close()
-    val isValid = fileString.startsWith("{") && fileString.endsWith("}") //NDJSON object start with { and end with } on the same line
-    ValidNDJSONFile(f,source,isValid)
+    val ft: FileType = fileString.startsWith("{") && fileString.endsWith("}") match {
+      case true => NDJSON
+      case false => JSON
+    } //TODO: Currently Entree only supports NDJSON and JSON
+    FileMetaData(f,source,ft)
   }
 
   /**
@@ -134,17 +143,18 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     * @param vnf - validNDSJONFile object. See HeadChef for implementation
     * @return - Optional vector of Json where Json represents an object in the file.
     */
-  def readFile(vnf:ValidNDJSONFile):Option[Vector[Json]] = {
+  def readFile(vnf:FileMetaData):Option[Vector[Json]] = {
     logger.info(s"Reading file - ${vnf.filename}")
     val input = DtlS3Cook.apply.getFileStream(vnf.source.bucket,vnf.source.folderPath.getOrElse("") + vnf.filename)
     val reader = new BufferedReader(new InputStreamReader(input))
-    vnf.valid match {
-        case true =>
+
+    vnf.format match {
+        case NDJSON =>
           // reading NDJSON
           val fileVec = Stream.continually(reader.readLine()).takeWhile(_ != null).toVector //.mkString("")
           reader.close()
           Some(fileVec.map(toJson(_)))
-        case false =>
+        case JSON =>
           // reading JSON
           val fileString = Stream.continually(reader.readLine()).takeWhile(_ != null).mkString("")
           reader.close()
