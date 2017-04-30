@@ -18,14 +18,15 @@
       "action":"description",
       "_type":"String"
     },
-    "sub_labels":{
-      "action":"sub_label list",
-      "_type": "Vector[String]"
+    "tokenized":{
+      "action":"breakdown",
+      "_type": "Map[String,String]"
     }
   },
   "BREAKDOWN_MAP": {
-    "full_name": ["first_name","middle_name","last_name","name_modifier"],
-    "address": ["house_number","street address","apartment_number","city",
+    "full_name": ["first_name","last_name"],
+    "address": ["house_number","street_number","street_address","city",
       "state","zip_code"]
+
   }
 }

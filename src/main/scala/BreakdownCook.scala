@@ -20,10 +20,9 @@ object BreakdownCook extends ConfigReader {
       }
   }
 
-  val rbdMap: Map[String,String] = bdMap.flatMap {
-    case (label, destNodes) => destNodes map {
-      case nodes => nodes -> label }
-  } //TODO: revisit this
+  val rbdMap: Map[String,String] = bdMap.flatMap{
+    case (bdk, bdVec) =>  bdVec.map(bdField => bdField -> bdk)
+  }
 
 
   def isKeyPresent(str:String): Boolean = bdMap.keySet.contains(str)

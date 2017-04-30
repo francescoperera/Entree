@@ -8,4 +8,5 @@ object Actions {
   val emptyValue = "empty_value"
   val decomposition = "decomposition"
   val sublabelList = "sub_label list"
+  val breakdown = "breakdown"
 }

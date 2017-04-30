@@ -13,7 +13,8 @@ object CFNMappingCook {
     "last_name" -> Array("last_name","lastname","surname","family_name"),
     "middle_name" -> Array("middle_name","middlename","middle"),
     "name_modifier" -> Array("modifier"),
-    "address" -> Array("address","physical_address","physicaladdress","employer_address","work_address","waddress","street_address"),
+    "address" -> Array("address","physical_address","physicaladdress","employer_address",
+      "work_address","waddress","street_address","street_name","street"),
     "phone_number" -> Array("phone_number","phonenumber","phone"),
     "username" -> Array("username","user_name"),
     "education"-> Array("college","university","school"),
@@ -31,11 +32,12 @@ object CFNMappingCook {
     "all" -> Array()
   )
 
-  //TODO: add val to generate reverse Map from cfnMap
-  val rbdMap: Map[String,String] = cfnMap.flatMap {
-    case (label, destNodes) => destNodes map {
-      case nodes => nodes -> label }
-  } //TODO: revisit this
+
+  val rcfnsMap: Map[String,String] = cfnMap.flatMap{
+    case (label, cfnArray ) => cfnArray.map{
+      case  cfn => cfn -> label
+    }
+  }
 
   /**
     * Given a certain string or value, it finds the key in cfnMap that maps to that string/value

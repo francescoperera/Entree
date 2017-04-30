@@ -18,7 +18,7 @@ object UnknownCook extends LazyLogging with ConfigReader {
         util.Random.shuffle(trigrams).mkString("")
     }
 
-  def wordSampler(s:String):String = { //TODO:useless input,fix
+  def wordSampler(s:String): String = { //TODO:useless input,fix
     val stopWordsFile = "stop_words"
     val start = 1
     val end = 5
@@ -29,28 +29,5 @@ object UnknownCook extends LazyLogging with ConfigReader {
     scala.util.Random.shuffle(words).take(n).mkString("")
 
   }
-
-  def createUnknowns(dfv: Vector[JsonObject]): Vector[JsonObject] = {
-    val unknownsVector: Vector[Option[JsonObject]] = dfv.map {df =>
-      val unknownLabel: String = "unknown" // the label and column values for unknowns is the same
-    val colDesc: String = "" //unknowns have empty column description.
-    val unknown: Option[JsonObject] = userInputDF match {
-      case None =>
-        logger.error(s"user-input.json was not properly formatted. Check docs for proper formatting")
-        None
-      case Some(ui) =>
-        val unKnownMap: Map[String, Json] = ui.map{case (k,p) =>
-          val fn: String => String = util.Random.shuffle(UnknownCook.generators).head
-          val dkn : String = getKeyName(Actions.value) //dkn = data key name
-        val unKnownVal: String = fn(df.apply(dkn).getOrElse(Json.Null).asString.get)
-          getKeyValuePair(p,k,Some(unKnownVal),Some(unknownLabel),colDesc,None,Some(unknownLabel),None)
-        }
-        unKnownMap.asJson.asObject
-    }
-      unknown
-    }
-    unknownsVector.flatten
-  }
-
 
 }
