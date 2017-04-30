@@ -310,7 +310,7 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     val bw = new BufferedWriter(new FileWriter(f))
     v.foreach(s => bw.write( s + "\n"))
     bw.close()
-//    val f = v.map(_.toByte).toArray  //TODO:Figure out to stream the content (v) back to S3.
+    //TODO:Figure out to stream the content (v) back to S3.
     logger.info(s"Saving to S3:$fname")
     DtlS3Cook.apply.saveFile(dest.bucket,dest.folderPath.getOrElse(""),f)
   }
