@@ -1,6 +1,6 @@
 import java.io._
 
-import HeadChef.userInputDF
+
 import com.typesafe.config.{ConfigObject, ConfigRenderOptions}
 import io.circe._
 import io.circe.syntax._
@@ -18,10 +18,6 @@ case object NDJSON extends FileType
 case class FileMetaData(filename:String, source:S3Bucket, format: FileType)
 case class KeyAndAction(key:String, action: String)
 case class FieldAndMap(field: String, bdm: Map[String, Properties])
-
-
-
-
 
 object FieldAndMap{
   def apply(tp: (String, Map[String, Properties])) : FieldAndMap = FieldAndMap(tp._1,tp._2)
@@ -84,7 +80,7 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     logger.info(s"Aggregating data from ${fv.length} files")
     val jsonVec : Vector[Json] = ndjson.flatMap( j => readFile(j)).flatten // flatMap flattens the Options and flatten turns Vec[Vec] into just Vec. Does it makes sense?
     logger.info(s"Entree detected ${jsonVec.size} possible objects")
-    val dataFormatVec: Vector[JsonObject]  = jsonVec.flatMap(createDataFormat(_)).flatten
+    val dataFormatVec: Vector[JsonObject]  = jsonVec.flatMap(createDataObjectVector(_)).flatten
 
 
 
@@ -130,25 +126,25 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     val reader = new BufferedReader(new InputStreamReader(input))
     val fileString = Stream.continually(reader.readLine()).take(1).mkString("")
     reader.close()
-    val ft: FileType = fileString.startsWith("{") && fileString.endsWith("}") match {
-      case true => NDJSON
-      case false => JSON
-    } //TODO: Currently Entree only supports NDJSON and JSON
+    val ft: FileType = if (fileString.startsWith("{") && fileString.endsWith("}")) {
+      NDJSON
+    } else {
+      JSON
+    }
     FileMetaData(f,source,ft)
   }
 
   /**
     * readFile takes a validNDJSONFile object streams the content of the file in the object,
     * and maps to a Vector of Json. Conversion to JSON differs between and NDJSON and JSON.
-    * @param vnf - validNDSJONFile object. See HeadChef for implementation
+    * @param fmd - validNDSJONFile object. See HeadChef for implementation
     * @return - Optional vector of Json where Json represents an object in the file.
     */
-  def readFile(vnf:FileMetaData):Option[Vector[Json]] = {
-    logger.info(s"Reading file - ${vnf.filename}")
-    val input = DtlS3Cook.apply.getFileStream(vnf.source.bucket,vnf.source.folderPath.getOrElse("") + vnf.filename)
+  def readFile(fmd:FileMetaData):Option[Vector[Json]] = {
+    logger.info(s"Reading file - ${fmd.filename}")
+    val input = DtlS3Cook.apply.getFileStream(fmd.source.bucket,fmd.source.folderPath.getOrElse("") + fmd.filename)
     val reader = new BufferedReader(new InputStreamReader(input))
-
-    vnf.format match {
+    val fileContent:Option[Vector[Json]] = fmd.format match {
         case NDJSON =>
           // reading NDJSON
           val fileVec = Stream.continually(reader.readLine()).takeWhile(_ != null).toVector //.mkString("")
@@ -160,6 +156,7 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
           reader.close()
           toJson(fileString).asArray
     }
+    fileContent
   }
 
   /**
@@ -168,72 +165,94 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     * @param j - Json
     * @return Optional vector of dataFormat objects.
     */
-  def createDataFormat (j: Json) : Option[Vector[JsonObject]] = {
-    j.asObject match {
+  def createDataObjectVector (j: Json) : Option[Vector[JsonObject]] = {
+    val dov:Option[Vector[JsonObject]] =  j.asObject match {
       case None => None
       case Some(obj) =>
         val keys: Vector[String] = obj.fields
-
-        ///
-        val objectBDLabel: Vector[String] = keys.flatMap( k => BreakdownCook.rbdMap.get(k))
-
-
-        //if list of BD labels is not the same as keys, then multiple keys have the same label. This is hierarchical data.
-        if (objectBDLabel.size != objectBDLabel.toSet.size){
-          // assumption is that that objectBDLabel is probably only at most one.
-
-          val bdl : String = objectBDLabel.head //bdl = breakdown label
-          val bdargs: Vector[String] = BreakdownCook.bdMap(bdl) // this should be the same as the keys that have a BD Label
-          val objValue:String = bdl match {
-            case "full_name" => //assuming risky because the breakdown label is set by the user so name might not always be set as "full_name"
-              bdargs.flatMap( arg => obj.apply(arg).get.asString).mkString(" ")
+        val objectBDLabels: Vector[String] = keys.flatMap( k => BreakdownCook.rbdMap.get(k))
+        val objectBDLabelsSet: Set[String] = objectBDLabels.toSet
+        /** if list of breakdown(BD) labels size is not the same as the set of BD labels, then multiple keys
+          * have the same BD label. This is hierarchical data. Also, hierarchical objects are only created
+          * if there is one BD label (objectBDLabelsSet.size == 1).
+          * If more than one unique BD label is present, then object is hierarchically ambiguous,
+          * so its going to be parsed key by key.*/
+        val dataObjectVector:Option[Vector[JsonObject]] =
+          if (objectBDLabels.size != objectBDLabelsSet.size & objectBDLabelsSet.size == 1 ) {
+          // Hierarchical object gets created
+          val bdl : String = objectBDLabelsSet.head //bdl = breakdown label
+          val bdargs: Vector[String] = BreakdownCook.bdMap(bdl) // components of breakdown label
+          val objValue:Option[String] = bdl match {
+            //TODO: Fix.assuming risky because the breakdown label is set by the user name might not always be set as "full_name"
+            case "full_name" =>
+              val fullNameVal: Vector[Json] = bdargs.flatMap( arg => obj.apply(arg))
+              Some(fullNameVal.flatMap(n => n.asString).mkString(" "))
             case "address" =>
-              val addressVal = bdargs.flatMap( arg => obj.apply(arg))
-              addressVal.flatMap( av => av.asString).mkString(",")
-          }
-          val bdData: Option[Map[String,String]] = Some(bdargs.map{arg =>
-            obj.apply(arg) match {
-              case None => arg -> None
-              case Some(v) => arg -> v.asString
+              val addressVal: Vector[Json] = bdargs.flatMap( arg => obj.apply(arg))
+              Some(addressVal.flatMap( av => av.asString).mkString(","))
+            case _ =>  None
+          } //Assumption: the order of elements in user-input.json is how full_name and address  will be composed
+          val bdData: Map[String,String] = keys.map{k =>
+            BreakdownCook.rbdMap.get(k) match {
+              case Some(`bdl`) =>
+                obj.apply(k) match {
+                  case None => k -> None
+                  case Some(v) => k -> v.asString
+                }
+              case _ => k -> None
             }
-          }.toMap.filter( kv => kv._2.isDefined).map{case (k,v) => k -> v.get})//TODO: redo this. 2 map are inefficient
-          //filter any key-value pairs whose value is None
+          }.toMap.filter( kv => kv._2.isDefined).map{case (k,v) => k -> v.get}
 
           // in the case of aggregate point, the original column is set as an empty String
-          val colName: String = ""
-          val dataObject: Option[JsonObject] = createDataObject(obj,colName)
+          val colName: String = "" //TODO: substitute this with nulls.
+          val dataObject: Option[JsonObject] = createDataObject(obj,colName,Some(bdl),objValue,Some(bdData))
           Some(Vector(dataObject).flatten)
-        }else{
-          // no columns in obj make up a hierarchical struct, so create a data object for each column
-          val dfv: Vector[Option[JsonObject]] = keys.map{k => //dfv = data format vector, k = column name
+        } else {
+          // create a data object for each column/key.
+          val dfv: Vector[Option[JsonObject]] = keys.map{ k => //dfv = data format vector
             if (CFNMappingCook.isLabelWithKeyPresent(k)) {
-              createDataObject(obj,k)
+              createDataObject(obj, k)
             } else {
               None
             }
           }
           Some(dfv.flatten)
         }
-
-        ///
-
+        dataObjectVector
     }
+    dov
   }
 
-  def createDataObject(obj: JsonObject, colName: String): Option[JsonObject] = userInputDF match {
+  def createDataObject(obj: JsonObject,
+                       colName: String ,
+                       aggLabel: Option[String] = None,
+                       objVal: Option[String] = None,
+                       bd: Option[Map[String, String]] = None): Option[JsonObject] = {
+    val dataObject: Option[JsonObject] = userInputDF match {
       case None =>
         logger.error(s"user-input.json was not properly formatted. Check docs for proper formatting")
         //TODO: move this log.error in ConfigReader if there is a Decoding Failure
         None
       case Some(df) =>
-        val dataObject: Map[String, Json] = df.map{case (key,properties) =>
-          val dataVal: Option[String] = Some(obj.apply(colName).getOrElse(Json.Null).asString.getOrElse("").trim)
+        val dataMap: Map[String, Json] = df.map { case (key, properties) =>
+          val dataVal = objVal match {
+            case None => Some(obj.apply(colName).getOrElse(Json.Null).asString.getOrElse("").trim)
+            case someVal => someVal
+          }
+          //val dataVal: Option[String] = Some(obj.apply(colName).getOrElse(Json.Null).asString.getOrElse("").trim)
           val colDesc: String = obj.apply("column_description").getOrElse(Json.Null).asString.getOrElse("")
-          val label: String = CFNMappingCook.getKeyFromVal(colName)
-          getKeyValuePair(properties,key,dataVal,Some(label),Some(colName),colDesc,None,None)
+          val label: Option[String] = aggLabel match {
+            case None => Some(CFNMappingCook.getKeyFromVal(colName))
+            case someLabel => someLabel
+          }
+          getKeyValuePair(properties, key, dataVal, label, Some(colName), colDesc, None, bd)
         }
-      dataObject.asJson.asObject
+        dataMap.asJson.asObject
+    }
+    dataObject
   }
+
+
 
 
   /** k = refers to column in original JsonObject*/
