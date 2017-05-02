@@ -258,7 +258,7 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
   /** k = refers to column in original JsonObject*/
   //TODO: re-order arguments! Too many args? dataVal, colDesc etc.. can be generated inside the function.
   def getKeyValuePair(p: Properties, dfKey: String, dataVal: Option[String],label:Option[String],
-                      colName: Option[String], colDesc:String, compositeField:Option[String],
+                      colName: Option[String], colDesc:String, subLabel:Option[String],
                       bd:Option[Map[String,String]]) : (String,Json) = {
 
     val kvPair: (String,Json) = p.action match {
@@ -266,7 +266,7 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
       case Actions.label => dfKey -> label.asJson
       case Actions.column => dfKey -> colName.asJson
       case Actions.description => dfKey -> colDesc.asJson
-      case Actions.subLabel => dfKey -> compositeField.asJson
+      case Actions.subLabel => dfKey -> subLabel.asJson
       case Actions.emptyValue => dfKey -> "".asJson
       case Actions.decomposition => getBreakdown(dfKey, p, label.getOrElse(""))
       case Actions.sublabelList => dfKey -> BreakdownCook.getSubLabelList(label.getOrElse("")).asJson
