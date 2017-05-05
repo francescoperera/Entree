@@ -25,8 +25,8 @@
   },
   "BREAKDOWN_MAP": {
     "full_name": ["first_name","last_name"],
-    "address": ["house_number","street_number","street_address","city",
-      "state","zip_code"]
+    "address": ["house_number","street_number","street_address","city","areaname3",
+      "state","areaname1","zip_code","iso3"]
 
   }
 }

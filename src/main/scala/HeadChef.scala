@@ -1,15 +1,11 @@
 import java.io._
+import java.nio.charset.StandardCharsets
 
-
-import com.typesafe.config.{ConfigObject, ConfigRenderOptions}
 import io.circe._
 import io.circe.syntax._
-
-import scala.collection.JavaConverters._
-import collection.JavaConverters._
 import com.typesafe.scalalogging.LazyLogging
 
-import scala.collection.mutable
+
 
 sealed trait FileType
 case object JSON extends FileType
@@ -336,7 +332,7 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     */
   def saveToS3(v:Vector[String],dest:S3Bucket,fname:String) : Unit = {
     val f = new File(s"$fname.json")
-    val bw = new BufferedWriter(new FileWriter(f))
+    val bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f),StandardCharsets.UTF_8))
     v.foreach(s => bw.write( s + "\n"))
     bw.close()
     //TODO:Figure out to stream the content (v) back to S3.
