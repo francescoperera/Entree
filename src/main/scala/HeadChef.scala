@@ -1,5 +1,7 @@
 import java.io._
+import java.nio.charset.StandardCharsets
 
+import com.amazonaws.services.s3.model.S3ObjectInputStream
 import com.typesafe.config.{ConfigObject, ConfigRenderOptions}
 import io.circe._
 import io.circe.syntax._
@@ -9,6 +11,8 @@ import collection.JavaConverters._
 import com.typesafe.scalalogging.LazyLogging
 
 import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
+import scala.util.Random
 
 case class ValidNDJSONFile(filename:String, source:S3Bucket, valid:Boolean) //TODO: susbtitute valid with type field ( i.e type: JSON, CSV)
 case class KeyAndAction(key:String, action: String)
@@ -103,6 +107,70 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     logger.info(s"Saving ${dataModels.size}  data format objects")
     logger.info(s"Saving to Bucket: ${destination.bucket}, Path:${destination.folderPath}")
     batchSave(dataModels,destination,label)
+  }
+
+  def randomlyIterateFiles(fnv: Vector[String],idx:Int,source:S3Bucket,dest: S3Bucket) = {
+    val t0 = System.nanoTime()
+    fnv.foreach{fn =>
+      val s3Stream: S3ObjectInputStream = DtlS3Cook.apply.getFileStream(source.bucket,
+        source.folderPath.getOrElse("") + fn)
+      val reader = new BufferedReader(new InputStreamReader(s3Stream,StandardCharsets.UTF_8))
+      val f = new File(s"tmp/$fn")
+      val writer = new BufferedWriter(new FileWriter(f))
+
+      val sourceIterator: java.util.Iterator[String] = reader.lines().iterator()
+      while (sourceIterator.hasNext){
+        writer.write(sourceIterator.next())
+        writer.newLine()
+      }
+      reader.close()
+      writer.close()
+    }
+    val t1 = System.nanoTime()
+    println("saved source file to tmp")
+    println("Elapsed time: " + (t1 - t0) + "ns")
+
+    val t2 = System.nanoTime()
+    val outputFile = new File(s"output/all_$idx.json") //TODO: fix this
+    val bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile),StandardCharsets.UTF_8))
+    val tmpFiles: Vector[File] = fnv.map( f => new File(s"tmp/$f"))
+    val done: ListBuffer[Boolean] = ListBuffer.fill(tmpFiles.size)(false)
+    val fileReaders: Vector[BufferedReader] = tmpFiles.map ( f =>
+      new BufferedReader(new InputStreamReader(new FileInputStream(f), "UTF-8")))
+    val iterators: Vector[java.util.Iterator[String]] = fileReaders.map( _.lines().iterator())
+
+    println("starting random read from file")
+    while (done.contains(false)){
+      val availableIdxs: ListBuffer[Int] = done.zipWithIndex.filter(_._1 == false ).map(_._2)
+      val idx: Int = Random.shuffle(availableIdxs).head
+      val iter: java.util.Iterator[String] = iterators(idx)
+      if (iter.hasNext) {
+        val obj: String = iter.next()
+        val jo: Json = toJson(obj)
+        val dataObjects: Vector[JsonObject] = createDataFormat(jo).filter(_.nonEmpty)
+        val filteredDataObjects: Vector[JsonObject] = FilteringCook.filterDataFormat(dataObjects)
+        val unknownObjects: Vector[JsonObject] = UnknownCook.createUnknowns(filteredDataObjects)
+        val dataModels: Vector[String] = (filteredDataObjects ++ unknownObjects).map(_.asJson.noSpaces)
+        //println(dataModels)
+        dataModels.foreach(m => bw.write( m + "\n"))
+      } else {
+        done(idx) = true
+        println(done)
+        fileReaders(idx).close()
+      }
+    }
+    val t3 = System.nanoTime()
+    println("Finished picking random iterators")
+    println("Elapsed time: " + (t3 - t2) + "ns")
+    tmpFiles.foreach( f => f.delete())
+    bw.close()
+    DtlS3Cook.apply.saveFile(dest.bucket,dest.folderPath.getOrElse(""),outputFile)
+    val t4 = System.nanoTime()
+    println("saved to S3")
+    println("Elapsed time: " + (t4 - t3) + "ns")
+    outputFile.delete()
+
+    println("Total Elapsed time: " + (t4 - t0) + "ns")
   }
 
   /**
