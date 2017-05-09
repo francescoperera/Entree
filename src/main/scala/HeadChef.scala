@@ -1,6 +1,7 @@
 import java.io._
 import java.nio.charset.StandardCharsets
 
+import HeadChef.numFilesProcessed
 import com.amazonaws.services.s3.model.S3ObjectInputStream
 import com.typesafe.config.{ConfigObject, ConfigRenderOptions}
 import io.circe._
@@ -54,7 +55,9 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     val fileNames = files.map(_.split("/").last)
     label match {
       case "all" =>
-        aggregateFiles(fileNames,source,destination,"all")
+        //aggregateFiles(fileNames,source,destination,"all")
+        val filesPartition: Vector[Vector[String]] = Random.shuffle(fileNames).grouped(numFilesProcessed).toVector
+        filesPartition.zipWithIndex.foreach( fv => randomlyIterateFiles(fv._1,fv._2,source,destination))
       case _ =>
         println(label) //TODO: this case needs to be looked at more carefully, filtering files based on content not filename
         val lf = fileNames.filterNot(CFNMappingCook.isValPresentWithKey(label,_)) // lf = labeled files or files whose name are under the designated lf //TODO: filter based on content not file name
@@ -75,38 +78,38 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
   def aggregateFiles(fv:Vector[String],source:S3Bucket,destination:S3Bucket,label:String) = {
     //for each f in flist, create a validNDJSON object
     //depending on the valid type in validNDSJON object read normally or just call toNDJSON and then do what you do now
-    val ndjson = fv.map(f => isNDJSON(f,source))
-    logger.info(s"Aggregating data from ${fv.length} files")
-    val jsonVec : Vector[Json] = ndjson.flatMap( j => readFile(j)).flatten // flatMap flattens the Options and flatten turns Vec[Vec] into just Vec. Does it makes sense?
-    logger.info(s"Entree detected ${jsonVec.size} possible objects")
-    val dataFormatVec: Vector[JsonObject]  = jsonVec.flatMap(createDataFormat(_)).flatten
-    logger.info(s"${dataFormatVec.size} dataFormat objects were created out of ${jsonVec.size} Json objects")
-    val filteredDataFormatVec : Vector[JsonObject]  = FilteringCook.filterDataFormat(dataFormatVec)
-    logger.info(s"The vector dataFormat objects was sized down to ${filteredDataFormatVec.size}")
-
-    val labelKey: String = getKeyName(Actions.label)
-    val chunkedDataFormat: Map[ Option[Json], Vector[JsonObject]] = filteredDataFormatVec.groupBy(df =>
-      df.apply(labelKey)
-    )
-    //For warning purposes
-    chunkedDataFormat.foreach {case (k,v)=>
-        if (v.size < classSize) {
-          val className: String = k.get.asString.get //TODO: is this good? .get?
-          logger.warn(s"$className has less than $classSize data points.")
-        }
-    }
-    //
-    val balancedDataClasses:Vector[JsonObject] = chunkedDataFormat.flatMap{case(k,v) =>
-        // rather shuffle than random indices because we don't know how many random elements we need and the size of v
-        val shuffledData: Vector[JsonObject] = util.Random.shuffle(v)
-        shuffledData.take(classSize)
-    }.toVector
-    val unknownsDataFormat = UnknownCook.createUnknowns(balancedDataClasses)
-    logger.info(s"Create vector of ${unknownsDataFormat.size} unknown data format objects")
-    val dataModels = (balancedDataClasses ++ unknownsDataFormat).map(_.asJson.noSpaces)
-    logger.info(s"Saving ${dataModels.size}  data format objects")
-    logger.info(s"Saving to Bucket: ${destination.bucket}, Path:${destination.folderPath}")
-    batchSave(dataModels,destination,label)
+//    val ndjson = fv.map(f => isNDJSON(f,source))
+//    logger.info(s"Aggregating data from ${fv.length} files")
+//    val jsonVec : Vector[Json] = ndjson.flatMap( j => readFile(j)).flatten // flatMap flattens the Options and flatten turns Vec[Vec] into just Vec. Does it makes sense?
+//    logger.info(s"Entree detected ${jsonVec.size} possible objects")
+//    val dataFormatVec: Vector[JsonObject]  = jsonVec.flatMap(createDataFormat(_)).flatten
+//    logger.info(s"${dataFormatVec.size} dataFormat objects were created out of ${jsonVec.size} Json objects")
+//    val filteredDataFormatVec : Vector[JsonObject]  = FilteringCook.filterDataFormat(dataFormatVec)
+//    logger.info(s"The vector dataFormat objects was sized down to ${filteredDataFormatVec.size}")
+//
+//    val labelKey: String = getKeyName(Actions.label)
+//    val chunkedDataFormat: Map[ Option[Json], Vector[JsonObject]] = filteredDataFormatVec.groupBy(df =>
+//      df.apply(labelKey)
+//    )
+//    //For warning purposes
+//    chunkedDataFormat.foreach {case (k,v)=>
+//        if (v.size < classSize) {
+//          val className: String = k.get.asString.get //TODO: is this good? .get?
+//          logger.warn(s"$className has less than $classSize data points.")
+//        }
+//    }
+//    //
+//    val balancedDataClasses:Vector[JsonObject] = chunkedDataFormat.flatMap{case(k,v) =>
+//        // rather shuffle than random indices because we don't know how many random elements we need and the size of v
+//        val shuffledData: Vector[JsonObject] = util.Random.shuffle(v)
+//        shuffledData.take(classSize)
+//    }.toVector
+//    val unknownsDataFormat = UnknownCook.createUnknowns(balancedDataClasses)
+//    logger.info(s"Create vector of ${unknownsDataFormat.size} unknown data format objects")
+//    val dataModels = (balancedDataClasses ++ unknownsDataFormat).map(_.asJson.noSpaces)
+//    logger.info(s"Saving ${dataModels.size}  data format objects")
+//    logger.info(s"Saving to Bucket: ${destination.bucket}, Path:${destination.folderPath}")
+//    batchSave(dataModels,destination,label)
   }
 
   def randomlyIterateFiles(fnv: Vector[String],idx:Int,source:S3Bucket,dest: S3Bucket) = {
