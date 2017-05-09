@@ -42,6 +42,8 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     case Some(num) => num.toInt.getOrElse(defaultRPF)
   }
 
+  private val numFilesProcessed = 3
+
   /**
     * takes the source S3 bucket and gets all the filenames according to the label. It then aggregates all the files.
     * @param source -  input S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
