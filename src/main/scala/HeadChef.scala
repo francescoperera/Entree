@@ -59,63 +59,27 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
       case "all" =>
         //aggregateFiles(fileNames,source,destination,"all")
         val filesPartition: Vector[Vector[String]] = Random.shuffle(fileNames).grouped(numFilesProcessed).toVector
-        filesPartition.zipWithIndex.foreach( fv => randomlyIterateFiles(fv._1,fv._2,source,destination))
+        filesPartition.zipWithIndex.foreach( fv => downloadAndTransformFiles(fv._1,fv._2,source,destination))
       case _ =>
         println(label) //TODO: this case needs to be looked at more carefully, filtering files based on content not filename
         val lf = fileNames.filterNot(CFNMappingCook.isValPresentWithKey(label,_)) // lf = labeled files or files whose name are under the designated lf //TODO: filter based on content not file name
-        aggregateFiles(lf,source,destination,label)
+        //aggregateFiles(lf,source,destination,label)
     }
   }
 
   /**
-    * Takes a vector of filesnames, the source S3bucket, destination S3Bucket and the label for which data needs to be aggregated for.
-    * It checks whether each file is a valid NDJSON file or not and creates a validNDSJON object. The vector of NDSJON objects is then
-    * used to read the files and aggregate all the data based on the input label. The vector of dataFormat objects it is then passed on
-    * and saved to S3.
-    * @param fv - vector of filenames
-    * @param source - input S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
-    * @param destination - output S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
-    * @param label - greater ontology/column field name for which data needs to be aggregated. Could be "all" vs "specific_label"
+    * Takes the vector of s3 file names,streams their content and writes them to temporary files in tmp directory.
+    * Readers for the tmp files are transformed to iterators. Iterators are chosen at random and a line(object)
+    * is extracted and transformed in a standard data format object. This object is written to a file
+    * in the output directory. Once all iterators are done , the file in the output directory
+    * @param fnv
+    * @param idx
+    * @param source
+    * @param dest
+    * @return
     */
-  def aggregateFiles(fv:Vector[String],source:S3Bucket,destination:S3Bucket,label:String) = {
-    //for each f in flist, create a validNDJSON object
-    //depending on the valid type in validNDSJON object read normally or just call toNDJSON and then do what you do now
-//    val ndjson = fv.map(f => isNDJSON(f,source))
-//    logger.info(s"Aggregating data from ${fv.length} files")
-//    val jsonVec : Vector[Json] = ndjson.flatMap( j => readFile(j)).flatten // flatMap flattens the Options and flatten turns Vec[Vec] into just Vec. Does it makes sense?
-//    logger.info(s"Entree detected ${jsonVec.size} possible objects")
-//    val dataFormatVec: Vector[JsonObject]  = jsonVec.flatMap(createDataFormat(_)).flatten
-//    logger.info(s"${dataFormatVec.size} dataFormat objects were created out of ${jsonVec.size} Json objects")
-//    val filteredDataFormatVec : Vector[JsonObject]  = FilteringCook.filterDataFormat(dataFormatVec)
-//    logger.info(s"The vector dataFormat objects was sized down to ${filteredDataFormatVec.size}")
-//
-//    val labelKey: String = getKeyName(Actions.label)
-//    val chunkedDataFormat: Map[ Option[Json], Vector[JsonObject]] = filteredDataFormatVec.groupBy(df =>
-//      df.apply(labelKey)
-//    )
-//    //For warning purposes
-//    chunkedDataFormat.foreach {case (k,v)=>
-//        if (v.size < classSize) {
-//          val className: String = k.get.asString.get //TODO: is this good? .get?
-//          logger.warn(s"$className has less than $classSize data points.")
-//        }
-//    }
-//    //
-//    val balancedDataClasses:Vector[JsonObject] = chunkedDataFormat.flatMap{case(k,v) =>
-//        // rather shuffle than random indices because we don't know how many random elements we need and the size of v
-//        val shuffledData: Vector[JsonObject] = util.Random.shuffle(v)
-//        shuffledData.take(classSize)
-//    }.toVector
-//    val unknownsDataFormat = UnknownCook.createUnknowns(balancedDataClasses)
-//    logger.info(s"Create vector of ${unknownsDataFormat.size} unknown data format objects")
-//    val dataModels = (balancedDataClasses ++ unknownsDataFormat).map(_.asJson.noSpaces)
-//    logger.info(s"Saving ${dataModels.size}  data format objects")
-//    logger.info(s"Saving to Bucket: ${destination.bucket}, Path:${destination.folderPath}")
-//    batchSave(dataModels,destination,label)
-  }
-
-  def randomlyIterateFiles(fnv: Vector[String],idx:Int,source:S3Bucket,dest: S3Bucket) = {
-    val t0 = System.nanoTime()
+  def downloadAndTransformFiles(fnv: Vector[String],idx:Int,source:S3Bucket,dest: S3Bucket) = {
+    // save all fnv files from source into the tmp folder
     fnv.foreach{fn =>
       val s3Stream: S3ObjectInputStream = DtlS3Cook.apply.getFileStream(source.bucket,
         source.folderPath.getOrElse("") + fn)
@@ -131,24 +95,20 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
       reader.close()
       writer.close()
     }
-    val t1 = System.nanoTime()
-    println("saved source file to tmp")
-    println("Elapsed time: " + (t1 - t0) + "ns")
 
-    val t2 = System.nanoTime()
+    //Read all files from tmp using iterators. Randomly pick lines in each file and create data objects from line.
+    //Save to output folder and stream all files in output to S3.
     val outputFile = new File(s"output/all_$idx.json") //TODO: fix this
     val bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile),StandardCharsets.UTF_8))
     val tmpFiles: Vector[File] = fnv.map( f => new File(s"tmp/$f"))
-    val done: ListBuffer[Boolean] = ListBuffer.fill(tmpFiles.size)(false)
-    val fileReaders: Vector[BufferedReader] = tmpFiles.map ( f =>
-      new BufferedReader(new InputStreamReader(new FileInputStream(f), "UTF-8")))
-    val iterators: Vector[java.util.Iterator[String]] = fileReaders.map( _.lines().iterator())
-
-    println("starting random read from file")
+    val done: Vector[Boolean] = Vector.fill(tmpFiles.size)(false)
+    val fileReaders: Vector[BufferedReader] = tmpFiles.map{ f =>
+      new BufferedReader(new InputStreamReader(new FileInputStream(f),StandardCharsets.UTF_8 ))}
+    val tmpIterators: Vector[java.util.Iterator[String]] = fileReaders.map( _.lines().iterator())
     while (done.contains(false)){
-      val availableIdxs: ListBuffer[Int] = done.zipWithIndex.filter(_._1 == false ).map(_._2)
+      val availableIdxs: Vector[Int] = done.zipWithIndex.filter(_._1 == false ).map(_._2)
       val idx: Int = Random.shuffle(availableIdxs).head
-      val iter: java.util.Iterator[String] = iterators(idx)
+      val iter: java.util.Iterator[String] = tmpIterators(idx)
       if (iter.hasNext) {
         val obj: String = iter.next()
         val jo: Json = toJson(obj)
@@ -159,23 +119,16 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
         //println(dataModels)
         dataModels.foreach(m => bw.write( m + "\n"))
       } else {
-        done(idx) = true
-        println(done)
+        done.updated(idx,true)
         fileReaders(idx).close()
       }
     }
-    val t3 = System.nanoTime()
-    println("Finished picking random iterators")
-    println("Elapsed time: " + (t3 - t2) + "ns")
     tmpFiles.foreach( f => f.delete())
     bw.close()
     DtlS3Cook.apply.saveFile(dest.bucket,dest.folderPath.getOrElse(""),outputFile)
-    val t4 = System.nanoTime()
-    println("saved to S3")
-    println("Elapsed time: " + (t4 - t3) + "ns")
     outputFile.delete()
 
-    println("Total Elapsed time: " + (t4 - t0) + "ns")
+
   }
 
   /**
@@ -224,9 +177,9 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     * @param j - Json
     * @return Optional vector of dataFormat objects.
     */
-  def createDataFormat (j: Json) : Option[Vector[JsonObject]] = {
+  def createDataFormat (j: Json) : Vector[JsonObject] = {
     j.asObject match {
-      case None => None
+      case None => Vector[JsonObject]()
       case Some(obj) =>
         val keys = obj.fields
         val dfv: Vector[Option[JsonObject]] = keys.map{k => //dfv = data format vector
@@ -237,7 +190,7 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
             None
           }
         }
-        Some(dfv.flatten)
+        dfv.flatten
     }
   }
 
