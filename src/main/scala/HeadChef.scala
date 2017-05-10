@@ -62,7 +62,8 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     label match {
       case "all" =>
         //aggregateFiles(fileNames,source,destination,"all")
-        val filesPartition: Vector[Vector[String]] = Random.shuffle(fileNames).grouped(numFilesProcessed).toVector
+        val vfmd: Vector[FileMetaData] = fileNames.map( n => getFileMetaData(n,source))
+        val filesPartition: Vector[Vector[FileMetaData]] = Random.shuffle(vfmd).grouped(numFilesProcessed).toVector
         filesPartition.zipWithIndex.foreach( fv => downloadAndTransformFiles(fv._1,fv._2,source,destination))
       case _ =>
         println(label) //TODO: this case needs to be looked at more carefully, filtering files based on content not filename
@@ -76,41 +77,61 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     * Readers for the tmp files are transformed to iterators. Iterators are chosen at random and a line(object)
     * is extracted and transformed in a standard data format object. This object is written to a file
     * in the output directory. Once all iterators are done , the file in the output directory
-    * @param fnv
+    * @param fmdv
     * @param idx
     * @param source
     * @param dest
     * @return
     */
-  def downloadAndTransformFiles(fnv: Vector[String],idx:Int,source:S3Bucket,dest: S3Bucket) = {
+  def downloadAndTransformFiles(fmdv: Vector[FileMetaData],idx:Int,source:S3Bucket,dest: S3Bucket) = {
     // save all fnv files from source into the tmp folder
-    fnv.foreach{fn =>
-      val s3Stream: S3ObjectInputStream = DtlS3Cook.apply.getFileStream(source.bucket,
-        source.folderPath.getOrElse("") + fn)
-      val reader = new BufferedReader(new InputStreamReader(s3Stream,StandardCharsets.UTF_8))
-      val f = new File(s"tmp/$fn")
-      val writer = new BufferedWriter(new FileWriter(f))
+    logger.info(s"Downloading files : ${fmdv.map(_.filename).mkString(",")}")
+    fmdv.foreach{fmd => fmd.format match {
+      case JSON =>
+        val input = DtlS3Cook.apply.getFileStream(fmd.source.bucket,fmd.source.folderPath.getOrElse("") + fmd.filename)
+        val reader = new BufferedReader(new InputStreamReader(input))
+        val fileString: String = Stream.continually(reader.readLine()).takeWhile(_ != null).mkString("")
+        reader.close()
+        val jsonArray: Option[Vector[Json]] = toJson(fileString).asArray
+        jsonArray match {
+          case None =>
+          case Some(arr) =>
+            val f = new File(s"tmp/${fmd.filename}")
+            val w = new BufferedWriter(new OutputStreamWriter(
+              new FileOutputStream(f),StandardCharsets.UTF_8))
+            arr.foreach(obj => w.write( obj.noSpaces + "\n"))
+            w.close()
+        }
+      case NDJSON =>
+        val s3Stream: S3ObjectInputStream = DtlS3Cook.apply.getFileStream(source.bucket,
+          source.folderPath.getOrElse("") + fmd.filename)
+        val reader = new BufferedReader(new InputStreamReader(s3Stream,StandardCharsets.UTF_8))
+        val f = new File(s"tmp/${fmd.filename}")
+        val writer = new BufferedWriter(new OutputStreamWriter(
+          new FileOutputStream(f),StandardCharsets.UTF_8))
+        val sourceIterator: java.util.Iterator[String] = reader.lines().iterator()
+        while (sourceIterator.hasNext){
+          writer.write(sourceIterator.next())
+          writer.newLine()
+        }
+        reader.close()
+        writer.close()
+    }}
 
-      val sourceIterator: java.util.Iterator[String] = reader.lines().iterator()
-      while (sourceIterator.hasNext){
-        writer.write(sourceIterator.next())
-        writer.newLine()
-      }
-      reader.close()
-      writer.close()
-    }
-
+    logger.info("Saved all S3 files to tmp directory.")
     //Read all files from tmp using iterators. Randomly pick lines in each file and create data objects from line.
     //Save to output folder and stream all files in output to S3.
-    val outputFile = new File(s"output/all_$idx.json") //TODO: fix this
+    val outputFile = new File(s"output/all_$idx.json")
     val bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile),StandardCharsets.UTF_8))
-    val tmpFiles: Vector[File] = fnv.map( f => new File(s"tmp/$f"))
-    val done: Vector[Boolean] = Vector.fill(tmpFiles.size)(false)
+    val tmpFiles: Vector[File] = fmdv.map( fmd => new File(s"tmp/${fmd.filename}"))
+    val done: ListBuffer[Boolean] = ListBuffer.fill(tmpFiles.size)(false)
     val fileReaders: Vector[BufferedReader] = tmpFiles.map{ f =>
       new BufferedReader(new InputStreamReader(new FileInputStream(f),StandardCharsets.UTF_8 ))}
     val tmpIterators: Vector[java.util.Iterator[String]] = fileReaders.map( _.lines().iterator())
+    // randomly pick the next line from the iterators until all iterators have parsed all lines.
+    logger.info(s"Writing line from tmp files to ${outputFile.getName}")
     while (done.contains(false)){
-      val availableIdxs: Vector[Int] = done.zipWithIndex.filter(_._1 == false ).map(_._2)
+      val availableIdxs: Vector[Int] = done.zipWithIndex.filter(_._1 == false ).map(_._2).toVector
       val idx: Int = Random.shuffle(availableIdxs).head
       val iter: java.util.Iterator[String] = tmpIterators(idx)
       if (iter.hasNext) {
@@ -120,16 +141,16 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
         val filteredDataObjects: Vector[JsonObject] = FilteringCook.filterDataFormat(dataObjects)
         val unknownObjects: Vector[JsonObject] = UnknownCook.createUnknowns(filteredDataObjects)
         val dataModels: Vector[String] = (filteredDataObjects ++ unknownObjects).map(_.asJson.noSpaces)
-        //println(dataModels)
         dataModels.foreach(m => bw.write( m + "\n"))
       } else {
-        done.updated(idx,true)
-        fileReaders(idx).close()
+        done(idx) = true
       }
     }
+    fileReaders.foreach( r => r.close())
     tmpFiles.foreach( f => f.delete())
     bw.close()
     DtlS3Cook.apply.saveFile(dest.bucket,dest.folderPath.getOrElse(""),outputFile)
+    logger.info(s"Uploaded ${outputFile.getName} (${outputFile.length() * 0.000001} MB) to S3")
     outputFile.delete()
 
 
@@ -156,33 +177,31 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
   }
 
 
-  /**
-    * If the file is  JSON then read it, transform it to NDSJON and save it a temporary folder
-    * fileConversion
-    * @param fmd
-    */
-  def toNDJSON(fmd:FileMetaData) = {
-    fmd.format match {
-        case JSON =>
-          val input = DtlS3Cook.apply.getFileStream(fmd.source.bucket,fmd.source.folderPath.getOrElse("") + fmd.filename)
-          val reader = new BufferedReader(new InputStreamReader(input))
-          val fileString: String = Stream.continually(reader.readLine()).takeWhile(_ != null).mkString("")
-          reader.close()
-          val jsonArray: Option[Vector[Json]] = toJson(fileString).asArray
-          jsonArray match {
-            case None =>
-            case Some(arr) =>
-              val outputFile = new File(s"fileConversion/${fmd.filename}.json")
-              val bw = new BufferedWriter(new OutputStreamWriter(
-                new FileOutputStream(outputFile),StandardCharsets.UTF_8))
-              arr.foreach(obj => bw.write( obj.noSpaces + "\n"))
-              bw.close()
-          }
-        case _ =>
-          // reading JSON
-
-    }
-  }
+//  /**
+//    * If the file is  JSON then read it, transform it to NDSJON and save it a temporary folder
+//    * fileConversion
+//    * @param fmd
+//    */
+//  def toNDJSON(fmd:FileMetaData) = {
+//    fmd.format match {
+//        case JSON =>
+//          val input = DtlS3Cook.apply.getFileStream(fmd.source.bucket,fmd.source.folderPath.getOrElse("") + fmd.filename)
+//          val reader = new BufferedReader(new InputStreamReader(input))
+//          val fileString: String = Stream.continually(reader.readLine()).takeWhile(_ != null).mkString("")
+//          reader.close()
+//          val jsonArray: Option[Vector[Json]] = toJson(fileString).asArray
+//          jsonArray match {
+//            case None =>
+//            case Some(arr) =>
+//              val outputFile = new File(s"fileConversion/${fmd.filename}.json")
+//              val bw = new BufferedWriter(new OutputStreamWriter(
+//                new FileOutputStream(outputFile),StandardCharsets.UTF_8))
+//              arr.foreach(obj => bw.write( obj.noSpaces + "\n"))
+//              bw.close()
+//          }
+//        case _ =>
+//    }
+//  }
 
   /**
     * createDataFormat takes Json casts it as a JsonObject and traverses its keys,creating
