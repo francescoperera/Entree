@@ -15,7 +15,11 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.util.Random
 
-case class ValidNDJSONFile(filename:String, source:S3Bucket, valid:Boolean) //TODO: susbtitute valid with type field ( i.e type: JSON, CSV)
+sealed trait FileType
+case object JSON extends FileType
+case object NDJSON extends FileType
+
+case class FileMetaData(filename:String, source:S3Bucket, format: FileType)
 case class KeyAndAction(key:String, action: String)
 case class FieldAndMap(field: String, bdm: Map[String, Properties])
 
@@ -138,36 +142,45 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     * @param source - input S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
     * @return - validNDSJONFile object. Look at HeadChef for validNDSJONFile implementation
     */
-  def isNDJSON(f:String,source:S3Bucket): ValidNDJSONFile = {
+  def getFileMetaData(f:String,source:S3Bucket): FileMetaData= {
     val input = DtlS3Cook.apply.getFileStream(source.bucket,source.folderPath.getOrElse("") + f)
     val reader = new BufferedReader(new InputStreamReader(input))
     val fileString = Stream.continually(reader.readLine()).take(1).mkString("")
     reader.close()
-    val isValid = fileString.startsWith("{") && fileString.endsWith("}") //NDJSON object start with { and end with } on the same line
-    ValidNDJSONFile(f,source,isValid)
+    val ft: FileType = if (fileString.startsWith("{") && fileString.endsWith("}")) {
+      NDJSON
+    } else {
+      JSON
+    }
+    FileMetaData(f,source,ft)
   }
 
+
   /**
-    * readFile takes a validNDJSONFile object streams the content of the file in the object,
-    * and maps to a Vector of Json. Conversion to JSON differs between and NDJSON and JSON.
-    * @param vnf - validNDSJONFile object. See HeadChef for implementation
-    * @return - Optional vector of Json where Json represents an object in the file.
+    * If the file is  JSON then read it, transform it to NDSJON and save it a temporary folder
+    * fileConversion
+    * @param fmd
     */
-  def readFile(vnf:ValidNDJSONFile):Option[Vector[Json]] = {
-    logger.info(s"Reading file - ${vnf.filename}")
-    val input = DtlS3Cook.apply.getFileStream(vnf.source.bucket,vnf.source.folderPath.getOrElse("") + vnf.filename)
-    val reader = new BufferedReader(new InputStreamReader(input))
-    vnf.valid match {
-        case true =>
-          // reading NDJSON
-          val fileVec = Stream.continually(reader.readLine()).takeWhile(_ != null).toVector //.mkString("")
+  def toNDJSON(fmd:FileMetaData) = {
+    fmd.format match {
+        case JSON =>
+          val input = DtlS3Cook.apply.getFileStream(fmd.source.bucket,fmd.source.folderPath.getOrElse("") + fmd.filename)
+          val reader = new BufferedReader(new InputStreamReader(input))
+          val fileString: String = Stream.continually(reader.readLine()).takeWhile(_ != null).mkString("")
           reader.close()
-          Some(fileVec.map(toJson(_)))
-        case false =>
+          val jsonArray: Option[Vector[Json]] = toJson(fileString).asArray
+          jsonArray match {
+            case None =>
+            case Some(arr) =>
+              val outputFile = new File(s"fileConversion/${fmd.filename}.json")
+              val bw = new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(outputFile),StandardCharsets.UTF_8))
+              arr.foreach(obj => bw.write( obj.noSpaces + "\n"))
+              bw.close()
+          }
+        case _ =>
           // reading JSON
-          val fileString = Stream.continually(reader.readLine()).takeWhile(_ != null).mkString("")
-          reader.close()
-          toJson(fileString).asArray
+
     }
   }
 
