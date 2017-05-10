@@ -143,7 +143,7 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
         val dataModels: Vector[String] = (filteredDataObjects ++ unknownObjects).map(_.asJson.noSpaces)
         dataModels.foreach(m => bw.write( m + "\n"))
       } else {
-        done(idx) = true
+        done(idx) = true //TODO: add logging to notify when iterator in one file is done ?
       }
     }
     fileReaders.foreach( r => r.close())
