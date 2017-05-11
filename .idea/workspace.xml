@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="e24fb3f7-ed2b-480d-ac0c-7a7e527ac1c2" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/HeadChef.scala" afterPath="$PROJECT_DIR$/src/main/scala/HeadChef.scala" />
-    </list>
+    <list default="true" id="e24fb3f7-ed2b-480d-ac0c-7a7e527ac1c2" name="Default" comment="" />
     <ignored path="Entree.iws" />
     <ignored path=".idea/workspace.xml" />
     <ignored path="$PROJECT_DIR$/out/" />
@@ -41,11 +39,11 @@
       <file leaf-file-name="HeadChef.scala" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/scala/HeadChef.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="4095">
-              <caret line="273" column="12" lean-forward="false" selection-start-line="273" selection-start-column="12" selection-end-line="273" selection-end-column="12" />
+            <state relative-caret-position="495">
+              <caret line="33" column="0" lean-forward="false" selection-start-line="33" selection-start-column="0" selection-end-line="33" selection-end-column="0" />
               <folding>
                 <element signature="e#0#16#0" expanded="true" />
-                <marker date="1494462585000" expanded="true" signature="962:14420" ph="{...}" />
+                <marker date="1494462744000" expanded="true" signature="962:14420" ph="{...}" />
               </folding>
             </state>
           </provider>
@@ -838,7 +836,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="199184000" />
+    <option name="totallyTimeSpent" value="199355000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-349" y="-1200" width="1221" height="1200" extended-state="0" />
@@ -1163,11 +1161,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/HeadChef.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4095">
-          <caret line="273" column="12" lean-forward="false" selection-start-line="273" selection-start-column="12" selection-end-line="273" selection-end-column="12" />
+        <state relative-caret-position="495">
+          <caret line="33" column="0" lean-forward="false" selection-start-line="33" selection-start-column="0" selection-end-line="33" selection-end-column="0" />
           <folding>
             <element signature="e#0#16#0" expanded="true" />
-            <marker date="1494462585000" expanded="true" signature="962:14420" ph="{...}" />
+            <marker date="1494462744000" expanded="true" signature="962:14420" ph="{...}" />
           </folding>
         </state>
       </provider>
