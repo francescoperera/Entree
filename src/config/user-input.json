@@ -24,9 +24,15 @@
     }
   },
   "BREAKDOWN_MAP": {
+<<<<<<< HEAD
     "full_name": ["first_name","last_name"],
     "address": ["house_number","street_number","street_address","city","areaname3",
       "state","areaname1","zip_code","iso3"]
 
+=======
+    "full_name": ["first_name","middle_name","last_name","name_modifier"],
+    "address": ["house_number","street address","apartment_number","city",
+      "areaname1","state","areaname3","zip_code","iso3"]
+>>>>>>> origin/master
   }
 }

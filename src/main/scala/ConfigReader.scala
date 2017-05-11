@@ -4,6 +4,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
 import io.circe._
 
+
 case class Properties(action: String, _type: String, breakdown_schema: Option[Map[String, Properties]])
 
 object Properties{
