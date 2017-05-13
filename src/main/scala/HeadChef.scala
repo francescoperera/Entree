@@ -67,18 +67,37 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
   }
 
   /**
+    * Takes a filename and its source S3 bucket, reads the first line of the file and determines whether the file has a NDJSON or just
+    * regular JSON. It then creates a validNDSJONFile object for the file
+    *
+    * @param f      - filename
+    * @param source - input S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
+    * @return - validNDSJONFile object. Look at HeadChef for validNDSJONFile implementation
+    */
+  def getFileMetaData(f: String, source: S3Bucket): FileMetaData = {
+    val input = DtlS3Cook.apply.getFileStream(source.bucket, source.folderPath.getOrElse("") + f)
+    val reader = new BufferedReader(new InputStreamReader(input))
+    val fileString = Stream.continually(reader.readLine()).take(1).mkString("")
+    reader.close()
+    val ft: FileType = if (fileString.startsWith("{") && fileString.endsWith("}")) {
+      NDJSON
+    } else {
+      JSON
+    }
+    FileMetaData(f, source, ft)
+  }
+
+  /**
     * Takes the vector of s3 file names,streams their content and writes them to temporary files in tmp directory.
     * Readers for the tmp files are transformed to iterators. Iterators are chosen at random and a line(object)
     * is extracted and transformed in a standard data format object. This object is written to a file
     * in the output directory. Once all iterators are done , the file in the output directory
-    *
     * @param fmdv
     * @param idx
     * @param source
     * @param dest
     * @return
     */
-
   def downloadAndTransformFiles(fmdv: Vector[FileMetaData], idx: Int, source: S3Bucket, dest: S3Bucket) = {
     // save all fnv files from source into the tmp folder
     logger.info(s"Downloading files : ${fmdv.map(_.filename).mkString(",")}")
@@ -153,28 +172,6 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     logger.info(s"Uploaded ${outputFile.getName} (${outputFile.length() * 0.000001} MB) to S3")
     outputFile.delete()
   }
-
-  /**
-    * Takes a filename and its source S3 bucket, reads the first line of the file and determines whether the file has a NDJSON or just
-    * regular JSON. It then creates a validNDSJONFile object for the file
-    *
-    * @param f      - filename
-    * @param source - input S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
-    * @return - validNDSJONFile object. Look at HeadChef for validNDSJONFile implementation
-    */
-  def getFileMetaData(f: String, source: S3Bucket): FileMetaData = {
-    val input = DtlS3Cook.apply.getFileStream(source.bucket, source.folderPath.getOrElse("") + f)
-    val reader = new BufferedReader(new InputStreamReader(input))
-    val fileString = Stream.continually(reader.readLine()).take(1).mkString("")
-    reader.close()
-    val ft: FileType = if (fileString.startsWith("{") && fileString.endsWith("}")) {
-      NDJSON
-    } else {
-      JSON
-    }
-    FileMetaData(f, source, ft)
-  }
-
 
   /**
     * createDataFormat takes Json casts it as a JsonObject and traverses its keys,creating
@@ -339,27 +336,6 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
   }
 }
 
-//  def createUnknownObjects(dfv: Vector[JsonObject]): Vector[JsonObject] = {
-//    val unknownsVector: Vector[Option[JsonObject]] = dfv.map {df =>
-//      val unknownLabel: Option[String] = Some("unknown") // the label and column values for unknowns is the same
-//      val colDesc: String = "" //unknowns have empty column description.
-//      val unknown: Option[JsonObject] = userInputDF match {
-//        case None =>
-//          logger.error(s"user-input.json was not properly formatted. Check docs for proper formatting")
-//          None
-//        case Some(ui) =>
-//          val unKnownMap: Map[String, Json] = ui.map{case (k,p) =>
-//          val fn: String => String = util.Random.shuffle(UnknownCook.generators).head
-//          val dkn : String = getKeyName(Actions.value) //dkn = data key name
-//          val unKnownVal: Option[String] = Some(fn(df.apply(dkn).getOrElse(Json.Null).asString.get))
-//            getKeyValuePair(p,k,unKnownVal,unknownLabel,None,colDesc,None,None)
-//          }
-//          unKnownMap.asJson.asObject
-//      }
-//      unknown
-//    }
-//    unknownsVector.flatten
-//  }
 
 
 
