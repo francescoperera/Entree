@@ -132,12 +132,11 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
           writer.close()
       }
     }
-
     logger.info("Saved all S3 files to tmp directory.")
-    //Read all files from tmp using iterators. Randomly pick lines in each file and create data objects from line.
+    //Read all files from tmp using iterators. For each line in an iterator create a number of data format objects
     //Save to output folder and stream all files in output to S3.
     val outputFile = new File(s"output/all_$idx.json")
-    val bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile), StandardCharsets.UTF_8))
+    val outputWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile), StandardCharsets.UTF_8))
     val tmpFiles: Vector[File] = fmdv.map(fmd => new File(s"tmp/${fmd.filename}"))
     val done: ListBuffer[Boolean] = ListBuffer.fill(tmpFiles.size)(false)
     val fileReaders: Vector[BufferedReader] = tmpFiles.map { f =>
@@ -153,7 +152,6 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
       if (iter.hasNext) {
         val obj: String = iter.next()
         val jo: Json = toJson(obj)
-        //TODO: fix createDataObject and createDataObjectVector
         val optDataObjects:Option[Vector[JsonObject]] = createDataObjectVector(jo).filter(_.nonEmpty)
          optDataObjects match {
           case None =>
@@ -161,7 +159,7 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
             val filteredDataObjects: Vector[JsonObject] = FilteringCook.filterDataFormat(dataObjects)
             val unknownObjects: Vector[JsonObject] = UnknownCook.createUnknownObjects(filteredDataObjects)
             val dataModels: Vector[String] = (filteredDataObjects ++ unknownObjects).map(_.asJson.noSpaces)
-            dataModels.foreach(m => bw.write(m + "\n"))
+            dataModels.foreach(m => outputWriter.write(m + "\n"))
         }
       } else {
         done(idx) = true //TODO: add logging to notify when iterator in one file is done ?
@@ -169,7 +167,7 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     }
     fileReaders.foreach(r => r.close())
     tmpFiles.foreach(f => f.delete())
-    bw.close()
+    outputWriter.close()
     DtlS3Cook.apply.saveFile(dest.bucket, dest.folderPath.getOrElse(""), outputFile)
     logger.info(s"Uploaded ${outputFile.getName} (${outputFile.length() * 0.000001} MB) to S3")
     outputFile.delete()
@@ -178,7 +176,6 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
   /**
     * createDataFormat takes Json casts it as a JsonObject and traverses its keys,creating
     * a data format object for each key (if the key has a label).
-    *
     * @param j - Json
     * @return Optional vector of dataFormat objects.
     */
@@ -200,11 +197,10 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
             val bdl : String = objectBDLabelsSet.head //bdl = breakdown label
             val bdargs: Vector[String] = BreakdownCook.bdMap(bdl) // components of breakdown label
             val objValue:Option[String] = bdl match {
-              //TODO: Fix.assuming risky because the breakdown label is set by the user name might not always be set as "full_name"
-              case "full_name" =>
+              case HierarchicalLabel.fullName =>
                 val fullNameVal: Vector[Json] = bdargs.flatMap( arg => obj.apply(arg))
                 Some(fullNameVal.flatMap(n => n.asString).mkString(" "))
-              case "address" =>
+              case HierarchicalLabel.address =>
                 val addressVal: Vector[Json] = bdargs.flatMap( arg => obj.apply(arg))
                 Some(addressVal.flatMap( av => av.asString).mkString(","))
               case _ =>  None
@@ -219,7 +215,6 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
                 case _ => k -> None
               }
             }.toMap.filter( kv => kv._2.isDefined).map{case (k,v) => k -> v.get}
-
             // in the case of aggregate point, the original column is set as an empty String
             val colName: String = "" //TODO: substitute this with nulls.
             val dataObject: Option[JsonObject] = createDataObject(obj,colName,Some(bdl),objValue,Some(bdData))
@@ -239,7 +234,6 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     }
     dov
   }
-
 
   /**
     * createDataObjects takes the jsonObject and a key and creates a data format object
@@ -264,13 +258,11 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
             case None => Some(obj.apply(colName).getOrElse(Json.Null).asString.getOrElse("").trim)
             case someVal => someVal
           }
-          //val dataVal: Option[String] = Some(obj.apply(colName).getOrElse(Json.Null).asString.getOrElse("").trim)
           val colDesc: String = obj.apply("column_description").getOrElse(Json.Null).asString.getOrElse("")
           val label: Option[String] = aggLabel match {
             case None => Some(CFNMappingCook.getKeyFromVal(colName))
             case someLabel => someLabel
           }
-            //TODO: fix this call here
           getKeyValuePair(properties, key, dataVal, label,colDesc,Some(colName),None, bd)
         }
         dataMap.asJson.asObject

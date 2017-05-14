@@ -31,3 +31,8 @@ object BreakdownCook extends ConfigReader {
 
   def getSubLabelList(label:String): Vector[String] = bdMap.getOrElse(label,Vector.empty[String])
 }
+
+object HierarchicalLabel {
+  val fullName = "full_name"
+  val address = "address"
+}

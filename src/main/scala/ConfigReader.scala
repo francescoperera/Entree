@@ -54,7 +54,6 @@ trait ConfigReader extends LazyLogging {
     this.userInput.asObject match {
       case None => None
       case Some(obj) => obj.apply("BREAKDOWN_MAP").get.asObject //check this get
-
     }
   }
 
