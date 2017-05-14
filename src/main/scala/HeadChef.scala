@@ -43,10 +43,9 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
 
   /**
     * takes the source S3 bucket and gets all the filenames according to the label. It then aggregates all the files.
-    *
-    * @param source      -  input S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
+    * @param source -  input S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
     * @param destination - output S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
-    * @param label       - greater ontology/column field name for which data needs to be aggregated. Could be "all" vs "specific_label"
+    * @param label - greater ontology/column field name for which data needs to be aggregated. Could be "all" vs "specific_label"
     */
   def getFilesWithLabel(source: S3Bucket, destination: S3Bucket, label: String) = {
     logger.info(s"Getting files from S3 Bucket: ${source.bucket}")
@@ -69,8 +68,7 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
   /**
     * Takes a filename and its source S3 bucket, reads the first line of the file and determines whether the file has a NDJSON or just
     * regular JSON. It then creates a validNDSJONFile object for the file
-    *
-    * @param f      - filename
+    * @param f - filename
     * @param source - input S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
     * @return - validNDSJONFile object. Look at HeadChef for validNDSJONFile implementation
     */
@@ -156,11 +154,15 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
         val obj: String = iter.next()
         val jo: Json = toJson(obj)
         //TODO: fix createDataObject and createDataObjectVector
-//        val dataObjects: Vector[JsonObject] = createDataObject(jo).filter(_.nonEmpty)
-//        val filteredDataObjects: Vector[JsonObject] = FilteringCook.filterDataFormat(dataObjects)
-//        val unknownObjects: Vector[JsonObject] = UnknownCook.createUnknowns(filteredDataObjects)
-//        val dataModels: Vector[String] = (filteredDataObjects ++ unknownObjects).map(_.asJson.noSpaces)
-//        dataModels.foreach(m => bw.write(m + "\n"))
+        val optDataObjects:Option[Vector[JsonObject]] = createDataObjectVector(jo).filter(_.nonEmpty)
+         optDataObjects match {
+          case None =>
+          case Some(dataObjects) =>
+            val filteredDataObjects: Vector[JsonObject] = FilteringCook.filterDataFormat(dataObjects)
+            val unknownObjects: Vector[JsonObject] = UnknownCook.createUnknownObjects(filteredDataObjects)
+            val dataModels: Vector[String] = (filteredDataObjects ++ unknownObjects).map(_.asJson.noSpaces)
+            dataModels.foreach(m => bw.write(m + "\n"))
+        }
       } else {
         done(idx) = true //TODO: add logging to notify when iterator in one file is done ?
       }
@@ -243,7 +245,7 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     * createDataObjects takes the jsonObject and a key and creates a data format object
     * for the key. It then casts the object as Json.
     * @param obj - Json Object
-    * @param k   - key/column for which an object should be created
+    * @param colName - key/column for which an object should be created
     * @return - Option[Json], where Json represents the data format object.
     */
   def createDataObject(obj: JsonObject,
@@ -269,7 +271,7 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
             case someLabel => someLabel
           }
             //TODO: fix this call here
-          //getKeyValuePair(properties, key, dataVal, label,colDesc, Some(obj),Some(colName), Some(bd))
+          getKeyValuePair(properties, key, dataVal, label,colDesc,Some(colName),None, bd)
           ("",Json.Null) //TODO:tmp.Delete this
         }
         dataMap.asJson.asObject
@@ -280,28 +282,29 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
   /**
     * Given a Property,p, getKeyValuePair generates a key-value pair depending on the action defined in the Property.
     *
-    * @param p              - Properties Object
-    * @param dok            - data object key(the key in the key-value pair that will be returned by the method)
-    * @param dataVal        - value from the source Json object
-    * @param label          - label or tag detected by looking at the original key from the source Json object
-    * @param colDesc        - column description if any is present in the source Json object
-    * @param obj            - TODO: Delete this argument, not needed. Then fix all the calls for this method
-    * @param k              - key( column) from source Json object for which you are creating the Data Object.
-    * @param compositeField - concatenation of various values in source Json object,bc the keys make up a hierarchical
-    *                       key.
+    * @param p - Properties Object
+    * @param dok - data object key(the key in the key-value pair that will be returned by the method)
+    * @param dataVal - value from the source Json object
+    * @param label - label or tag detected by looking at the original key from the source Json object
+    * @param colDesc - column description if any is present in the source Json object
+    * @param k - key( column) from source Json object for which you are creating the Data Object.
+    * @param subLabel - if a label is hierarchical, it will have sub labels. This is a string.
+    * @param bd - breakdown of hierarchical (labeled) data.
     * @return - Tuple ( key - value pair) that will compose the Data Object.
     */
   def getKeyValuePair(p: Properties, dok: String, dataVal: Option[String], label: Option[String], colDesc: String,
-                      obj: Option[JsonObject], k: Option[String], compositeField: Option[String]): (String, Json) = {
+                      k: Option[String], subLabel: Option[String],bd:Option[Map[String,String]]): (String, Json) = {
     p.action match {
       case Actions.value => dok -> dataVal.asJson
       case Actions.label => dok -> label.asJson
       case Actions.column => dok -> k.asJson
       case Actions.description => dok -> colDesc.asJson
-      case Actions.subLabel => dok -> compositeField.asJson
+      case Actions.subLabel => dok -> subLabel.asJson
       case Actions.emptyValue => dok -> "".asJson
       case Actions.decomposition => getBreakdown(dok, p, label.getOrElse(""))
       //ok to use getOrElse here bc label is checked in BreakdownMap, if not present nothing happens.
+      case Actions.sublabelList => dok -> BreakdownCook.getSubLabelList(label.getOrElse("")).asJson
+      case Actions.breakdown => dok -> bd.asJson
       case _ => dok -> Json.Null
     }
   }
@@ -325,7 +328,7 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
       val bdComposition: Vector[FieldAndMap] = bdFields.zip(bdMapVector) map { (tp: (String, Map[String, Properties])) => FieldAndMap(tp) }
       val breakdown: Json = bdComposition.map { fam =>
         val updatedBDMap: Map[String, Json] = fam.bdm.map { case (bdk, bdp) =>
-          getKeyValuePair(bdp, bdk, None, None, "", None, None, Some(fam.field))
+          getKeyValuePair(bdp, bdk, None, None, "", None, Some(fam.field),None)
         }
         updatedBDMap.asJson
       }.asJson

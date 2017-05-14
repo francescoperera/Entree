@@ -30,6 +30,4 @@ object BreakdownCook extends ConfigReader {
   def getCompositeFields(k:String):Vector[String] = bdMap.getOrElse(k,Vector[String]())
 
   def getSubLabelList(label:String): Vector[String] = bdMap.getOrElse(label,Vector.empty[String])
-
-
 }
