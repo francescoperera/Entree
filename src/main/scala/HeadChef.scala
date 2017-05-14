@@ -272,7 +272,6 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
           }
             //TODO: fix this call here
           getKeyValuePair(properties, key, dataVal, label,colDesc,Some(colName),None, bd)
-          ("",Json.Null) //TODO:tmp.Delete this
         }
         dataMap.asJson.asObject
     }
