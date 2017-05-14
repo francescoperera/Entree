@@ -24,22 +24,15 @@ object FieldAndMap{
 
 object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
   /** HeadChef is the main resource of Entree and will direct every other resource. */
-
-  private val defaultRPF: Int = 100000
-
-  private val defaultCS: Int = 10000
-
-  private val rowsPerFile: Int = userInputRPF match {
-    case None => defaultRPF //default value if no value is found in the config file
-    case Some(num) => num.toInt.getOrElse(defaultRPF)
-  } //conf.getInt("local.ROWS_PER_FILE")//Important: this value determines the size of the output files.
-
-  private val classSize: Int = userInputCS match {
-    case None => defaultCS
-    case Some(num) => num.toInt.getOrElse(defaultRPF)
-  }
-
   private val numFilesProcessed = 3
+  private val rowsPerFile: Int = userInputRPF match {
+    case None => Defaults.RPF
+    case Some(num) => num.toInt.getOrElse(Defaults.RPF)
+  }
+  private val classSize: Int = userInputCS match {
+    case None => Defaults.CS
+    case Some(num) => num.toInt.getOrElse(Defaults.CS)
+  }
 
   /**
     * takes the source S3 bucket and gets all the filenames according to the label. It then aggregates all the files.
@@ -248,10 +241,7 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
                        objVal: Option[String] = None,
                        bd: Option[Map[String, String]] = None): Option[JsonObject] = {
     val dataObject: Option[JsonObject] = userInputDF match {
-      case None =>
-        logger.error(s"user-input.json was not properly formatted. Check docs for proper formatting")
-        //TODO: move this log.error in ConfigReader if there is a Decoding Failure
-        None
+      case None => None
       case Some(df) =>
         val dataMap: Map[String, Json] = df.map { case (key, properties) =>
           val dataVal = objVal match {

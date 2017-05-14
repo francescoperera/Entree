@@ -4,32 +4,32 @@ object CFNMappingCook {
     * that can interact with it.
     * */
 
-  val cfnMap:Map[String,Array[String]] = Map (
-    "email_address" -> Array("email_address","email","emailaddress","emails"),
-    "full_name" -> Array("full_name","fullname","name","employee"),
-//    "name"  -> Array("first_name","firstname","last_name",
+  val cfnMap:Map[String,Vector[String]] = Map(
+    "email_address" -> Vector("email_address","email","emailaddress","emails"),
+    "full_name" -> Vector("full_name","fullname","name","employee"),
+//    "name"  -> Vector("first_name","firstname","last_name",
 //      "lastname","surname","family_name","middle_name","middlename","middle","modifier"),
-    "first_name" -> Array("first_name","firstname"),
-    "last_name" -> Array("last_name","lastname","surname","family_name"),
-    "middle_name" -> Array("middle_name","middlename","middle"),
-    "name_modifier" -> Array("modifier"),
-    "address" -> Array("address","physical_address","physicaladdress","employer_address",
+    "first_name" -> Vector("first_name","firstname"),
+    "last_name" -> Vector("last_name","lastname","surname","family_name"),
+    "middle_name" -> Vector("middle_name","middlename","middle"),
+    "name_modifier" -> Vector("modifier"),
+    "address" -> Vector("address","physical_address","physicaladdress","employer_address",
       "work_address","waddress","street_address","street_name","street"),
-    "phone_number" -> Array("phone_number","phonenumber","phone"),
-    "username" -> Array("username","user_name"),
-    "education"-> Array("college","university","school"),
-    "employee_id" -> Array("employee_id"),
-    "uuid" -> Array("uuid"),
-//    "job" -> Array("job","occupation"),
-    "job_title" -> Array("job_title","jobtitle","occupation_title","jobTitle","job","occupation"),
-    "salary" -> Array("salary"),
+    "phone_number" -> Vector("phone_number","phonenumber","phone"),
+    "username" -> Vector("username","user_name"),
+    "education"-> Vector("college","university","school"),
+    "employee_id" -> Vector("employee_id"),
+    "uuid" -> Vector("uuid"),
+//    "job" -> Vector("job","occupation"),
+    "job_title" -> Vector("job_title","jobtitle","occupation_title","jobTitle","job","occupation"),
+    "salary" -> Vector("salary"),
 //    "employer" -> Array("employer"),
-    "company_name" -> Array("companyName","employer","organization"),
-    "credit_card_number" -> Array("credit_card_number"),
-    "date" -> Array("date"),
-    "ip_number" -> Array("ip_number"),
-    "vehicle_plate" -> Array("vehicle_plate"),
-    "all" -> Array()
+    "company_name" -> Vector("companyName","employer","organization"),
+    "credit_card_number" -> Vector("credit_card_number"),
+    "date" -> Vector("date"),
+    "ip_number" -> Vector("ip_number"),
+    "vehicle_plate" -> Vector("vehicle_plate"),
+    "all" -> Vector()
   )
 
 

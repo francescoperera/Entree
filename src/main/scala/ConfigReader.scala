@@ -1,8 +1,8 @@
 import java.io.{BufferedReader, File, FileReader}
 
-import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
 import io.circe._
+import io.circe.syntax._
 
 
 case class Properties(action: String, _type: String, breakdown_schema: Option[Map[String, Properties]])
@@ -26,34 +26,44 @@ trait ConfigReader extends LazyLogging {
   }
   val userInputDF: Option[Map[String,Properties]] = {
     this.userInput.asObject match {
-      case None => None //TODO: Replace None with a a default data format schema
+      case None =>
+        logger.error("A Data Format object was not specified in user-input.json. Entree will use a default one.")
+        Some(Defaults.DF)
       case Some(obj) =>
-        val df: Option[JsonObject] = obj.apply("DATA_FORMAT").get.asObject //check this get
-        val newDF: Map[String,Properties] = df.get.toMap.map{case (k,v) =>
-          val properties = v.as[Properties].right.get //check this get, risky?
-          k -> properties
+        val dataFormat: Option[Map[String, Properties]] = obj.apply("DATA_FORMAT") match {
+          case None => Some(Defaults.DF)
+          case Some(df) =>
+            val newDF: Map[String, Properties] = df.asObject match {
+              case None => Defaults.DF
+              case Some(dfObject) =>
+                dfObject.toMap.map { case (k, v) =>
+                  val properties = v.as[Properties].right.get //check this get, risky?
+                  k -> properties
+                }
+            }
+            Some(newDF)
         }
-        Some(newDF)
+        dataFormat
     }
   }
   val userInputRPF: Option[JsonNumber] = {
     this.userInput.asObject match {
-      case None => None
-      case Some(obj) => obj.apply("ROWS_PER_FILE").get.asNumber //check this get
+      case None => Defaults.RPF.asJson.asNumber
+      case Some(obj) => obj.apply("ROWS_PER_FILE").getOrElse(Defaults.RPF.asJson).asNumber
     }
   }
 
   val userInputCS: Option[JsonNumber] = {
     this.userInput.asObject match {
-      case None => None
-      case Some(obj) => obj.apply("CLASS_SIZE").get.asNumber //check this get
+      case None => Defaults.CS.asJson.asNumber
+      case Some(obj) => obj.apply("CLASS_SIZE").getOrElse(Defaults.CS.asJson).asNumber
     }
   }
 
   val userInputBD: Option[JsonObject] = {
     this.userInput.asObject match {
-      case None => None
-      case Some(obj) => obj.apply("BREAKDOWN_MAP").get.asObject //check this get
+      case None => Defaults.BDMap.asJson.asObject
+      case Some(obj) => obj.apply("BREAKDOWN_MAP").getOrElse(Defaults.BDMap.asJson).asObject
     }
   }
 
@@ -73,18 +83,23 @@ trait ConfigReader extends LazyLogging {
     }
     vka.head.key
   }
-
 }
 
-object AppConfig {
-  // HOCON Config for tokens etc..
-  val mode: String = Mode.test
-  val conf: Config = ConfigFactory.load().getConfig(mode)
-  val S3ClientID: String = conf.getString("aws.s3.clientId")
-  val S3ClientSecret: String = conf.getString("aws.s3.clientSecret")
+object Defaults {
+  val RPF: Int = 100000
+  val CS: Int = 10000
+  val BDMap: Map[String, Vector[String]] = Map (
+    "full_name" -> Vector("first_name","middle_name","last_name","name_modifier"),
+    "address" -> Vector("house_number","street address","apartment_number","city",
+      "state","zip_code")
+  )
+  val DF: Map[String,Properties] = Map (
+    "data" -> Properties("value","String",None),
+    "label" -> Properties("label","String",None),
+    "column_header" -> Properties("column","String",None),
+    "column_description" -> Properties("description","String",None),
+    "tokenized" -> Properties("breakdown","Map[String,String]",None)
+  )
 }
 
-object Mode {
-  val test = "test"
-  val dev = "dev"
-}
+
