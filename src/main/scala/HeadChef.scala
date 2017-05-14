@@ -47,7 +47,7 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     * @param destination - output S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
     * @param label - greater ontology/column field name for which data needs to be aggregated. Could be "all" vs "specific_label"
     */
-  def getFilesWithLabel(source: S3Bucket, destination: S3Bucket, label: String) = {
+  def getFilesWithLabel(source: S3Bucket, destination: S3Bucket, label: String): Unit = {
     logger.info(s"Getting files from S3 Bucket: ${source.bucket}")
     logger.info(s"Following Folder Path : ${source.folderPath.getOrElse("")}")
     val files = DtlS3Cook.apply.listFiles(source.bucket).filterNot(fp => fp.endsWith("/")).filter(_.contains(source.folderPath.getOrElse("")))
