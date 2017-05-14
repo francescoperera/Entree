@@ -4,6 +4,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
 import io.circe._
 
+
 case class Properties(action: String, _type: String, breakdown_schema: Option[Map[String, Properties]])
 
 object Properties{
@@ -53,7 +54,6 @@ trait ConfigReader extends LazyLogging {
     this.userInput.asObject match {
       case None => None
       case Some(obj) => obj.apply("BREAKDOWN_MAP").get.asObject //check this get
-
     }
   }
 

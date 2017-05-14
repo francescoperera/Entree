@@ -20,9 +20,19 @@ object BreakdownCook extends ConfigReader {
       }
   }
 
+  val rbdMap: Map[String,String] = bdMap.flatMap{
+    case (bdk, bdVec) =>  bdVec.map(bdField => bdField -> bdk)
+  }
+
 
   def isKeyPresent(str:String): Boolean = bdMap.keySet.contains(str)
 
   def getCompositeFields(k:String):Vector[String] = bdMap.getOrElse(k,Vector[String]())
 
+  def getSubLabelList(label:String): Vector[String] = bdMap.getOrElse(label,Vector.empty[String])
+}
+
+object HierarchicalLabel {
+  val fullName = "full_name"
+  val address = "address"
 }

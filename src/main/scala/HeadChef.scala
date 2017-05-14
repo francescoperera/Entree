@@ -1,20 +1,13 @@
 import java.io._
 import java.nio.charset.StandardCharsets
 
-import HeadChef.numFilesProcessed
 import com.amazonaws.services.s3.model.S3ObjectInputStream
-import com.typesafe.config.{ConfigObject, ConfigRenderOptions}
+import com.typesafe.scalalogging.LazyLogging
 import io.circe._
 import io.circe.syntax._
 
-import scala.collection.JavaConverters._
-import collection.JavaConverters._
-import com.typesafe.scalalogging.LazyLogging
-
-import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.util.Random
-
 sealed trait FileType
 case object JSON extends FileType
 case object NDJSON extends FileType
@@ -50,12 +43,11 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
 
   /**
     * takes the source S3 bucket and gets all the filenames according to the label. It then aggregates all the files.
-    *
-    * @param source      -  input S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
+    * @param source -  input S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
     * @param destination - output S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
-    * @param label       - greater ontology/column field name for which data needs to be aggregated. Could be "all" vs "specific_label"
+    * @param label - greater ontology/column field name for which data needs to be aggregated. Could be "all" vs "specific_label"
     */
-  def getFilesWithLabel(source: S3Bucket, destination: S3Bucket, label: String) = {
+  def getFilesWithLabel(source: S3Bucket, destination: S3Bucket, label: String): Unit = {
     logger.info(s"Getting files from S3 Bucket: ${source.bucket}")
     logger.info(s"Following Folder Path : ${source.folderPath.getOrElse("")}")
     val files = DtlS3Cook.apply.listFiles(source.bucket).filterNot(fp => fp.endsWith("/")).filter(_.contains(source.folderPath.getOrElse("")))
@@ -74,11 +66,30 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
   }
 
   /**
+    * Takes a filename and its source S3 bucket, reads the first line of the file and determines whether the file has a NDJSON or just
+    * regular JSON. It then creates a validNDSJONFile object for the file
+    * @param f - filename
+    * @param source - input S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
+    * @return - validNDSJONFile object. Look at HeadChef for validNDSJONFile implementation
+    */
+  def getFileMetaData(f: String, source: S3Bucket): FileMetaData = {
+    val input = DtlS3Cook.apply.getFileStream(source.bucket, source.folderPath.getOrElse("") + f)
+    val reader = new BufferedReader(new InputStreamReader(input))
+    val fileString = Stream.continually(reader.readLine()).take(1).mkString("")
+    reader.close()
+    val ft: FileType = if (fileString.startsWith("{") && fileString.endsWith("}")) {
+      NDJSON
+    } else {
+      JSON
+    }
+    FileMetaData(f, source, ft)
+  }
+
+  /**
     * Takes the vector of s3 file names,streams their content and writes them to temporary files in tmp directory.
     * Readers for the tmp files are transformed to iterators. Iterators are chosen at random and a line(object)
     * is extracted and transformed in a standard data format object. This object is written to a file
     * in the output directory. Once all iterators are done , the file in the output directory
-    *
     * @param fmdv
     * @param idx
     * @param source
@@ -121,12 +132,11 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
           writer.close()
       }
     }
-
     logger.info("Saved all S3 files to tmp directory.")
-    //Read all files from tmp using iterators. Randomly pick lines in each file and create data objects from line.
+    //Read all files from tmp using iterators. For each line in an iterator create a number of data format objects
     //Save to output folder and stream all files in output to S3.
     val outputFile = new File(s"output/all_$idx.json")
-    val bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile), StandardCharsets.UTF_8))
+    val outputWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile), StandardCharsets.UTF_8))
     val tmpFiles: Vector[File] = fmdv.map(fmd => new File(s"tmp/${fmd.filename}"))
     val done: ListBuffer[Boolean] = ListBuffer.fill(tmpFiles.size)(false)
     val fileReaders: Vector[BufferedReader] = tmpFiles.map { f =>
@@ -142,121 +152,150 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
       if (iter.hasNext) {
         val obj: String = iter.next()
         val jo: Json = toJson(obj)
-        val dataObjects: Vector[JsonObject] = createDataFormat(jo).filter(_.nonEmpty)
-        val filteredDataObjects: Vector[JsonObject] = FilteringCook.filterDataFormat(dataObjects)
-        val unknownObjects: Vector[JsonObject] = UnknownCook.createUnknowns(filteredDataObjects)
-        val dataModels: Vector[String] = (filteredDataObjects ++ unknownObjects).map(_.asJson.noSpaces)
-        dataModels.foreach(m => bw.write(m + "\n"))
+        val optDataObjects:Option[Vector[JsonObject]] = createDataObjectVector(jo).filter(_.nonEmpty)
+         optDataObjects match {
+          case None =>
+          case Some(dataObjects) =>
+            val filteredDataObjects: Vector[JsonObject] = FilteringCook.filterDataFormat(dataObjects)
+            val unknownObjects: Vector[JsonObject] = UnknownCook.createUnknownObjects(filteredDataObjects)
+            val dataModels: Vector[String] = (filteredDataObjects ++ unknownObjects).map(_.asJson.noSpaces)
+            dataModels.foreach(m => outputWriter.write(m + "\n"))
+        }
       } else {
         done(idx) = true //TODO: add logging to notify when iterator in one file is done ?
       }
     }
     fileReaders.foreach(r => r.close())
     tmpFiles.foreach(f => f.delete())
-    bw.close()
+    outputWriter.close()
     DtlS3Cook.apply.saveFile(dest.bucket, dest.folderPath.getOrElse(""), outputFile)
     logger.info(s"Uploaded ${outputFile.getName} (${outputFile.length() * 0.000001} MB) to S3")
     outputFile.delete()
-
-
   }
-
-  /**
-    * Takes a filename and its source S3 bucket, reads the first line of the file and determines whether the file has a NDJSON or just
-    * regular JSON. It then creates a validNDSJONFile object for the file
-    *
-    * @param f      - filename
-    * @param source - input S3Bucket ( bucket and path folder). Look at S3Cook for S3Bucket implementation
-    * @return - validNDSJONFile object. Look at HeadChef for validNDSJONFile implementation
-    */
-  def getFileMetaData(f: String, source: S3Bucket): FileMetaData = {
-    val input = DtlS3Cook.apply.getFileStream(source.bucket, source.folderPath.getOrElse("") + f)
-    val reader = new BufferedReader(new InputStreamReader(input))
-    val fileString = Stream.continually(reader.readLine()).take(1).mkString("")
-    reader.close()
-    val ft: FileType = if (fileString.startsWith("{") && fileString.endsWith("}")) {
-      NDJSON
-    } else {
-      JSON
-    }
-    FileMetaData(f, source, ft)
-  }
-
 
   /**
     * createDataFormat takes Json casts it as a JsonObject and traverses its keys,creating
     * a data format object for each key (if the key has a label).
-    *
     * @param j - Json
     * @return Optional vector of dataFormat objects.
     */
-  def createDataFormat(j: Json): Vector[JsonObject] = {
-    j.asObject match {
-      case None => Vector[JsonObject]()
+  def createDataObjectVector (j: Json) : Option[Vector[JsonObject]] = {
+    val dov:Option[Vector[JsonObject]] =  j.asObject match {
+      case None => None
       case Some(obj) =>
-        val keys = obj.fields
-        val dfv: Vector[Option[JsonObject]] = keys.map { k => //dfv = data format vector
-          if (CFNMappingCook.isLabelWithKeyPresent(k)) {
-            val o = createDataObject(obj, k) //TODO: consider moving method body her
-            o
+        val keys: Vector[String] = obj.fields
+        val objectBDLabels: Vector[String] = keys.flatMap( k => BreakdownCook.rbdMap.get(k))
+        val objectBDLabelsSet: Set[String] = objectBDLabels.toSet
+        /** if list of breakdown(BD) labels size is not the same as the set of BD labels, then multiple keys
+          * have the same BD label. This is hierarchical data. Also, hierarchical objects are only created
+          * if there is one BD label (objectBDLabelsSet.size == 1).
+          * If more than one unique BD label is present, then object is hierarchically ambiguous,
+          * so its going to be parsed key by key.*/
+        val dataObjectVector:Option[Vector[JsonObject]] =
+          if (objectBDLabels.size != objectBDLabelsSet.size & objectBDLabelsSet.size == 1 ) {
+            // Hierarchical object gets created
+            val bdl : String = objectBDLabelsSet.head //bdl = breakdown label
+            val bdargs: Vector[String] = BreakdownCook.bdMap(bdl) // components of breakdown label
+            val objValue:Option[String] = bdl match {
+              case HierarchicalLabel.fullName =>
+                val fullNameVal: Vector[Json] = bdargs.flatMap( arg => obj.apply(arg))
+                Some(fullNameVal.flatMap(n => n.asString).mkString(" "))
+              case HierarchicalLabel.address =>
+                val addressVal: Vector[Json] = bdargs.flatMap( arg => obj.apply(arg))
+                Some(addressVal.flatMap( av => av.asString).mkString(","))
+              case _ =>  None
+            } //Assumption: the order of elements in user-input.json is how full_name and address  will be composed
+            val bdData: Map[String,String] = keys.map{k =>
+              BreakdownCook.rbdMap.get(k) match {
+                case Some(`bdl`) =>
+                  obj.apply(k) match {
+                    case None => k -> None
+                    case Some(v) => k -> v.asString
+                  }
+                case _ => k -> None
+              }
+            }.toMap.filter( kv => kv._2.isDefined).map{case (k,v) => k -> v.get}
+            // in the case of aggregate point, the original column is set as an empty String
+            val colName: String = "" //TODO: substitute this with nulls.
+            val dataObject: Option[JsonObject] = createDataObject(obj,colName,Some(bdl),objValue,Some(bdData))
+            Some(Vector(dataObject).flatten)
           } else {
-            None
+            // create a data object for each column/key.
+            val dfv: Vector[Option[JsonObject]] = keys.map{ k => //dfv = data format vector
+              if (CFNMappingCook.isLabelWithKeyPresent(k)) {
+                createDataObject(obj, k)
+              } else {
+                None
+              }
+            }
+            Some(dfv.flatten)
           }
-        }
-        dfv.flatten
+        dataObjectVector
     }
+    dov
   }
 
   /**
     * createDataObjects takes the jsonObject and a key and creates a data format object
     * for the key. It then casts the object as Json.
-    *
     * @param obj - Json Object
-    * @param k   - key/column for which an object should be created
+    * @param colName - key/column for which an object should be created
     * @return - Option[Json], where Json represents the data format object.
     */
-  def createDataObject(obj: JsonObject, k: String): Option[JsonObject] = {
-    userInputDF match {
+  def createDataObject(obj: JsonObject,
+                       colName: String ,
+                       aggLabel: Option[String] = None,
+                       objVal: Option[String] = None,
+                       bd: Option[Map[String, String]] = None): Option[JsonObject] = {
+    val dataObject: Option[JsonObject] = userInputDF match {
       case None =>
         logger.error(s"user-input.json was not properly formatted. Check docs for proper formatting")
         //TODO: move this log.error in ConfigReader if there is a Decoding Failure
         None
       case Some(df) =>
-        val dataObject: Map[String, Json] = df.map { case (key, properties) =>
-          val dataVal: Option[String] = Some(obj.apply(k).getOrElse(Json.Null).asString.getOrElse("").trim)
+        val dataMap: Map[String, Json] = df.map { case (key, properties) =>
+          val dataVal = objVal match {
+            case None => Some(obj.apply(colName).getOrElse(Json.Null).asString.getOrElse("").trim)
+            case someVal => someVal
+          }
           val colDesc: String = obj.apply("column_description").getOrElse(Json.Null).asString.getOrElse("")
-          val label: String = CFNMappingCook.getKeyFromVal(k)
-          getKeyValuePair(properties, key, dataVal, Some(label), colDesc, Some(obj), Some(k), None)
+          val label: Option[String] = aggLabel match {
+            case None => Some(CFNMappingCook.getKeyFromVal(colName))
+            case someLabel => someLabel
+          }
+          getKeyValuePair(properties, key, dataVal, label,colDesc,Some(colName),None, bd)
         }
-        dataObject.asJson.asObject
+        dataMap.asJson.asObject
     }
+    dataObject
   }
 
   /**
     * Given a Property,p, getKeyValuePair generates a key-value pair depending on the action defined in the Property.
     *
-    * @param p              - Properties Object
-    * @param dok            - data object key(the key in the key-value pair that will be returned by the method)
-    * @param dataVal        - value from the source Json object
-    * @param label          - label or tag detected by looking at the original key from the source Json object
-    * @param colDesc        - column description if any is present in the source Json object
-    * @param obj            - TODO: Delete this argument, not needed. Then fix all the calls for this method
-    * @param k              - key( column) from source Json object for which you are creating the Data Object.
-    * @param compositeField - concatenation of various values in source Json object,bc the keys make up a hierarchical
-    *                       key.
+    * @param p - Properties Object
+    * @param dok - data object key(the key in the key-value pair that will be returned by the method)
+    * @param dataVal - value from the source Json object
+    * @param label - label or tag detected by looking at the original key from the source Json object
+    * @param colDesc - column description if any is present in the source Json object
+    * @param k - key( column) from source Json object for which you are creating the Data Object.
+    * @param subLabel - if a label is hierarchical, it will have sub labels. This is a string.
+    * @param bd - breakdown of hierarchical (labeled) data.
     * @return - Tuple ( key - value pair) that will compose the Data Object.
     */
   def getKeyValuePair(p: Properties, dok: String, dataVal: Option[String], label: Option[String], colDesc: String,
-                      obj: Option[JsonObject], k: Option[String], compositeField: Option[String]): (String, Json) = {
+                      k: Option[String], subLabel: Option[String],bd:Option[Map[String,String]]): (String, Json) = {
     p.action match {
       case Actions.value => dok -> dataVal.asJson
       case Actions.label => dok -> label.asJson
       case Actions.column => dok -> k.asJson
       case Actions.description => dok -> colDesc.asJson
-      case Actions.subLabel => dok -> compositeField.asJson
+      case Actions.subLabel => dok -> subLabel.asJson
       case Actions.emptyValue => dok -> "".asJson
       case Actions.decomposition => getBreakdown(dok, p, label.getOrElse(""))
       //ok to use getOrElse here bc label is checked in BreakdownMap, if not present nothing happens.
+      case Actions.sublabelList => dok -> BreakdownCook.getSubLabelList(label.getOrElse("")).asJson
+      case Actions.breakdown => dok -> bd.asJson
       case _ => dok -> Json.Null
     }
   }
@@ -266,7 +305,6 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     * into its sub components if they exist. I.e The label "full_name" can be broken down into "first_name",
     * "middle_name" and "last_name". This method returns this breakdown(Map) in a Tuple(key-value pair) with the
     * Data Object key.
-    *
     * @param dok   - Data Object key(the key in the key-value pair that will be returned by the method)
     * @param p     - Properties Object
     * @param label - label or tag detected by looking at the original key from the source Json object
@@ -281,7 +319,7 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
       val bdComposition: Vector[FieldAndMap] = bdFields.zip(bdMapVector) map { (tp: (String, Map[String, Properties])) => FieldAndMap(tp) }
       val breakdown: Json = bdComposition.map { fam =>
         val updatedBDMap: Map[String, Json] = fam.bdm.map { case (bdk, bdp) =>
-          getKeyValuePair(bdp, bdk, None, None, "", None, None, Some(fam.field))
+          getKeyValuePair(bdp, bdk, None, None, "", None, Some(fam.field),None)
         }
         updatedBDMap.asJson
       }.asJson
@@ -291,5 +329,8 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
     }
   }
 }
+
+
+
 
 
