@@ -275,7 +275,7 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
       case Actions.decomposition => getBreakdown(dok, p, label.getOrElse(""))
       //ok to use getOrElse here bc label is checked in BreakdownMap, if not present nothing happens.
       case Actions.sublabelList => dok -> BreakdownCook.getSubLabelList(label.getOrElse("")).asJson
-      case Actions.breakdown => dok -> bd.asJson
+      case Actions.hierarchical => dok -> bd.asJson
       case _ => dok -> Json.Null
     }
   }

@@ -132,6 +132,35 @@ If label has composite fields, then these fields are stored under the key whose 
 ##### empty_value
 Entree performs no action and maps the corresponding key to an empty string.
 
+##### sub_label_list
+Entree looks at the identified label and checks to see whether it is a hierarchical label ( one made of sub_labels).
+If sub labels are identified, then Entree will provide a list of all the sub labels connected to the label (i.e  the
+labels "full_name" has "first_name","middle_name", "last_name" and "name_modifier" as sub_labels). The sub_labels are
+identified or checked by looking at the "BREAKDOWN_MAP". If no sub_labels are present, then an empty list will be
+returned.
+
+##### hierarchical
+This a special action. Given this action, Entree will look at the entire source data (NDJSON) object, grab all of its
+keys and check whether multiple keys have the same label. This check is done by comparing whether multiple keys
+map to the same label ( the key in the BREAKDOWN MAP) as specified in the BREAKDOWN MAP. If the check is successful,
+then Entree will concatenate together all the values from the keys in the source object to create a hierarchical data
+point.
+For example:
+
+```
+"BREAKDOWN_MAP": {
+    "full_name": ["first_name","middle_name","last_name","name_modifier"],
+    "address": ["house_number","street address","apartment_number","city",
+      "state","zip_code"]
+  }
+```
+```{"first_name":"Sara", "last_name":"Mo"}```
+
+is considered a hierarchical object because the keys "first_name" and "last_name" refer to the same label("full_name")
+as specified by the BREAKDOWN MAP. Hence, Entree will grab the values from both keys and concatenate them together.
+The concatenation order is defined by the order in the list defined by the key "full_name" in the BREAKDOWN MAP.
+The  DATA_FORMAT object key ( with the _hierarchical_ action) in this example will map to the string "Sara Mo".
+
 
 #### Type
 Type is a property that defines the type to be expected for the key. Type may be String,Int,Vector[String], etc...

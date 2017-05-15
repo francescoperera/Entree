@@ -7,6 +7,6 @@ object Actions {
   val subLabel = "sub_label"
   val emptyValue = "empty_value"
   val decomposition = "decomposition"
-  val sublabelList = "sub_label list"
-  val breakdown = "breakdown"
+  val sublabelList = "sub_label_list"
+  val hierarchical = "hierarchical"
 }
