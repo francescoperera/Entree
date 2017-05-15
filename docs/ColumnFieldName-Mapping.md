@@ -5,25 +5,29 @@
  This is the current Map:
 
  ```
- val cfnMap:Map[String,Array[String]] = Map (
-     "email_address" -> Array("email_address","email","emailaddress"),
-     "full_name" -> Array("full_name","fullname"),
-     "first_name" -> Array("first_name","firstname"),
-     "last_name" -> Array("last_name","lastname","surname","family_name"),
-     "name" -> Array ("name"),
-     "middle_name" -> Array("middle_name","middlename"),
-     "address" -> Array("address","physical_address","physicaladdress","employer_address","work_address"),
-     "phone_number" -> Array("phone_number","phonenumber","phone"),
-     "username" -> Array("username","user_name"),
-     "education"-> Array("college","university","school"),
-     "employee" -> Array("employee"),
-     "employee_id" -> Array("employee_id"),
-     "uuid" -> Array("uuid"),
-     "job_title" -> Array("job_title","jobtitle","occupation","occupation_title","jobTitle"),
-     "salary" -> Array("salary"),
-     "employer" -> Array("employer","companyName"),
-     "all" -> Array()
-   )
+val cfnMap:Map[String,Vector[String]] = Map(
+    "email_address" -> Vector("email_address","email","emailaddress","emails"),
+    "full_name" -> Vector("full_name","fullname","name","employee"),
+    "first_name" -> Vector("first_name","firstname"),
+    "last_name" -> Vector("last_name","lastname","surname","family_name"),
+    "middle_name" -> Vector("middle_name","middlename","middle"),
+    "name_modifier" -> Vector("modifier"),
+    "address" -> Vector("address","physical_address","physicaladdress","employer_address",
+      "work_address","waddress","street_address","street_name","street"),
+    "phone_number" -> Vector("phone_number","phonenumber","phone"),
+    "username" -> Vector("username","user_name"),
+    "education"-> Vector("college","university","school"),
+    "employee_id" -> Vector("employee_id"),
+    "uuid" -> Vector("uuid"),
+    "job_title" -> Vector("job_title","jobtitle","occupation_title","jobTitle","job","occupation"),
+    "salary" -> Vector("salary"),
+    "company_name" -> Vector("companyName","employer","organization"),
+    "credit_card_number" -> Vector("credit_card_number"),
+    "date" -> Vector("date"),
+    "ip_number" -> Vector("ip_number"),
+    "vehicle_plate" -> Vector("vehicle_plate"),
+    "all" -> Vector()
+  )
 ```
 The keys in cfNMap are the labels known to Entree and the values contain all the column names that Entree will tag
 to the corresponding label.

@@ -1,6 +1,6 @@
 # Entree
-Entree is a a data labeling and aggregation tool. It downloads data from different files, data points are labeled and
-grouped together according to the assigned label.
+Entree is a a **data labeling** and **aggregation** tool. It downloads data from different files, data points
+are labeled and grouped together according to the assigned label.
 Individual data points are transformed into NDJSON objects in which the keys( and its corresponding values)
 are defined by the user in user-input.json.
 Entree is able to read in files that are either in JSON or NDJSON format.
