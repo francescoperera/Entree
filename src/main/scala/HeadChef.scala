@@ -25,14 +25,8 @@ object FieldAndMap{
 object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
   /** HeadChef is the main resource of Entree and will direct every other resource. */
   private val numFilesProcessed = 3
-  private val rowsPerFile: Int = userInputRPF match {
-    case None => Defaults.RPF
-    case Some(num) => num.toInt.getOrElse(Defaults.RPF)
-  }
-  private val classSize: Int = userInputCS match {
-    case None => Defaults.CS
-    case Some(num) => num.toInt.getOrElse(Defaults.CS)
-  }
+  private val rowsPerFile: Int = userInputRPF
+  private val classSize: Int = userInputCS
 
   /**
     * takes the source S3 bucket and gets all the filenames according to the label. It then aggregates all the files.
@@ -155,7 +149,8 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
             dataModels.foreach(m => outputWriter.write(m + "\n"))
         }
       } else {
-        done(idx) = true //TODO: add logging to notify when iterator in one file is done ?
+        done(idx) = true
+        logger.info(s"Finished iterating through: ${fmdv(idx).filename}")
       }
     }
     fileReaders.foreach(r => r.close())
@@ -240,24 +235,38 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
                        aggLabel: Option[String] = None,
                        objVal: Option[String] = None,
                        bd: Option[Map[String, String]] = None): Option[JsonObject] = {
-    val dataObject: Option[JsonObject] = userInputDF match {
-      case None => None
-      case Some(df) =>
-        val dataMap: Map[String, Json] = df.map { case (key, properties) =>
-          val dataVal = objVal match {
-            case None => Some(obj.apply(colName).getOrElse(Json.Null).asString.getOrElse("").trim)
-            case someVal => someVal
-          }
-          val colDesc: String = obj.apply("column_description").getOrElse(Json.Null).asString.getOrElse("")
-          val label: Option[String] = aggLabel match {
-            case None => Some(CFNMappingCook.getKeyFromVal(colName))
-            case someLabel => someLabel
-          }
-          getKeyValuePair(properties, key, dataVal, label,colDesc,Some(colName),None, bd)
-        }
-        dataMap.asJson.asObject
+//    val dataObject: Option[JsonObject] = userInputDF match {
+//      case None => None
+//      case Some(df) =>
+//        val dataMap: Map[String, Json] = df.map { case (key, properties) =>
+//          val dataVal = objVal match {
+//            case None => Some(obj.apply(colName).getOrElse(Json.Null).asString.getOrElse("").trim)
+//            case someVal => someVal
+//          }
+//          val colDesc: String = obj.apply("column_description").getOrElse(Json.Null).asString.getOrElse("")
+//          val label: Option[String] = aggLabel match {
+//            case None => Some(CFNMappingCook.getKeyFromVal(colName))
+//            case someLabel => someLabel
+//          }
+//          getKeyValuePair(properties, key, dataVal, label,colDesc,Some(colName),None, bd)
+//        }
+//        dataMap.asJson.asObject
+//    }
+//    dataObject
+    val dataFormat = userInputDF
+    val dataMap: Map[String, Json] = dataFormat.map { case (key, properties) =>
+      val dataVal = objVal match {
+        case None => Some(obj.apply(colName).getOrElse(Json.Null).asString.getOrElse("").trim)
+        case someVal => someVal
+      }
+      val colDesc: String = obj.apply("column_description").getOrElse(Json.Null).asString.getOrElse("")
+      val label: Option[String] = aggLabel match {
+        case None => Some(CFNMappingCook.getKeyFromVal(colName))
+        case someLabel => someLabel
+      }
+      getKeyValuePair(properties, key, dataVal, label,colDesc,Some(colName),None, bd)
     }
-    dataObject
+    dataMap.asJson.asObject
   }
 
   /**

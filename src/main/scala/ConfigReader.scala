@@ -24,14 +24,14 @@ trait ConfigReader extends LazyLogging {
       case Right(j) => j
     }
   }
-  val userInputDF: Option[Map[String,Properties]] = {
+  val userInputDF: Map[String,Properties] = {
     this.userInput.asObject match {
       case None =>
         logger.error("A Data Format object was not specified in user-input.json. Entree will use a default one.")
-        Some(Defaults.DF)
+        Defaults.DF
       case Some(obj) =>
-        val dataFormat: Option[Map[String, Properties]] = obj.apply("DATA_FORMAT") match {
-          case None => Some(Defaults.DF)
+        val dataFormat: Map[String, Properties] = obj.apply("DATA_FORMAT") match {
+          case None => Defaults.DF
           case Some(df) =>
             val newDF: Map[String, Properties] = df.asObject match {
               case None => Defaults.DF
@@ -41,22 +41,22 @@ trait ConfigReader extends LazyLogging {
                   k -> properties
                 }
             }
-            Some(newDF)
+            newDF
         }
         dataFormat
     }
   }
-  val userInputRPF: Option[JsonNumber] = {
+  val userInputRPF: Int = {
     this.userInput.asObject match {
-      case None => Defaults.RPF.asJson.asNumber
-      case Some(obj) => obj.apply("ROWS_PER_FILE").getOrElse(Defaults.RPF.asJson).asNumber
+      case None => Defaults.RPF
+      case Some(obj) => obj.apply("ROWS_PER_FILE").getOrElse(Defaults.RPF.asJson).asNumber.get.toInt.get
     }
   }
 
-  val userInputCS: Option[JsonNumber] = {
+  val userInputCS: Int = {
     this.userInput.asObject match {
-      case None => Defaults.CS.asJson.asNumber
-      case Some(obj) => obj.apply("CLASS_SIZE").getOrElse(Defaults.CS.asJson).asNumber
+      case None => Defaults.CS
+      case Some(obj) => obj.apply("CLASS_SIZE").getOrElse(Defaults.CS.asJson).asNumber.get.toInt.get
     }
   }
 
@@ -74,9 +74,8 @@ trait ConfigReader extends LazyLogging {
     * @return - name of the key that has ap as its action property value.
     */
   def getKeyName(ap: String) : String = {
-    val df = userInputDF.get
-    val vka: Vector[KeyAndAction] = df.map{case (k,p) => KeyAndAction(k,p.action)}.filter(ka =>
-      ka.action.contains(ap)).toVector
+    val vka: Vector[KeyAndAction] = this.userInputDF.map{case (k,p) => KeyAndAction(k,p.action)}
+      .filter(ka => ka.action.contains(ap)).toVector
     if(vka.size > 1){
       logger.warn("Entree detected that the Data Format schema in user-input.json contains multiple" +
         "keys with the action: value. The first key will be used in the filtering process.")
