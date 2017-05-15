@@ -1,17 +1,17 @@
 ## Data Format Object
 
-DATA_FORMAT is an object that users will use to define the structure and the content of the object
+__DATA_FORMAT__ is an object that users will use to define the structure and the content of the object
 that Entree will use to label and aggregate data. Users can define this object in **user-input.json**.
 The DATA_FORMAT object should handle and store the data and its contextual information. Most key-value pairs in the
 object should be first level entries( not nested).
 
 The base unit of this object is a key-value pair. In order to build this pair, the user needs to
-provide the name of the key and a set of properties. See the Structure section below for more information
+provide the name of the key and a set of properties. See the **Structure** section below for more information
 
 
-### Breakdown
+### Decomposition
 If a "breakdown" of the data into its composite fields should be needed, it can be added to the DATA_FORMAT object and
-it should be the only nested parameter in the object. An example of a breakdown is :
+it should be the only nested parameter in the object. An example of a decomposition is :
 
 
 address | house_number | street_address | apartment_number | state | city | zip_code |
@@ -22,7 +22,7 @@ Note that a breakdown occurs only if the label detected by Entree for the datapo
 In this case Entree looked at datapoint ```123 Washington Avenue, Apt 3B, NY , NY 10000``` labeled it as **address**
 and recognized that address is a label made of composite fields : house_number, street_address, apartment_number,
 state, city and zip_code.
-Users can define which labels if any have composite fields  by adding a Map to **user-input.conf**.
+Users can define which labels if any have composite fields  by adding a **BREAKDOWN_MAP** to **user-input.json**.
 
 An example of a user defined Map for relating labels with its components is :
 
@@ -83,9 +83,9 @@ In this example, the key was named *another_key_name* and it was given 3 propert
 property was set to be "decomposition", then Entree expects to also be given the "components" property.
 Check the Action and Components sections for more information on decomposition and  components.
 
-#### Action
-Action is a property that relates to the action that Entree will need to do to get the value for its key. E
-ntree has a number of defined actions :
+#### Actions
+Action is a property that relates to the action that Entree will need to do to get the value for its key.
+Entree has a number of defined actions :
 
 ##### value
 Entree grabs the value stored in the data point.
@@ -101,7 +101,7 @@ Entree gets the label for the key in the data point
 ```{"first_name":"Frank"}```
 
 Entree grabs the key, in this case "first_name", and looks for its associated label. The label for "first_name"
-is "full_name". Thus the key whose action property is *label* will map to the value "full_name".
+is "first_name". Thus the key whose action property is *label* will map to the value "first_name".
 
 ##### column
 Entree gets the key used in the original data point
@@ -119,17 +119,17 @@ If no column description is found, then column description is a set as an empty 
 Entree grabs the value under "column_description",in this case "Some random person". The key whose action property
 is *description* will map to the value "Some random person".
 
-#### decomposition
+##### decomposition
 Entree looks at the value stored under the property "components" and uses it to create the schema for the
 breakdown data. Any key whose action is set to "decomposition", will also have components mapped to an non empty array.
 For more information, check the Breakdown and Components section.
 
-#### sub_label
+##### sub_label
 Entree looks at the label for the data point and then checks if the label is made of composite field.
 This done by looking at at "breakdown" Map, which can be either user defined or default one.
 If label has composite fields, then these fields are stored under the key whose action property is set as "sub_label".
 
-### empty_value
+##### empty_value
 Entree performs no action and maps the corresponding key to an empty string.
 
 
@@ -138,8 +138,8 @@ Type is a property that defines the type to be expected for the key. Type may be
 
 #### Components
 Components is a property that defines how to structure the breakdown of a value. Components typically map to empty arrays except when
-the action is set to be *decomposition*. When a key has this action, then  the property components maps to an Array of 1 object. The object stores
-the key ( and its properties) that will be used to describe the breakdown.
+the action is set to be *decomposition*. When a key has this action, then  the property components maps to an
+Array of 1 object. The object stores the key ( and its properties) that will be used to describe the breakdown.
 For example, if the DATA_FORMAT object had the following key defined :
 ```
     ......
@@ -164,9 +164,10 @@ For example, if the DATA_FORMAT object had the following key defined :
     .....
 ```
 
-The following data point :  ``` 123 Washington Avenue, Apt 3B, NY , NY 10000``` is one made of composite fields( as mentioned above),
-its label is address and address is made up of : house_number, street_address, apartment_number, state, city and zip_code.
-The  "breakdown"  portion for the DATA_FORMAT object ( in this case the "breakdown" key is called "division") for this data is :
+The following data point :  ``` 123 Washington Avenue, Apt 3B, NY , NY 10000``` is one made of composite fields
+( as mentioned above),its label is address and address is made up of : house_number, street_address, apartment_number,
+state, city and zip_code. The  "breakdown"  portion for the DATA_FORMAT object ( in this case the "breakdown"
+key is called "division") for this data is :
 
 ```   ......
        ......
@@ -199,8 +200,10 @@ The  "breakdown"  portion for the DATA_FORMAT object ( in this case the "breakdo
        .....
        .....
 ```
+The values of each composite_field are kept as empty strings as they will be hydrated later by some other application
+depending on the use of the data. The object hydration is not part of Entree's core responsabilities.
 
-## Example
+## Examples
 
 ### user-input.json
 
@@ -272,7 +275,7 @@ The  "breakdown"  portion for the DATA_FORMAT object ( in this case the "breakdo
 1) Entree reads a datapoint
 2) Extracts all keys that have a label and grabs their corresponding values.
 3) If data point has column description, it also grabs the value stored in this key
-4) Entree reads the DATA_FORMAT schema defined in **user-input.conf** and builds a Map, which is then casted into JSON.
+4) Entree reads the DATA_FORMAT schema defined in **user-input.json** and builds the data format object with the datapoint
 5) Steps 1-4 are repeated for all datapoints
 6) The JSON representation of the DATA_FORMAT objects are then saved.
 
@@ -289,9 +292,10 @@ for each label.
 - "label" ->  "company_name" (label detected for value)
 - "column_header" -> "companyName" (key used to store the value in the data point)
 - "column_description" -> "" (empty string because data point had no column_description")
-- "breakdown" -> [] ( empty array because the label is not one of the keys in the breakdownMap and thus has no composite fields)
+- "breakdown" -> [] ( empty array because the label is not one of the keys in the breakdownMap and t
+thus has no composite fields)
 
-*Note that the following DATA_FORMAT object will be shown in JSON*.
+*Note that the following DATA_FORMAT object will be shown in JSON (for easier readibility)*.
 
 ```
 {
@@ -312,7 +316,7 @@ for each label.
 - "column_description" -> "" (empty string because data point had no column_description")
 - "breakdown" -> [] ( empty array because the label is not one of the keys in the breakdownMap and thus has no composite fields)
 
-*Note that the following DATA_FORMAT object will be shown in JSON*.
+*Note that the following DATA_FORMAT object will be shown in JSON (for easier readibility)*.
 
 ```
 {
@@ -323,7 +327,6 @@ for each label.
     "column_description":""
 }
 ```
-
 
 ### Data Point Example 2:
 ``` {"name": "Samuel Donovan"} ```
@@ -354,9 +357,10 @@ Entree will create one  DATA_FORMAT object for this data point.
             "field":"name_modifier",
             "data":""
         }
-    ](full_name was detected as a label with composite fields ,check breakdownMap in the Breakdown Map section.)
+    ]
+**full_name** was detected as a label with composite fields ,check breakdownMap in the Breakdown Map section.
 
-*Note that the following DATA_FORMAT object will be shown in JSON*.
+*Note that the following DATA_FORMAT object will be shown in JSON (for easier readibility)*.
 
 ```
 {
@@ -400,7 +404,7 @@ Entree will create one  DATA_FORMAT object for this data point.
 - "column_description" -> "first name of employee" (value under the key column_description in the data point)
 - "breakdown" -> [] ( empty array because the label is not one of the keys in the breakdownMap and thus has no composite fields)
 
-*Note that the following DATA_FORMAT object will be shown in JSON*.
+*Note that the following DATA_FORMAT object will be shown in JSON (for easier readibility)*.
 
 ```
 {
