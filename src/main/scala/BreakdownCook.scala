@@ -19,7 +19,6 @@ object BreakdownCook extends ConfigReader {
     case (bdk, bdVec) =>  bdVec.map(bdField => bdField -> bdk)
   }
 
-
   def isKeyPresent(str:String): Boolean = bdMap.keySet.contains(str)
 
   def getCompositeFields(k:String):Vector[String] = bdMap.getOrElse(k,Vector[String]())

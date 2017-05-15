@@ -1,12 +1,15 @@
 # Entree
-Entree is a a data labeling and aggregation tool. It streams data from different files, data points are labeled and
+Entree is a a data labeling and aggregation tool. It downloads data from different files, data points are labeled and
 grouped together according to the assigned label.
-Individual data points are transformed into NDJSON format where the object parameters are defined by the user in
-user-input.json.
+Individual data points are transformed into NDJSON objects in which the keys( and its corresponding values)
+are defined by the user in user-input.json.
 Entree is able to read in files that are either in JSON or NDJSON format.
-Currently Entree works as a command line tool (clt), where the user defines the inputs a json
-config file (user-input.json). For more information about this config file, check [User-Input](./docs/User-Input.md)
+Currently Entree works as a command line tool (clt), where the user defines the most application inputs in a json
+config file (user-input.json). However, this application requires the user to specify three arguments as command
+line inputs ( see **Input** section) .
+ For more information about this config file, check [User-Input](./docs/User-Input.md)
 
+---
 ## Why?
 Data is messy and is defined in an inconsistent manner. Depending on the source, data that refer to the same concept
 (i.e email address, phone numbers, address etc..) can be stored with keys or column names that can be written in
@@ -14,7 +17,7 @@ a number of ways.
 For example, one dataset could use the column name "email_address" to store emails, while a different dataset
 could store the same information using the column name "email".
 The only way you can define that those column from both datasets are referring to the same "concept" is if they
-are tagged to the same label.
+are tagged as the same label.
 Entree contains this ability to look at the data point and identify a label.
 
 Whether you are training machine learning models or doing some analysis on Spark, you need to define the format
@@ -23,7 +26,7 @@ Other times, you want the object to contain more contextual information, like co
 of data if it is made of composite fields (i.e name has first name, middle name and last name).
 Entree takes your input on how to structure the data format object ( what parameters / fields it should contain) and
 stores the data accordingly.
-
+---
 
 ## How?
 Data labeling is done by maintaining a column field name map, which delineates the different ways that a certain
@@ -36,10 +39,10 @@ For example
 "phone_number" : ["phone_number","phonenumber","phone"],
 ...
 ```
-shows that any data point whose key or column name is _phone_number_ , _phonenumber_ and _phone_ will all
-be labeled as *phone_number*. For more information check [ColumnFieldName-Mapping](./docs/ColumnFieldName-Mapping.md)
+shows that any data point whose key or column name is **phone_number** , **phonenumber** and **phone** will all
+be labeled as **phone_number**. For more information check [ColumnFieldName-Mapping](./docs/ColumnFieldName-Mapping.md)
 
-### Label
+### Labels
 The following is a list of labels:
  - email_address
  - full_name
@@ -59,11 +62,10 @@ The following is a list of labels:
  - employer
  - all
 
-
-Entree aggregates and stores data into a defined object by looking at how the user defined the DATA_FORMAT object
+Entree aggregates and stores data into a defined object by looking at how the user defined the **DATA_FORMAT** object
 in user-input.json. Refer to [Data_Format](./docs/Data_Format.md) and  for more information.
 
-
+---
 ## Required
 ### sbt
 download sbt from here http://www.scala-sbt.org/
@@ -75,7 +77,6 @@ This clt requires three inputs:
   3. label or column field name that you want to format data for. If you want to label all column field names in your bucket use "all",
   else type the column field name ( i.e "email_address"). Entree will only accept labels that are stored as values in cfnMap.
 
-
 ## Output
 JSON data is aggregated into one or more files in NDJSON format, where each object has a series of key value pairs.
 The files are then saved back to S3.
@@ -84,6 +85,7 @@ The files are then saved back to S3.
         {"data":"foo","label":"bar","originalLabel":"baz"}
 ```
 
+---
 ## Getting started
 
 ### Compile

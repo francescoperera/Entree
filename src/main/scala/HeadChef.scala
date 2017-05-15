@@ -8,6 +8,7 @@ import io.circe.syntax._
 
 import scala.collection.mutable.ListBuffer
 import scala.util.Random
+
 sealed trait FileType
 case object JSON extends FileType
 case object NDJSON extends FileType
@@ -19,8 +20,6 @@ case class FieldAndMap(field: String, bdm: Map[String, Properties])
 object FieldAndMap{
   def apply(tp: (String, Map[String, Properties])) : FieldAndMap = FieldAndMap(tp._1,tp._2)
 }
-
-
 
 object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
   /** HeadChef is the main resource of Entree and will direct every other resource. */
