@@ -9,7 +9,6 @@ config file (user-input.json). However, this application requires the user to sp
 line inputs ( see **Input** section) .
  For more information about this config file, check [User-Input](./docs/User-Input.md)
 
----
 ## Why?
 Data is messy and is defined in an inconsistent manner. Depending on the source, data that refer to the same concept
 (i.e email address, phone numbers, address etc..) can be stored with keys or column names that can be written in
@@ -26,7 +25,7 @@ Other times, you want the object to contain more contextual information, like co
 of data if it is made of composite fields (i.e name has first name, middle name and last name).
 Entree takes your input on how to structure the data format object ( what parameters / fields it should contain) and
 stores the data accordingly.
----
+
 
 ## How?
 Data labeling is done by maintaining a column field name map, which delineates the different ways that a certain
@@ -66,6 +65,7 @@ Entree aggregates and stores data into a defined object by looking at how the us
 in user-input.json. Refer to [Data_Format](./docs/Data_Format.md) and  for more information.
 
 ---
+
 ## Required
 ### sbt
 download sbt from here http://www.scala-sbt.org/
@@ -86,6 +86,7 @@ The files are then saved back to S3.
 ```
 
 ---
+
 ## Getting started
 
 ### Compile
