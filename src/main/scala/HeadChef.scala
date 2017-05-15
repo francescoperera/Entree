@@ -235,25 +235,7 @@ object HeadChef extends JsonConverter with LazyLogging with ConfigReader {
                        aggLabel: Option[String] = None,
                        objVal: Option[String] = None,
                        bd: Option[Map[String, String]] = None): Option[JsonObject] = {
-//    val dataObject: Option[JsonObject] = userInputDF match {
-//      case None => None
-//      case Some(df) =>
-//        val dataMap: Map[String, Json] = df.map { case (key, properties) =>
-//          val dataVal = objVal match {
-//            case None => Some(obj.apply(colName).getOrElse(Json.Null).asString.getOrElse("").trim)
-//            case someVal => someVal
-//          }
-//          val colDesc: String = obj.apply("column_description").getOrElse(Json.Null).asString.getOrElse("")
-//          val label: Option[String] = aggLabel match {
-//            case None => Some(CFNMappingCook.getKeyFromVal(colName))
-//            case someLabel => someLabel
-//          }
-//          getKeyValuePair(properties, key, dataVal, label,colDesc,Some(colName),None, bd)
-//        }
-//        dataMap.asJson.asObject
-//    }
-//    dataObject
-    val dataFormat = userInputDF
+    val dataFormat: Map[String,Properties] = userInputDF
     val dataMap: Map[String, Json] = dataFormat.map { case (key, properties) =>
       val dataVal = objVal match {
         case None => Some(obj.apply(colName).getOrElse(Json.Null).asString.getOrElse("").trim)
