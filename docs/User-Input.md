@@ -29,7 +29,6 @@ This parameter is used to define the structure and format of the data objects us
 More information can be found in [Data_Format](./Data_Format.md)
 
 If no DATA_FORMAT object is defined, Entree will use the following default:
-
 ```
 val DF: Map[String,Properties] = Map (
     "data" -> Properties("value","String",None),
@@ -52,7 +51,6 @@ val BDMap: Map[String, Vector[String]] = Map (
       "state","zip_code")
   )
 ```
-
 
 ### Example
 ```
